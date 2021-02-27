@@ -371,7 +371,7 @@ function! s:TOhi(...) " {{{2
 	let l:colorschemes = exists('g:toimage_colorschemes') ?
 		\ ' ' . join(map(g:toimage_colorschemes,
 		\ '''"+'' . v:val . ''"''')) : ''
-	let l:string = 'view -E -N -u ~/.vimrc -s '
+	let l:string = 'view -E -N -u ~/.vim/vimrc -s '
 		\ . l:input . l:fold . l:nonumber . l:colorschemes
 		\ . ' "+runtime syntax/2image.vim" "+w! '
 		\ . l:output . '" "+qa!" >/dev/null'

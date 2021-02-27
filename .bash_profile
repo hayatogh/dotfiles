@@ -23,14 +23,14 @@ export GIT_PS1_SHOWUPSTREAM=auto
 export GIT_PS1_SHOWCOLORHINTS=1
 export GIT_PS1_HIDE_IF_PWD_IGNORED=1
 export HISTCONTROL=ignoreboth:erasedups
-export HISTSIZE=-1
+export HISTSIZE=2000
+export HISTTIMEFORMAT="%c : "
 if type fdfind &>/dev/null; then
 	export FZF_DEFAULT_COMMAND="fdfind --type f --hidden --follow --exclude .git"
 else
 	export FZF_DEFAULT_COMMAND="fd --type f --hidden --follow --exclude .git"
 fi
 export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --color='hl:9,hl+:9,spinner:16'"
-export HISTTIMEFORMAT="%c : "
 _PSJOBS()
 {
 	PSJOBS=$(jobs -p)

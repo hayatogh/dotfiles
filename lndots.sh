@@ -4,7 +4,7 @@
 dotfiles=$(realpath $(dirname ${BASH_SOURCE[0]}))
 uname=$(uname)
 
-files=".inputrc .profile .bash_profile .bashrc .bash_logout .Xresources .Xmodmap"
+files=".inputrc .profile .bash_profile .bashrc .bash_logout"
 files="$files .screenrc .infokey .gdbinit .vim .w3m .themes"
 dirsinconfig="git yapf emacs latexmk cheat"
 
