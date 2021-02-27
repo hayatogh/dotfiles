@@ -1,0 +1,19 @@
+remove mod1 = Alt_L
+remove lock = Caps_Lock
+
+keycode 64 = Mode_switch NoSymbol Mode_switch
+
+keycode 43 = h H Left Left
+keycode 44 = j J Down Down
+keycode 45 = k K Up Up
+keycode 46 = l L Right Right
+
+keycode 57 = n N Home Home
+keycode 58 = m M Next Next
+
+keycode  59 = comma less Prior Prior
+keycode  60 = period greater End End
+
+keycode 66 = Control_L
+
+add control = Control_L

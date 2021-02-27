@@ -1,0 +1,8 @@
+! xrdb ~/.Xresources
+XTerm*metaSendsEscape: true
+XTerm*saveLines: 4096
+! XTerm*background : black
+! XTerm*foreground : white
+XTerm*transparent: true
+XTerm*reverseVideo: on
+XTerm*cursorColor: green

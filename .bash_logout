@@ -1,0 +1,2 @@
+HISTSIZE=500
+true

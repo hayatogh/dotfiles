@@ -1,0 +1,1006 @@
+" header {{{1
+set encoding=utf-8
+scriptencoding utf-8
+let s:jailshell = &shell =~# 'jailshell'
+" set options {{{1
+set autoread
+set backspace=indent
+set belloff=backspace,cursor,error,showmatch,esc visualbell
+set showbreak=>\  breakindent breakindentopt=shift:14,min:22
+set ignorecase smartcase
+set casemap=keepascii
+set clipboard=unnamed,unnamedplus
+set colorcolumn=+1
+set completeopt=menu,menuone,preview
+set confirm
+set cursorline
+set diffopt=filler,vertical,closeoff
+set display=lastline
+set fileencodings=ucs-bom,utf-8,default,euc-jp,cp932
+set fileformats=unix,dos
+set fillchars=vert:│,fold:-
+set guioptions+=M
+set formatoptions+=mMj
+set guicursor=a:blinkon0
+set helplang=Ja,En
+set history=1000
+set smartindent autoindent
+" set list listchars=eol:￩,tab:»-,extends:»,precedes:«,nbsp:◦
+set list listchars=tab:»-,extends:»,precedes:«,nbsp:◦
+set showmatch matchtime=1 matchpairs+=「:」,（:）,『:』,【:】,［:］
+set modeline modelines=3
+set mouse=a mousemodel=extend
+if &term == 'screen-256color'
+	set mouse=
+endif
+set number relativenumber
+set pastetoggle=<F10>
+" path {{{2
+if has('linux') && !s:jailshell
+	set path+=include,./include,arch/x86/include,./arch/x86/include
+	let g:ale_c_gcc_options = '-fsyntax-only -std=gnu99'
+	let s:idirs = []
+	let s:pdir = '/lib/modules/' . substitute(system('uname -r'), '\n', '', '') . '/source'
+	let s:idir = s:pdir . '/include'
+	let s:idirs += [ s:idir ]
+	let s:idir = s:pdir . '/arch/x86/include'
+	let s:idirs += [ s:idir ]
+	if !empty(s:idirs)
+		for s:idir in s:idirs
+			execute "set path+=" . s:idir
+			" let g:ale_c_gcc_options .= ' -I' . s:idir
+		endfor
+	endif
+endif
+" }}}
+set pumheight=10
+set report=15
+set scrolloff=3 sidescroll=1 sidescrolloff=10
+set incsearch hlsearch nowrapscan
+if has('win32')
+	set shell=powershell
+	set shellcmdflag=-c
+	set shellquote=\"
+	set shellxquote=
+endif
+set shortmess=aoOtT
+set splitbelow splitright
+set suffixes+=.exe,.lock
+set suffixesadd=.tex
+set laststatus=2
+" statusline {{{2
+let g:CRLF = {'unix': 'LF', 'dos': 'CRLF', 'mac': 'CR'}
+let s:autoIminsertZero=1
+function! g:Imzero()
+	if s:autoIminsertZero | set iminsert=0 | endif
+	return ""
+endfunction
+function! g:Charcount()
+	return wordcount().chars - line('$')
+endfunction
+function! g:Bomb()
+	return &l:bomb ? '(bomb)' : ''
+endfunction
+function! g:Paste()
+	return &g:paste ? '<paste>' : ''
+endfunction
+" }}}
+set statusline=[%f]%<%h%m%r[%{&fileencoding}%{g:Bomb()}][%{g:CRLF[&fileformat]}][%Y][0x%02.4B]%{g:Paste()}%=%l,%c%V\ %P\ %LL%{g:Charcount()}C%{g:Imzero()}
+set showtabline=2
+" tabline {{{2
+" used hi Title ctermfg=166 in molokai.vim
+function! s:tablabel(tabpagenr)
+	let l:buflist = tabpagebuflist(a:tabpagenr)
+	let l:curbufnr = l:buflist[tabpagewinnr(a:tabpagenr) - 1]
+	let l:hi = a:tabpagenr == tabpagenr() ? '%#TabLineSel#' : '%#TabLine#'
+	let l:no = len(l:buflist) == 1 ? '' : len(l:buflist)
+	let l:mod = len(filter(copy(l:buflist), 'getbufvar(v:val, "&modified")')) ? '+' : ''
+	let l:sp = (l:no . l:mod) == '' ? '' : ' '
+	let l:fname = fnamemodify(bufname(l:curbufnr), ":.")
+	let l:fname1 = fnamemodify(bufname(l:curbufnr), ":~")
+	let l:fname = l:fname == '' ? '_'
+		\ : strchars(l:fname) <= strchars(l:fname1) ? l:fname
+		\ : l:fname1
+	return '%' . a:tabpagenr . 'T%#Title#' . l:no . l:hi . l:mod . l:sp . l:fname . '%#TabLineFill#'
+endfunction
+function! g:Cuitabline()
+	let l:tabpages = join(map(range(1, tabpagenr('$')), 's:tablabel(v:val)'), ' ')
+	let l:info = strftime('%m/%d%a %H:%M') . ' %#TabLine#' . fnamemodify(getcwd(), ":~") . ' '
+	return l:tabpages . ' %T%=' . l:info
+endfunction
+" }}}
+set tabline=%!Cuitabline()
+" set termguicolors
+set noexpandtab shiftwidth=0 tabstop=8
+set tags=./tags;./../../,tags;../../
+set ttimeoutlen=1
+let $MYVIM = fnamemodify($MYVIMRC, ':p:h')
+set viminfofile=$MYVIM/.viminfo directory=$MYVIM/swap
+set virtualedit=block
+set wildmenu wildignorecase wildmode=list:longest,full
+set wrap
+
+let g:c_comment_strings = 1
+let g:html_font = ['Consolas', 'Monaco']
+let g:html_pre_wrap = 0
+let g:mapleader = ' '
+let g:maplocalleader = ' '
+let g:vim_json_conceal = 0
+let g:rst_style = 1
+let g:rst_syntax_code_list = {
+	\ 'c'     : ['c'],
+	\ 'cpp'   : ['cpp', 'c++'],
+	\ 'java'  : ['java'],
+	\ 'json'  : ['json'],
+	\ 'lisp'  : ['lisp'],
+	\ 'perl'  : ['perl'],
+	\ 'php'   : ['php'],
+	\ 'python': ['python'],
+	\ 'sh'    : ['sh'],
+	\ 'vim'   : ['vim'],
+	\ }
+let g:rst_use_emphasis_colors = 1
+let g:rust_bang_comment_leader = 1
+let g:tex_flavor = 'latex'
+let g:tex_conceal = ''
+let g:vim_indent_cont = &shiftwidth
+
+if &term == 'xterm' || has('win32')
+	set t_Co=256
+endif
+if !has('win32')
+	let &t_VS = "\<Esc>]12;#00ffff\x7"
+	let &t_EI = &t_VS
+	let &t_SR = &t_VS
+	let &t_SI = &t_VS
+endif
+if has('win32unix')
+	let &t_TI = ""
+	let &t_TE = ""
+endif
+if $WSL_DISTRO_NAME != "" || $MSYSTEM != ""
+	let g:ImStatus = 0
+	function! g:ImStatusFunc()
+		return g:ImStatus
+	endfunction
+	set imstatusfunc=ImStatusFunc
+	function! g:ImActivateFunc(activate)
+		let g:ImStatus = a:activate ? 1 : 0
+		execute 'silent! !echo -ne ''\e[<' . g:ImStatus . 't''' | redraw!
+	endfunction
+	set imactivatefunc=ImActivateFunc
+endif
+let s:clipexe_ok = 0
+if executable("clip.exe") && has('linux')
+	let s:clipexe_ok = 1
+endif
+
+set <M-1>=1 <M-2>=2 <M-3>=3 <M-4>=4 <M-5>=5 <M-6>=6 <M-7>=7 <M-8>=8 <M-9>=9 <M-0>=0 <M-A>=a <M-B>=b <M-C>=c <M-D>=d <M-E>=e <M-F>=f <M-G>=g <M-H>=h <M-I>=i <M-J>=j <M-K>=k <M-L>=l <M-M>=m <M-N>=n <M-O>=o <M-P>=p <M-Q>=q <M-R>=r <M-S>=s <M-T>=t <M-U>=u <M-V>=v <M-W>=w <M-X>=x <M-Y>=y <M-Z>=z
+
+filetype plugin indent on
+syntax enable
+
+" mapping {{{1
+" echo "\200" <80>
+map Y y$
+
+nnoremap <silent> mm :<C-U>nohlsearch<CR>
+nnoremap <silent> mn :<C-U>Hi0<CR>
+
+nnoremap <C-W><C-H> :<C-U>execute "tabprevious " . v:count1<CR>
+nnoremap <C-W><C-J> :-tabedit<CR>
+nnoremap <C-W><C-K> :tabedit<CR>
+nnoremap <C-W><C-L> :<C-U>for i in range(1, v:count1) \| tabnext \| endfor<CR>
+nnoremap <C-W><C-E> :tablast \| :tabedit<CR>
+nnoremap <C-W><C-A> :tabrewind \| :-tabedit<CR>
+nnoremap <C-W><C-O> :tabonly<CR>
+nnoremap <C-W><C-Q> :tabclose<CR>
+nnoremap <C-W><C-T> :<C-U>execute "tabnext " . (v:count + 1)<CR>
+
+nnoremap <Plug>Blankline :call append(line('.'), '')<CR>j:call repeat#set("\<Plug>Blankline")<CR>
+nmap <Leader>o <Plug>Blankline
+
+nnoremap Q gq
+nnoremap <Leader>w :w<CR>
+nnoremap <Leader>n :n<CR>
+nnoremap <Leader>p :N<CR>
+nnoremap <Leader>c :clo<CR>
+
+function! s:ResetSearchDirection(cmd)
+	let @/=@/
+	nunmap n
+	nunmap N
+	return a:cmd
+endfunction
+function! s:ConsistentSearch(cmd)
+	nnoremap <expr> n <SID>ResetSearchDirection('n')
+	nnoremap <expr> N <SID>ResetSearchDirection('N')
+	return a:cmd
+endfunction
+nnoremap <expr> ? <SID>ConsistentSearch('?')
+nnoremap <expr> # <SID>ConsistentSearch('#')
+nnoremap <expr> g# <SID>ConsistentSearch('g#')
+function! s:Search(zero, word)
+	if a:zero == 0
+		let l:pat = '\<' . a:word . '\>'
+	else
+		let l:pat = a:word
+	endif
+	call histadd("/", l:pat)
+	let @/=l:pat
+	call <SID>copytoScreenReg(a:word)
+endfunction
+nnoremap <silent> <Plug>Star0 :call <SID>Search(0, expand('<cword>'))<CR>"_yiw<BS>
+nnoremap <silent> <Plug>Star1 :call <SID>Search(1, expand('<cword>'))<CR>"_yiw<BS>
+nmap *  <Plug>Star0n
+nmap g* <Plug>Star1n
+nnoremap g/ /\<\><Left><Left>
+
+if has('win32')
+	silent! vunmap <C-X>
+endif
+
+inoremap <C-U> <C-G>u<C-U>
+inoremap <M-9> (
+inoremap <M-0> )
+
+function! g:RestoreRegister()
+	silent! let @* = s:restore_reg
+	silent! let @+ = s:restore_reg
+	let @" = s:restore_reg
+	return ''
+endfunction
+function! s:Repl()
+	silent! let s:restore_reg = @*
+	silent! let s:restore_reg = @+
+	let s:restore_reg = @"
+	return "p@=RestoreRegister()\<CR>"
+endfunction
+vnoremap <expr> p <SID>Repl()
+
+function! s:getfname()
+	let l:fname = fnamemodify(bufname(), ':t') . ':' . getcurpos()[1]
+	silent! let @* = l:fname
+	silent! let @+ = l:fname
+	if &term =~# 'screen'
+		call system('screen -X register . ' . l:fname)
+	endif
+	return l:fname
+endfunction
+command! Getfname echo s:getfname()
+nnoremap <silent> yd :<C-U>echo <SID>getfname()<CR>
+
+cnoremap <Left> <Space><BS><Left>
+cnoremap <Right> <Space><BS><Right>
+cnoremap <C-P> <Up>
+cnoremap <C-N> <Down>
+cnoremap <Up> <C-P>
+cnoremap <Down> <C-N>
+cnoremap <C-A> <Home>
+cnoremap <C-O> <C-P>
+cnoremap <C-B> <C-E><C-U>
+
+nnoremap <M-K> <C-W>+
+nnoremap <M-J> <C-W>-
+nnoremap <M-L> <C-W>>
+nnoremap <M-H> <C-W><
+cnoremap <M-B> <S-Left>
+cnoremap <M-F> <S-Right>
+
+nmap ysa' ys2i'
+nmap ysa" ys2i"
+nmap ysa` ys2i`
+
+nmap <Leader>0 :<C-U>Hi0<CR>
+nmap <Leader>1 :<C-U>Hi1 <C-R><C-W><CR>
+nmap <Leader>2 :<C-U>Hi2 <C-R><C-W><CR>
+nmap <Leader>3 :<C-U>Hi3 <C-R><C-W><CR>
+nmap <Leader>4 :<C-U>Hi4 <C-R><C-W><CR>
+nmap <Leader>5 :<C-U>Hi5 <C-R><C-W><CR>
+nmap <Leader>6 :<C-U>Hi6 <C-R><C-W><CR>
+
+tnoremap <C-W><C-H> <C-W>:<C-U>execute "tabprevious " . v:count1<CR>
+tnoremap <C-W><C-J> <C-W>:-tabnew<CR>
+tnoremap <C-W><C-K> <C-W>:tabnew<CR>
+tnoremap <C-W><C-L> <C-W>:<C-U>for i in range(1, v:count1) \| tabnext \| endfor<CR>
+tnoremap <C-W><C-E> <C-W>:tablast \| :tabedit<CR>
+tnoremap <C-W><C-A> <C-W>:tabrewind \| :-tabedit<CR>
+tnoremap <C-W><C-O> <C-W>:tabonly<CR>
+tnoremap <C-W><C-Q> <C-W>:tabclose<CR>
+tnoremap <C-W><C-T> <C-W>:<C-U>execute "tabnext " . (v:count + 1)<CR>
+
+" excommand {{{1
+command! DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis | wincmd p | diffthis
+
+command! Gccandrun !gcc % && ./a.out
+
+function! s:gccrunandread() " {{{2
+	set paste
+	execute "normal! o/*\<CR>*/\<ESC>k"
+	set nopaste
+	w
+	!gcc %
+	r!./a.out
+endfunction
+" }}}
+command! Gccrunandread call s:gccrunandread()
+
+function! s:readTypescript() " {{{2
+	let l:ts = map(readfile("typescript")[1:-3], {_, val -> substitute(val, '\s\+$', '', '')})
+	if &ft == 'c'
+		let l:ts = ['/*'] + l:ts + ['*/']
+	endif
+	call append(getpos('.')[1], l:ts)
+endfunction
+" }}}
+command! Typesc call s:readTypescript()
+
+function! s:Executepdfplatex() " {{{2
+	if "tex" == &filetype
+		execute("\!C:\\w32tex\\bin\\pdfplatex.bat\ " . expand("%:p"))
+		execute("\!start\ \"C:\\Program\ Files\\Tracker\ Software\\" . "PDF\ Editor\\PDFXEdit.exe\" " . expand("%:r").".pdf")
+	endif
+endfunction
+" }}}
+command! Pdfplatex call s:Executepdfplatex()
+
+command! Hitest runtime syntax/hitest.vim
+command! Colortest source $VIMRUNTIME/syntax/colortest.vim
+
+command! -nargs=0 Cdhere cd %:p:h
+
+function! s:FixWhitespace(line1,line2) " {{{2
+	let l:save_cursor = getpos(".")
+	silent! execute ':' . a:line1 . ',' . a:line2 . 's/\\\@<!\s\+$//'
+	call setpos('.', l:save_cursor)
+endfunction " }}}
+command! -range=% FixWhitespace call s:FixWhitespace(<line1>,<line2>)
+
+function! s:TOhi(...) " {{{2
+	if a:0 == 0
+		let l:input = escape(expand('%'), ' ')
+	else
+		let l:input = a:1
+	endif
+	let l:output = l:input . '.html'
+	let g:toimage_lastoutput = l:output
+	let l:fold = exists('g:toimage_fold') && g:toimage_fold ?
+		\ ' "+set foldmethod=marker foldlevel=0"' : ''
+	let l:nonumber = exists('g:toimage_nonumber') && g:toimage_nonumber ?
+		\ ' "+set nonumber norelativenumber"' : ''
+	let l:colorschemes = exists('g:toimage_colorschemes') ?
+		\ ' ' . join(map(g:toimage_colorschemes,
+		\ '''"+'' . v:val . ''"''')) : ''
+	let l:string = 'view -E -N -u ~/.vimrc -s '
+		\ . l:input . l:fold . l:nonumber . l:colorschemes
+		\ . ' "+runtime syntax/2image.vim" "+w! '
+		\ . l:output . '" "+qa!" >/dev/null'
+	call system(l:string)
+	call s:TOi()
+endfunction " }}}
+command! -nargs=? -complete=file TOhi call s:TOhi(<f-args>)
+function! s:TOi(...) " {{{2
+	if a:0 == 0
+		if !exists('g:toimage_lastoutput') | return | endif
+		let l:input = g:toimage_lastoutput
+	else
+		let l:input = a:1
+	endif
+	let l:output = fnamemodify(l:input, ':r') . '.' . g:toimage_output
+	let l:string = g:toimage_wkhtmltoimage . ' -q --width 0 ' . l:input . ' ' . l:output
+	call system(l:string)
+endfunction " }}}
+command! -nargs=? -complete=file TOi call s:TOi(<f-args>)
+
+function! s:XXD(do) " {{{2
+	if a:do
+		let b:save_ft_binary = [&filetype, &l:binary]
+		let &binary = 1
+		silent edit " for binary to take effect
+		let &ft = "xxd"
+		%!xxd
+	else
+		if exists('b:save_ft_binary')
+			let [&filetype, &l:binary] = b:save_ft_binary
+			unlet b:save_ft_binary
+		endif
+		%!xxd -r
+	endif
+endfunction " }}}
+command! XXD call s:XXD(1)
+command! XXDundo call s:XXD(0)
+
+function! s:multiHlSetup() " {{{2
+	highlight Multihl1 ctermbg=14 ctermfg=8 guibg=#00ffff guifg=#808080
+	highlight Multihl2 ctermbg=13 ctermfg=8 guibg=#ff00ff guifg=#808080
+	highlight Multihl3 ctermbg=11 ctermfg=8 guibg=#ffff00 guifg=#808080
+	highlight Multihl4 ctermbg=1  ctermfg=7 guibg=#800000 guifg=#c0c0c0
+	highlight Multihl5 ctermbg=4  ctermfg=7 guibg=#000080 guifg=#c0c0c0
+	highlight Multihl6 ctermbg=2  ctermfg=7 guibg=#008000 guifg=#c0c0c0
+endfunction
+function! s:Hi(num, ...)
+	if a:num == 0
+		call clearmatches()
+	else
+		silent! call matchdelete(a:num + 5)
+		if a:0 != 0
+			call matchadd("Multihl" . a:num, a:1, 10, a:num + 5)
+			call histadd(":", "Hi" . a:num . " " . a:1)
+			return
+		endif
+	endif
+	call histadd(":", "Hi" . a:num)
+endfunction " }}}
+command! -nargs=0 Hi0 call s:Hi(0)
+command! -nargs=? Hi1 call s:Hi(1, <f-args>)
+command! -nargs=? Hi2 call s:Hi(2, <f-args>)
+command! -nargs=? Hi3 call s:Hi(3, <f-args>)
+command! -nargs=? Hi4 call s:Hi(4, <f-args>)
+command! -nargs=? Hi5 call s:Hi(5, <f-args>)
+command! -nargs=? Hi6 call s:Hi(6, <f-args>)
+
+function! s:ManPager() " {{{2
+	setlocal filetype=man
+	runtime ftplugin/man.vim
+	silent keepjumps keeppatterns %s/\v(.)\b\ze\1?//ge
+	silent keepjumps keeppatterns %s/\v\e\[([0-9]{1,2}(;[0-9]{1,2})?)?m//ge
+	call cursor(1, 1)
+	" let n = search(".*(.*)", "c")
+	" if n > 1 | exe "1," . n-1 . "d" | endif
+	setlocal nonumber norelativenumber nomodified nomodifiable noswapfile
+	setlocal bufhidden=hide nobuflisted buftype=nofile nofoldenable
+endfunction " }}}
+command! -nargs=0 MYMANPAGER call s:ManPager() | delcommand MYMANPAGER
+
+function! s:Align(cmd, line1, line2, ...) " {{{2
+	let l:save_cursor = getcurpos()
+	if a:0 == 0
+		let l:char = input("")
+	else
+		let l:char = a:1
+	endif
+	execute 'normal ' . a:line1 . 'GV' . a:line2 . 'G' . a:cmd . l:char
+	call setpos('.', l:save_cursor)
+endfunction " }}}
+command! -range -nargs=? AlignRight call s:Align('gL', <line1>, <line2>, <f-args>)
+command! -range -nargs=? AlignLeft call s:Align('gl', <line1>, <line2>, <f-args>)
+
+command! -nargs=0 Reload let s:undoreload = &undoreload | set undoreload=0 | edit | let &undoreload = s:undoreload
+
+function! s:Nkf() " {{{2
+	let l:fname = fnamemodify(expand("%"), ":p")
+	if executable("uchardet")
+		let l:enc = system("uchardet " . l:fname)
+	elseif executable("nkf")
+		let l:enc = system("nkf --guess=1 " . l:fname)
+	else
+		echoerr "uchardet or nkf must be installed!"
+		return
+	endif
+	execute "e ++enc=" . l:enc
+endfunction " }}}
+command! -nargs=0 Nkf call s:Nkf()
+
+function! s:CommandPreview(...) " {{{2
+	let l:shcmdflag = has('win32') ? &shellcmdflag : '-ic'
+	let l:cmd = &shell . ' ' . l:shcmdflag . ' "' . join(a:000) . '"'
+	let l:opt = { "hidden": 1, "term_finish": "open", "term_opencmd": "botright sbuf %d | setl modifiable" }
+	call term_start(l:cmd, l:opt)
+endfunction
+function! s:BashComp(ArgLead, CmdLine, CursorPos)
+	let l:str = strpart(a:CmdLine, 0, a:CursorPos)
+	let l:str = substitute(l:str, '^S ', '', '')
+	return g:bash#complete(l:str)
+endfunction " }}}
+if has('win32')
+	command! -nargs=* -complete=file S call s:CommandPreview(<f-args>)
+else
+	command! -nargs=* -complete=customlist,s:BashComp S call s:CommandPreview(<f-args>)
+endif
+
+function! s:Template() " {{{2
+	let l:template = {
+		\ 'c'     : ['#include <stdio.h>', '', 'int main(void) {', '	printf("Hello\n");', '	return 0;', '}'],
+		\ 'go'    : ['package main', '', 'import "fmt"', '', 'func main() {', '	fmt.Println("Hello")', '}'],
+		\ 'perl'  : '#!/usr/bin/env perl',
+		\ 'python': '#!/usr/bin/env python3',
+		\ 'sh'    : '#!/usr/bin/env bash',
+		\ }
+	if !executable('python3')
+		let l:template['python'] = '#!/usr/bin/env python'
+	endif
+	let l:after = {
+		\ 'c' : 'call setpos(''.'', [0, 4, 2, 2])',
+		\ 'go': 'call setpos(''.'', [0, 6, 2, 2])',
+		\ }
+	if has_key(l:template, &filetype)
+		call append(0, l:template[&filetype])
+		if getline('$') == ''
+			$delete _
+		endif
+		if has_key(l:after, &filetype)
+			execute(l:after[&filetype])
+		endif
+		echon ' Template loaded'
+	endif
+endfunction " }}}
+command! -nargs=0 Template call s:Template()
+" autocommand {{{1
+command! AUTOiminsertzero let s:autoIminsertZero = !s:autoIminsertZero
+
+command! AUTOhltrailingwhitespaces call s:toggleAutoHlTrailingWhiteSpaces()
+let s:autoHlTrailingWhiteSpaces = 1
+function! s:toggleAutoHlTrailingWhiteSpaces()
+	let s:autoHlTrailingWhiteSpaces = !s:autoHlTrailingWhiteSpaces
+	call s:hlTrailingWhiteSpace(1)
+endfunction
+function! s:hlTrailingWhiteSpace(isNormal)
+	silent! call matchdelete(4)
+	if !s:autoHlTrailingWhiteSpaces | return | endif
+	if a:isNormal
+		call matchadd("ExtraWhitespace", '\\\@<!\s\+$', 10, 4)
+	else
+		call matchadd("ExtraWhitespace", '\\\@<!\s\+\%#\@<!$', 10, 4)
+	endif
+endfunction
+
+command! AUTOhlideographicspace call s:toggleAutoHlIdeographicSpace()
+let s:autoHlIdeographicSpace = 1
+function! s:toggleAutoHlIdeographicSpace()
+	let s:autoHlIdeographicSpace = !s:autoHlIdeographicSpace
+	call s:hlIdeographicSpace()
+endfunction
+function! s:hlIdeographicSpace()
+	silent! call matchdelete(5)
+	if !s:autoHlIdeographicSpace | return | endif
+	call matchadd("IdeographicSpace", '[\u3000]', 10, 5)
+endfunction
+
+command! AUTOhalfcommas let s:autoHalfCommas = !s:autoHalfCommas
+let s:autoHalfCommas = 1
+function! s:halfCommas()
+	if !s:autoHalfCommas | return | endif
+	let l:curpos = getcurpos()
+	silent! keeppatterns %s/，\+$/\=repeat(',', strchars(submatch(0)))/g
+	silent! keeppatterns %s/．\+$/\=repeat('.', strchars(submatch(0)))/g
+	silent! keeppatterns %s/，\+\ze /\=repeat(',', strchars(submatch(0)))/g
+	silent! keeppatterns %s/．\+\ze /\=repeat('.', strchars(submatch(0)))/g
+	silent! keeppatterns %s/，\+/\=repeat(',', strchars(submatch(0))) . ' '/g
+	silent! keeppatterns %s/．\+/\=repeat('.', strchars(submatch(0))) . ' '/g
+	call setpos('.', l:curpos)
+endfunction
+
+command! AUTOconvertpunctuation let s:autoConvertPunctuation = !s:autoConvertPunctuation
+let s:autoConvertPunctuation = 0
+function! s:convertPunctuation()
+	if !s:autoConvertPunctuation | return | endif
+	let l:curpos = getcurpos()
+	silent! keeppatterns %s/．/。/g
+	silent! keeppatterns %s/，/、/g
+	silent! keeppatterns %s/\.\.\./…/g
+	" ―
+	call setpos('.', l:curpos)
+endfunction
+
+function! s:copytoScreenRegUnnamed()
+	if v:event.regname == ''
+		call <SID>copytoScreenReg(join(v:event.regcontents))
+	endif
+endfunction
+function! s:copytoScreenReg(str)
+	if &term =~# 'screen'
+		let l:escaped = escape(a:str, '\$^')
+		if len(l:escaped) <= 749
+			call job_start(["screen", "-X", "register", ".", l:escaped])
+		endif
+	endif
+	if s:clipexe_ok
+		let l:escaped = shellescape(a:str)
+		let l:escaped = substitute(l:escaped, '\\\$', '$', 'g')
+		call job_start(["/bin/sh", "-c", "echo -n " . l:escaped . " | clip.exe"])
+	endif
+endfunction
+
+augroup vimrc
+	autocmd!
+	autocmd BufRead,BufNewFile * if &ft == 'asm' | set ft=gas | endif
+	autocmd BufRead,BufNewFile *.lalrpop set ft=lalrpop
+
+	autocmd Colorscheme * highlight Cursor guifg=Black guibg=Cyan
+	autocmd Colorscheme * highlight CursorIM guifg=Black guibg=Magenta
+
+	autocmd BufReadPost * if line("'\"") >= 1 && line("'\"") <= line("$") && &ft !~# 'commit' | exe "normal! g`\"" | endif
+
+	autocmd CmdwinEnter * nnoremap <buffer> <F5> :let g:CmdWindowLineMark=line(".")<CR><CR>q::execute "normal ".g:CmdWindowLineMark."G"<CR>
+
+	autocmd ColorScheme * highlight ExtraWhitespace ctermbg=darkred guibg=darkred
+	autocmd BufEnter,BufRead,BufNew * call s:hlTrailingWhiteSpace(1)
+	autocmd InsertLeave * call s:hlTrailingWhiteSpace(1)
+	autocmd InsertEnter * call s:hlTrailingWhiteSpace(0)
+
+	autocmd Colorscheme * highlight IdeographicSpace term=underline ctermbg=DarkGreen guibg=DarkGreen
+	autocmd BufEnter,BufRead,BufNew * call s:hlIdeographicSpace()
+
+	autocmd Colorscheme * call s:multiHlSetup()
+
+	autocmd BufWritePre *.tex call s:halfCommas()
+
+	autocmd TextYankPost * call s:copytoScreenRegUnnamed()
+
+	autocmd BufWritePre *.txt call s:convertPunctuation()
+
+	autocmd BufNewFile *.go,*.pl,*.py,*.sh call s:Template()
+augroup END " }}}
+" pack {{{1
+" minpac {{{2
+function! s:Minpac()
+	if !exists('*minpac#init')
+		if s:jailshell | return | endif
+		call system('git clone --depth 1 -- git://github.com/matsuhav/minpac.git ' . $HOME . '/.vim/pack/minpac/opt/minpac')
+		packadd minpac
+	endif
+	call minpac#init({'jobs': s:jailshell ? 1 : 8, 'autoyes': 1})
+	call minpac#add('matsuhav/minpac', {'type': 'opt'})
+	call minpac#add('vim-jp/syntax-vim-ex')
+	" call minpac#add('nathanaelkane/vim-indent-guides')
+	call minpac#add('tpope/vim-commentary')
+	call minpac#add('vimoutliner/vimoutliner')
+	call minpac#add('szw/vim-tags')
+	call minpac#add('lervag/vimtex')
+	call minpac#add('kana/vim-textobj-user')
+	call minpac#add('kana/vim-operator-user')
+	call minpac#add('kana/vim-textobj-indent')
+	call minpac#add('previm/previm')
+	call minpac#add('tpope/vim-fugitive')
+	call minpac#add('cohama/lexima.vim')
+	call minpac#add('guns/xterm-color-table.vim')
+	call minpac#add('chrisbra/csv.vim')
+	call minpac#add('scrooloose/nerdtree')
+	call minpac#add('matsuhav/vim-surround')
+	call minpac#add('luochen1990/rainbow')
+	call minpac#add('vim-jp/vimdoc-ja')
+	call minpac#add('tomasr/molokai')
+	call minpac#add('vim-jp/autofmt')
+	call minpac#add('thinca/vim-quickrun')
+	call minpac#add('Yggdroot/indentLine')
+	call minpac#add('tpope/vim-repeat')
+	call minpac#add('Shirk/vim-gas')
+	call minpac#add('NLKNguyen/papercolor-theme')
+	call minpac#add('HiPhish/info.vim')
+	call minpac#add('dense-analysis/ale')
+	" call minpac#add('lifepillar/vim-colortemplate')
+	call minpac#add('matsuhav/w3m.vim')
+	call minpac#add('nelstrom/vim-mac-classic-theme')
+	call minpac#add('PProvost/vim-ps1')
+	call minpac#add('kchmck/vim-coffee-script')
+	call minpac#add('tpope/vim-markdown')
+	call minpac#add('tommcdo/vim-lion')
+	call minpac#add('kana/vim-tabpagecd')
+	call minpac#add('terryma/vim-multiple-cursors')
+	call minpac#add('tpope/vim-eunuch')
+	call minpac#add('editorconfig/editorconfig-vim', {'submodule': 0})
+	call minpac#add('mattn/emmet-vim', {'submodule': 0})
+	call minpac#add('junegunn/fzf.vim')
+	call minpac#add('glts/vim-magnum')
+	call minpac#add('glts/vim-radical')
+	call minpac#add('vim-python/python-syntax')
+	call minpac#add('gluon-lang/vim-gluon')
+	call minpac#add('matsuhav/vim-bash-completion')
+	call minpac#add('wlangstroth/vim-racket')
+	call minpac#add('cespare/vim-toml')
+	call minpac#clean()
+	call minpac#update()
+endfunction
+
+command! MinLoad silent! source $MYVIMRC | call s:Minpac()
+" }}}
+" previm {{{2
+let g:previm_enable_realtime = 1
+if has('win32')
+	let g:previm_open_cmd = '"C:\Program Files\Firefox Developer Edition\firefox.exe"'
+elseif has('win32unix')
+	let g:previm_open_cmd = '"/c/Program Files/Firefox Developer Edition/firefox.exe"'
+elseif has('mac')
+	let g:previm_open_cmd = 'open -a Firefox'
+else
+	let g:previm_open_cmd = 'firefox'
+endif
+let g:loaded_previm = 1
+augroup Previm
+	autocmd!
+	autocmd FileType *{mkd,markdown,rst,textile,asciidoc}* command! -buffer -nargs=0 PrevimOpen unlet g:loaded_previm | runtime plugin/previm.vim | doautocmd Previm FileType | PrevimOpen
+augroup END
+" }}}
+" vimtex {{{2
+if has('win32')
+	let g:vimtex_view_general_viewer = 'SumatraPDF'
+	let g:vimtex_view_general_options_latexmk = '-reuse-instance'
+	let g:vimtex_view_general_options = '-reuse-instance -forward-search @tex @line @pdf'
+elseif has('mac')
+	let g:vimtex_view_general_viewer = 'evince'
+endif
+nmap <LocalLeader>ls <plug>(vimtex-compile-ss)
+" }}}
+" lexima {{{2
+let g:lexima_enable_basic_rules = 0
+let g:lexima_enable_newline_rules = 0
+let g:lexima_enable_space_rules = 0
+let g:lexima_enable_endwise_rules = 0
+let g:lexima_map_escape=''
+" }}}
+" quickrun {{{2
+let g:quickrun_config = {
+	\ '_': {
+	\         'outputter/buffer/split': 'botright',
+	\         'outputter/buffer/running_mark': 'running...',
+	\         'outputter/buffer/close_on_empty': 1,
+	\         'runner': 'job',
+	\ },
+	\ 'scheme': {
+	\         'command': 'chezscheme',
+	\         'exec': '%c --script %s',
+	\ },
+	\ 'rust': {
+	\         'command': 'runner',
+	\         'exec': '%c %s %o',
+	\ },
+	\ }
+if has('win32')
+	let g:quickrun_config.scheme = {
+		\ 'command': 'C:\Program Files\Racket\mzscheme.exe',
+		\ 'exec': '%c %o -e ''(load "%s")'' %a',
+		\ }
+elseif has('osxdarwin')
+	let g:quickrun_config.scheme.command = 'chez'
+endif
+" }}}
+" indentLine {{{2
+let g:indentLine_enabled = 0
+let g:indentLine_fileTypeExclude = ['c', 'cpp', 'vim', 'help', 'man', 'text']
+let g:indentLine_char = '▏'
+" }}}
+" 2html {{{2
+if !has('win32unix')
+	let g:toimage_wkhtmltoimage = '/c/ProgramData/chocolatey/bin/wkhtmltoimage.exe'
+else
+	let g:toimage_wkhtmltoimage = 'wkhtmltoimage'
+endif
+let g:toimage_font_size = '20pt'
+let g:toimage_no_hyperlinks = 1
+let g:toimage_additionalCss = [
+	\ '.underlined { text-decoration: underline;',
+	\ '              text-decoration-color: red;',
+	\ '}'
+	\ ]
+let g:toimage_nonumber = 1
+let g:toimage_fold = 1
+let g:toimage_colorschemes = [
+	\ 'set background=light',
+	\ 'colorscheme PaperColor',
+	\ 'RainbowToggleOff'
+	\ ]
+let g:toimage_output = 'png'
+" }}}
+" ale {{{2
+nmap <Leader>j <Plug>(ale_next)
+nmap <Leader>k <Plug>(ale_previous)
+nmap <Leader>t <Plug>(ale_toggle)
+nmap <Leader>b <Plug>(ale_toggle_buffer)
+nmap <Leader>h <Plug>(ale_hover)
+nmap <Leader>d <Plug>(ale_detail)
+
+function! g:Tjump()
+	if tagfiles() == []
+		return ":ALEGoToDefinition\<CR>"
+	else
+		return "g\<C-]>"
+	endif
+endfunction
+function! g:Tjumpsp()
+	if tagfiles() == []
+		return ":ALEGoToDefinition -split\<CR>"
+	else
+		return "\<C-W>g\<C-]>"
+	endif
+endfunction
+for s:tagcmd in ['<C-]>', 'g]', 'g<C-]>']
+	execute 'nnoremap <expr> ' . s:tagcmd . ' g:Tjump()'
+	execute 'vnoremap <expr> ' . s:tagcmd . ' g:Tjump()'
+endfor
+for s:tagcmd in ['<C-W>]', '<C-W><C-]>', '<C-W>g]', '<C-W>g<C-]>']
+	execute 'nnoremap <expr> ' . s:tagcmd . ' g:Tjumpsp()'
+	execute 'vnoremap <expr> ' . s:tagcmd . ' g:Tjumpsp()'
+endfor
+
+let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
+let g:ale_linters = {
+	\ 'tex'   : ['chktex'],
+	\ 'c'     : [],
+	\ 'cpp'   : [],
+	\ 'python': ['mypy', 'pyls'],
+	\ 'go'    : ['govet', 'gopls'],
+	\ 'rust'  : ['rls', 'cargo']
+	\ }
+let g:ale_fixers = {
+	\ 'python': ['isort', 'yapf'],
+	\ 'go'    : ['gofmt', 'goimports'],
+	\ 'rust'  : ['rustfmt']
+	\ }
+let g:ale_python_mypy_options = '--ignore-missing-imports'
+let g:ale_rust_cargo_use_clippy = executable('cargo-clippy')
+let g:ale_completion_enabled = 1
+let g:ale_fix_on_save = 1
+let g:ale_hover_cursor = 0
+if has('win32unix')
+	let g:ale_enabled = 0
+endif
+" }}}
+" vim-markdown {{{2
+let g:markdown_fenced_languages = ['html', 'python', 'bash=sh', 'c', 'cpp']
+let g:markdown_syntax_conceal = 0
+" }}}
+" vim-surround {{{2
+let g:surround_dict = {
+	\ 'U' : 'https://\r/',
+	\ 'mk': '「\r」',
+	\ 'mn': '『\r』',
+	\ 'mb': '（\r）',
+	\ 'ms': '【\r】',
+	\ 'ma': '［\r］',
+	\ }
+" }}}
+" fzf {{{2
+if has('win32unix')
+	function! s:FzyCommand(choice_command, vim_command)
+		try
+			let output = system(a:choice_command . ' | fzy ')
+		catch /Vim:Interrupt/
+		endtry
+		redraw!
+		if v:shell_error == 0 && !empty(output)
+			exec a:vim_command . ' ' . output
+		endif
+	endfunction
+	let g:fzycmd = environ()['FZF_DEFAULT_COMMAND']
+	nnoremap <leader>fe :call <SID>FzyCommand(g:fzycmd, 'e')<CR>
+	nnoremap <leader>fv :call <SID>FzyCommand(g:fzycmd, 'vs')<CR>
+	nnoremap <leader>fs :call <SID>FzyCommand(g:fzycmd, 'sp')<CR>
+	nnoremap <leader>ft :call <SID>FzyCommand(g:fzycmd, 'tabe')<CR>
+else
+	if has('osxdarwin')
+		silent! source /usr/local/opt/fzf/plugin/fzf.vim
+	else
+		silent! source /usr/share/doc/fzf/examples/fzf.vim
+	endif
+	function! g:FzfLayout()
+		execute 'botright ' . float2nr(&lines * 0.4) . 'new'
+	endfunction
+	let g:fzf_layout = {'window': 'call g:FzfLayout()'}
+	nnoremap <leader>fe :call fzf#run(fzf#wrap({'sink': 'e'}))<CR>
+	nnoremap <leader>fv :call fzf#run(fzf#wrap({'sink': 'vs'}))<CR>
+	nnoremap <leader>fs :call fzf#run(fzf#wrap({'sink': 'sp'}))<CR>
+	nnoremap <leader>ft :call fzf#run(fzf#wrap({'sink': 'tabe'}))<CR>
+endif
+" }}}
+" rainbow vim-gas vim-lion emmet python-syntax {{{2
+let g:rainbow_active = 1
+let g:gasCppComments = 1
+let g:lion_squeeze_spaces = 1
+let g:user_emmet_leader_key='<C-K>'
+let g:python_highlight_all = 1
+" }}}
+" after let g:var
+" variables for startup behavior must be set before this line
+packloadall!
+packadd matchit
+silent! packadd termdebug
+silent! packadd minpac
+runtime ftplugin/man.vim
+" lexima {{{2
+" default_rules {{{3
+let s:rulelist = [
+	\ {'char': '(', 'input_after': ')'},
+	\ {'char': '(', 'at': '\\\%#'},
+	\ {'char': ')', 'at': '\%#)', 'leave': 1},
+	\ {'char': '<BS>', 'at': '(\%#)', 'delete': 1},
+	\ {'char': '<C-H>', 'at': '(\%#)', 'delete': 1},
+	\ {'char': '{', 'input_after': '}'},
+	\ {'char': '}', 'at': '\%#}', 'leave': 1},
+	\ {'char': '<BS>', 'at': '{\%#}', 'delete': 1},
+	\ {'char': '<C-H>', 'at': '{\%#}', 'delete': 1},
+	\ {'char': '[', 'input_after': ']'},
+	\ {'char': '[', 'at': '\\\%#'},
+	\ {'char': ']', 'at': '\%#]', 'leave': 1},
+	\ {'char': '<BS>', 'at': '\[\%#\]', 'delete': 1},
+	\ {'char': '<C-H>', 'at': '\[\%#\]', 'delete': 1},
+	\ ]
+" }}}
+" default_rules 2 {{{3
+let s:rulelist += [
+	\ {'char': '"', 'input_after': '"'},
+	\ {'char': '"', 'at': '\%#"', 'leave': 1},
+	\ {'char': '"', 'at': '\\\%#'},
+	\ {'char': '"', 'at': '^\s*\%#', 'filetype': 'vim'},
+	\ {'char': '"', 'at': '\%#\s*$', 'filetype': 'vim'},
+	\ {'char': '<BS>', 'at': '"\%#"', 'delete': 1},
+	\ {'char': '<C-H>', 'at': '"\%#"', 'delete': 1},
+	\ {'char': '"', 'at': '""\%#', 'input_after': '"""'},
+	\ {'char': '"', 'at': '\%#"""', 'leave': 3},
+	\ {'char': '<BS>', 'at': '"""\%#"""', 'input': '<BS><BS><BS>', 'delete': 3},
+	\ {'char': '<C-H>', 'at': '"""\%#"""', 'input': '<BS><BS><BS>', 'delete': 3},
+	\ {'char': "'", 'input_after': "'"},
+	\ {'char': "'", 'at': '\%#''', 'leave': 1},
+	\ {'char': "'", 'at': '\w\%#''\@!'},
+	\ {'char': "'", 'at': '\\\%#'},
+	\ {'char': "'", 'at': '\\\%#', 'leave': 1, 'filetype': ['vim', 'sh', 'csh', 'ruby', 'tcsh', 'zsh']},
+	\ {'char': "'", 'filetype': ['haskell', 'lisp', 'clojure', 'ocaml', 'scala', 'rust', 'scheme', 'text']},
+	\ {'char': '<BS>', 'at': "'\\%#'", 'delete': 1},
+	\ {'char': '<C-H>', 'at': "'\\%#'", 'delete': 1},
+	\ {'char': "'", 'at': "''\\%#", 'input_after': "'''"},
+	\ {'char': "'", 'at': "\\%#'''", 'leave': 3},
+	\ {'char': '<BS>', 'at': "'''\\%#'''", 'input': '<BS><BS><BS>', 'delete': 3},
+	\ {'char': '<C-H>', 'at': "'''\\%#'''", 'input': '<BS><BS><BS>', 'delete': 3},
+	\ {'char': '`', 'input_after': '`'},
+	\ {'char': '`', 'at': '\%#`', 'leave': 1},
+	\ {'char': '<BS>', 'at': '`\%#`', 'delete': 1},
+	\ {'char': '<C-H>', 'at': '`\%#`', 'delete': 1},
+	\ {'char': '`', 'filetype': ['ocaml']},
+	\ {'char': '`', 'at': '``\%#', 'input_after': '```'},
+	\ {'char': '`', 'at': '\%#```', 'leave': 3},
+	\ {'char': '<BS>', 'at': '```\%#```', 'input': '<BS><BS><BS>', 'delete': 3},
+	\ {'char': '<C-H>', 'at': '```\%#```', 'input': '<BS><BS><BS>', 'delete': 3},
+	\ ]
+" }}}
+" newline {{{3
+let s:rulelist += [
+	\ {'char': '<CR>', 'at': '(\%#)', 'input_after': '<CR>'},
+	\ {'char': '<CR>', 'at': '{\%#}', 'input_after': '<CR>'},
+	\ {'char': '<CR>', 'at': '\[\%#]', 'input_after': '<CR>'},
+	\ ]
+" }}}
+" endwise {{{3
+function! s:Lexima_endwise_rule_make_rule(at, end, filetype, syntax)
+	return {'char': '<CR>', 'input': '<CR>', 'input_after': '<CR>' . a:end,
+		\ 'at': a:at, 'except': '\C\v^(\s*)\S.*%#\n%(%(\s*|\1\s.+)\n)*\1' . a:end,
+		\ 'filetype': a:filetype, 'syntax': a:syntax}
+endfunction
+for s:at in ['if', 'while', 'for', 'try']
+	let s:rulelist += [s:Lexima_endwise_rule_make_rule('^\s*' . s:at . '\>.*\%#$', 'end' . s:at, 'vim', []),]
+endfor
+let s:rulelist += [s:Lexima_endwise_rule_make_rule('^\s*function!.*\%#$', 'endfunction', 'vim', []),
+	\ s:Lexima_endwise_rule_make_rule('^\s*augroup\s\+.\+\%#$', 'augroup END', 'vim', []),
+	\ s:Lexima_endwise_rule_make_rule('\%(^\s*#.*\)\@<!do\s*\%#$', 'end', 'elixir', []),
+	\ s:Lexima_endwise_rule_make_rule('^\s*if\>.*\%#$', 'fi', ['sh', 'zsh'], []),
+	\ s:Lexima_endwise_rule_make_rule('^\s*case\>.*\%#$', 'esac', ['sh', 'zsh'], []),
+	\ s:Lexima_endwise_rule_make_rule('\%(^\s*#.*\)\@<!do\>.*\%#$', 'done', ['sh', 'zsh'], []),]
+let s:rulelist += [{'char': '<CR>', 'input': '<CR>'}] " inoremap <CR> <C-G>u<CR>
+" }}}
+" filetype specific {{{3
+let s:rulelist += [{'char': '<', 'input_after': '>', 'filetype': 'pov'},
+	\ {'char': '>', 'at': '\%#' . '>', 'leave': 1, 'filetype': 'pov'},
+	\ {'char': '<C-H>', 'at': '<' . '\%#' . '>', 'delete': 1, 'filetype': 'pov'},
+	\ {'char': '<Space>', 'at': '\%#' . '>', 'delete': 1, 'filetype': 'pov'},]
+let s:rulelist += [{'char': '$', 'input_after': '$', 'filetype': 'tex'},
+	\ {'char': '$', 'at': '\%#\' . '$', 'leave': 1, 'filetype': 'tex'},
+	\ {'char': '<C-H>', 'at': '\' . '$' . '\%#\' . '$', 'delete': 1, 'filetype': 'tex'},]
+" }}}
+for s:rule in s:rulelist
+	silent! call lexima#add_rule(s:rule)
+endfor
+" }}}
+" vim-surround {{{2
+let s:surround_textobj = {
+	\ 'surround-mk': {'pattern': ['「', '」'], 'select-a': 'amk', 'select-i': 'imk'},
+	\ 'surround-mn': {'pattern': ['『', '』'], 'select-a': 'amn', 'select-i': 'imn'},
+	\ 'surround-mb': {'pattern': ['（', '）'], 'select-a': 'amb', 'select-i': 'imb'},
+	\ 'surround-ms': {'pattern': ['【', '】'], 'select-a': 'ams', 'select-i': 'ims'},
+	\ 'surround-ma': {'pattern': ['［', '］'], 'select-a': 'ama', 'select-i': 'ima'},
+	\ }
+silent! call textobj#user#plugin('surround', s:surround_textobj)
+" }}}
+" footer {{{1
+if filereadable(expand($HOME . '/.localvimrc.vim'))
+	source $HOME/.localvimrc.vim
+endif
+silent! colorscheme molokai
+" vim: foldmethod=marker foldcolumn=3

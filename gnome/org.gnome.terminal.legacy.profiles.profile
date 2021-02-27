@@ -1,0 +1,14 @@
+audible-bell=false
+background-color='rgb(0,0,0)'
+bold-is-bright=true
+cursor-background-color='rgb(0,255,255)'
+cursor-colors-set=true
+cursor-foreground-color='rgb(0,0,0)'
+default-size-columns=100
+default-size-rows=50
+font='Source Code Pro Semi-Bold 11'
+foreground-color='rgb(191,191,191)'
+palette=['rgb(0,0,0)', 'rgb(205,0,0)', 'rgb(0,205,0)', 'rgb(205,205,0)', 'rgb(0,0,238)', 'rgb(205,0,205)', 'rgb(0,205,205)', 'rgb(229,229,229)', 'rgb(127,127,127)', 'rgb(255,0,0)', 'rgb(0,255,0)', 'rgb(255,255,0)', 'rgb(92,92,255)', 'rgb(255,0,255)', 'rgb(0,255,255)', 'rgb(255,255,255)']
+text-blink-mode='never'
+use-system-font=false
+use-theme-colors=false

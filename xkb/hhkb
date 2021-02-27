@@ -1,0 +1,20 @@
+partial alphanumeric_keys
+xkb_symbols "hhkb" {
+	include "us(basic)"
+	name[Group1]= "hhkb";
+
+	key <KPMU> { [ Left  ] };
+	key <KPDV> { [ Down  ] };
+	key <HOME> { [ Up    ] };
+	key <PGUP> { [ Right ] };
+
+	key <KPAD> { [ Home  ] };
+	key <KPSU> { [ Next  ] };
+	key <END>  { [ Prior ] };
+	key <PGDN> { [ End   ] };
+
+	key <LEFT> { [ Muhenkan  ] };
+	key <DOWN> { [ Menu      ] };
+	key <UP>   { [ Caps_Lock ] };
+	key <RGHT> { [ Henkan    ] };
+};

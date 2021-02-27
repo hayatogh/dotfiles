@@ -1,0 +1,36 @@
+[alias]
+	s = status
+	ss = status --branch --short --
+	a = add
+	c = commit
+	d = diff
+	ds = diff --staged
+	dn = !git -P diff --numstat
+	dt = !git -P diff --stat
+	g = log --graph --all --format=\"%x09%C(cyan bold)%<(19,trunc)%an %C(yellow nobold)%h %Creset%s%C(magenta bold)%d\"
+	l = log
+	sc = clone --depth 1 --
+[core]
+	autocrlf = false
+	safecrlf = false
+[fetch]
+	prune = true
+	pruneTags = true
+[log]
+	follow = true
+[merge]
+	conflictStyle = diff3
+	tool = vimdiff
+[mergetool]
+	keepBackup = false
+[pager]
+	diff = less -x9,17
+[pull]
+	rebase = false
+[push]
+	followTags = true
+[user]
+	name = matsuhav
+	email = 28914976+matsuhav@users.noreply.github.com
+
+# vim: ft=gitconfig

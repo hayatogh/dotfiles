@@ -1,0 +1,12 @@
+--- acconfig.h.orig	2019-10-24 05:29:18.913462300 +0900
++++ acconfig.h	2019-10-24 05:25:53.747872700 +0900
+@@ -191,7 +191,9 @@
+  * If screen is installed with permissions to update /etc/utmp (such
+  * as if it is installed set-uid root), define UTMPOK.
+  */
++#ifndef __MSYS__
+ #define UTMPOK
++#endif
+ 
+ /* Set LOGINDEFAULT to one (1)
+  * if you want entries added to /etc/utmp by default, else set it to

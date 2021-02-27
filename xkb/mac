@@ -1,0 +1,6 @@
+partial alphanumeric_keys
+xkb_symbols "mac" {
+	include "us(basic)"
+	include "capslock(ctrl_modifier)"
+	name[Group1]= "mac";
+};

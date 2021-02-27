@@ -1,0 +1,69 @@
+#info
+1 add-digit-to-numeric-arg
+2 add-digit-to-numeric-arg
+3 add-digit-to-numeric-arg
+4 add-digit-to-numeric-arg
+5 add-digit-to-numeric-arg
+6 add-digit-to-numeric-arg
+7 add-digit-to-numeric-arg
+8 add-digit-to-numeric-arg
+9 add-digit-to-numeric-arg
+
+h backward-char
+\kx backward-char
+j next-line
+k prev-line
+l forward-char
+\^ beginning-of-line
+0 beginning-of-line
+$ end-of-line
+w forward-word
+W forward-word
+B backward-word
+g beginning-of-node
+G end-of-node
+M move-to-window-line
+n search-next
+N search-previous
+
+^f scroll-forward-page-only
+^b scroll-backward-page-only
+b scroll-backward
+^d scroll-half-screen-down
+^u scroll-half-screen-up
+d scroll-half-screen-down
+u scroll-half-screen-up
+^e down-line
+^y up-line
+zt redraw-display
+
+^o history-node
+^h list-visited-nodes
+o goto-node
+^n next-node
+^p prev-node
+
+i virtual-index
+I index-apropos
+
+^w^w next-window
+^ww next-window
+^wj next-window
+^wk prev-window
+^ws split-window
+^wq quit
+^wc delete-window
+^w+ grow-window
+^w= tile-windows
+
+:q quit
+^c quit
+\e abort-key
+
+#echo-area
+\e echo-area-abort
+
+#var
+highlight-searches=On
+mouse=normal-tracking
+visible-bell=On

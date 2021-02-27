@@ -1,0 +1,56 @@
+# C-a : source ~/.screenrc
+altscreen on
+attrcolor b ".I"
+caption splitonly '%?%F%{= gW}%:%{= Kk}%?%2n%f%07=%t%='
+compacthist on
+defencoding utf-8
+defflow on interrupt
+defscrollback 1000
+defshell -bash
+defutf8 on
+escape ^j^j
+hardstatus alwayslastline '%{=}%m/%d%D %0c %{= .g}%H%{-} %L=%-w%45L>%{= gk}%n* %t%{-}%+w %-20<%=%{= .y}(%l)'
+# %L=    only pad until this point. i.e. don't truncate
+# %45L>  truncate until this point is on 45% on screen
+# %-20<  trancate until this point is -20
+# %=     pad to right
+ignorecase on
+maptimeout 1
+msgminwait 0
+msgwait 2
+shelltitle '$ |bash:'
+startup_message off
+term 'screen-256color'
+termcapinfo xterm 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'
+vbell on
+# copymode Y = yy
+#          W = yiw
+#          x = o
+#          y = ^ mark
+#          c C set rectangle left and right region
+#          J toggles join mode. LF,  join, joined with spaces, commas
+#          v V toggle region not to include line number
+#          vim like hjkl0+-HML|g%^$wbBEfFtT;,/?nNo C-e C-y C-u C-d C-b C-f C-g
+#          less like g Home=gg End=G
+bind e screen
+bind t screen
+bind f windowlist -b
+bind s split
+bind v split -v
+bind h focus left
+bind j focus down
+bind k focus up
+bind l focus right
+bind t focus top
+bind b focus bottom
+bind o only
+bind c remove
+bind ' ' copy
+bind \033
+bind = resize =
+bind + resize +2
+bind - resize -2
+bind > resize -h +2
+bind < resize -h -2
+bind I login on
+bind O login off

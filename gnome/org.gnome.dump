@@ -1,0 +1,31 @@
+[GWeather]
+temperature-unit='centigrade'
+
+[desktop/input-sources]
+sources=[('xkb', 'mac'), ('xkb', 'hhkb'), ('ibus', 'kkc')]
+
+[desktop/interface]
+clock-show-date=true
+clock-show-weekday=true
+cursor-blink=false
+enable-animations=false
+enable-hot-corners=false
+monospace-font-name='Consolas 12'
+show-battery-percentage=true
+
+[desktop/wm/keybindings]
+switch-applications-backward=@as []
+switch-applications=@as []
+switch-windows-backward=['<Shift><Alt>Tab']
+switch-windows=['<Alt>Tab']
+
+[desktop/wm/preferences]
+button-layout='appmenu:minimize,maximize,close'
+num-workspaces=1
+
+[mutter]
+dynamic-workspaces=false
+experimental-features=['scale-monitor-framebuffer']
+
+[settings-daemon/plugins/power]
+ambient-enabled=false

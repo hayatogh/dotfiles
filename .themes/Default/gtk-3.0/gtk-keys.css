@@ -1,0 +1,14 @@
+@binding-set gtk-ctrlh
+{
+	bind "<ctrl>k" { "delete-from-cursor" (paragraph-ends, 1) };
+	bind "<ctrl>u" { "move-cursor" (paragraph-ends, -1, 0)
+			"delete-from-cursor" (paragraph-ends, 1) };
+	bind "<ctrl>h" { "delete-from-cursor" (chars, -1) };
+	bind "<ctrl>w" { "delete-from-cursor" (word-ends, -1) };
+}
+entry {
+	-gtk-key-bindings: gtk-ctrlh;
+}
+textview {
+	-gtk-key-bindings: gtk-ctrlh;
+}
