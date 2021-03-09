@@ -20,7 +20,7 @@ else
 	version=-0-
 fi
 
-url=https://github.com$(wget -q -O - https://github.com/ocaml/opam/releases/latest | grep -E -m1 -o '/ocaml/opam/releases/download/[[:digit:].]+/opam-[[:digit:].]+-'$ARCH'-'$OS)
+url=https://github.com$(wget -q -O - https://github.com/ocaml/opam/releases/latest | grep -E -m1 -o '/ocaml/opam/releases/download/[0-9.]+/opam-[0-9.]+-'$ARCH'-'$OS)
 fname=$(grep -E -o '[^/]+$' <<<$url)
 
 if [[ ! $fname =~ $version ]]; then

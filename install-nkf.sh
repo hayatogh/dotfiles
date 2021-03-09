@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-num=$(wget -q -O - 'https://jaist.dl.osdn.jp/nkf/?C=M;O=D' | grep -P -m1 -o '(?<=href=")[[:digit:]]+(?=/")')
-nkfver=$(wget -q -O - 'https://jaist.dl.osdn.jp/nkf/'$num'?C=M;O=D' | grep -P -m1 -o '(?<=href=")nkf-[[:digit:].]+(?=\.tar\.gz")')
+num=$(wget -q -O - 'https://jaist.dl.osdn.jp/nkf/?C=M;O=D' | grep -P -m1 -o '(?<=href=")[0-9]+(?=/")')
+nkfver=$(wget -q -O - 'https://jaist.dl.osdn.jp/nkf/'$num'?C=M;O=D' | grep -P -m1 -o '(?<=href=")nkf-[0-9.]+(?=\.tar\.gz")')
 
 mkdir -p /usr/local/src
 cd /usr/local/src

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 patchscreen=$(realpath $(dirname ${BASH_SOURCE[0]}))
-screenver=$(wget -q -O - 'http://ftp.gnu.org/gnu/screen/?C=M;O=D' | grep -P -m1 -o '(?<=href=")screen-[[:digit:].]+(?=\.tar\.gz")')
+screenver=$(wget -q -O - 'http://ftp.gnu.org/gnu/screen/?C=M;O=D' | grep -P -m1 -o '(?<=href=")screen-[0-9.]+(?=\.tar\.gz")')
 
 mkdir -p /usr/local/src
 cd /usr/local/src
