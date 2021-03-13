@@ -5,16 +5,16 @@ else
 	os=linux
 fi
 if type -a go &>/dev/null; then
-	version=$(go version | grep -P -o '(?<=go)[0-9.]+')
+	version=$(go version | grep -Po '(?<=go)[0-9.]+')
 else
 	version=0
 fi
-url=https://golang.org$(wget -q -O - https://golang.org/dl/ | grep -E -m1 -o '/dl/go[0-9.]+'$os'-amd64\.tar\.gz')
-fname=$(grep -E -o '[^/]+$' <<<$url)
+url=https://golang.org$(wget -q -O - https://golang.org/dl/ | grep -Eom1 '/dl/go[0-9.]+'$os'-amd64\.tar\.gz')
+fname=$(grep -Eo '[^/]+$' <<<$url)
 
 if [[ $1 == '-n' ]]; then
 	echo "Installed:     $version"
-	echo "Remote latest: $(grep -P -o '(?<=go)[0-9.]+(?=\.'$os'-amd64\.tar\.gz)' <<<$fname)"
+	echo "Remote latest: $(grep -Po '(?<=go)[0-9.]+(?=\.'$os'-amd64\.tar\.gz)' <<<$fname)"
 	echo "URL: $url"
 	exit
 fi

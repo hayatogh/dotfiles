@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-screenver=$(wget -q -O - 'http://ftp.gnu.org/gnu/screen/?C=M;O=D' | grep -P -m1 -o '(?<=href=")screen-[0-9.]+(?=\.tar\.gz")')
+screenver=$(wget -q -O - 'http://ftp.gnu.org/gnu/screen/?C=M;O=D' | grep -Pom1 '(?<=href=")screen-[0-9.]+(?=\.tar\.gz")')
 mkdir -p /usr/local/src
 cd /usr/local/src
 wget -q -O $screenver.tar.gz https://git.savannah.gnu.org/cgit/screen.git/snapshot/$screenver.tar.gz

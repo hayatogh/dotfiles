@@ -4,8 +4,8 @@ if [[ $(uname) == Darwin ]]; then
 else
 	os=linux
 fi
-url=https://github.com$(wget -q -O - https://github.com/cheat/cheat/releases/latest | grep -E -o '/cheat/cheat/releases/download/[0-9.]+/cheat-'$os'-amd64\.gz')
-fname=$(grep -E -o '[^/]+$' <<<$url)
+url=https://github.com$(wget -q -O - https://github.com/cheat/cheat/releases/latest | grep -Eo '/cheat/cheat/releases/download/[0-9.]+/cheat-'$os'-amd64\.gz')
+fname=$(grep -Eo '[^/]+$' <<<$url)
 
 cd /tmp
 wget -q -O $fname $url

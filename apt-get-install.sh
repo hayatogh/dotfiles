@@ -13,6 +13,8 @@ apt-get -y install libncurses-dev flex bison libssl-dev bc libelf-dev
 ## syzkaller
 # apt-get install -y debootstrap qemu-system-x86
 
+ln -sf /usr/bin/fdfind ~/.local/bin/fd
+
 # manual install
 cd $dotfiles
 ./dpkg-install.sh

@@ -1,6 +1,3 @@
-#!/usr/bin/env bash
-# [[ -f /etc/bashrc ]] && . /etc/bashrc
-# [[ -f /etc/bash.bashrc ]] && . /etc/bash.bashrc
 shopt -s autocd cdspell checkjobs checkwinsize dotglob globstar lithist no_empty_cmd_completion nocaseglob
 if [[ $TERM =~ screen ]]; then
 	if [[ $SHLVL > 2 ]]; then
@@ -25,10 +22,10 @@ alias git_empty_commit="git a -A && git c -m 'No commit message' && git push"
 alias grep="grep --color=auto"
 alias ls="ls --color=auto"
 alias la="\ls -AF --color=auto"
-alias l.=_ldot
 alias ll="\ls -lhF --color=auto"
 alias al="\ls -alhF --color=auto"
-alias lt="\ls -alhrtF --color=auto"
+alias ltime="\ls -alhrtF --color=auto"
+alias lsize="\ls -alhrFS --color=auto"
 alias manless="man -P less"
 alias mkdir="mkdir -p"
 alias rm="rm -i"
@@ -42,29 +39,19 @@ alias vs="vagrant ssh"
 alias vh="vagrant halt"
 alias wget="wget -N"
 alias which=_which
-_which()
-{
+_which() {
 	if [[ $(type -t "${@: -1}" 2>&1) == builtin ]]; then
-		type -t "${@: -1}"
+		echo builtin
 	fi
-	(alias; declare -f) | \
-		\which --tty-only --read-alias --read-functions --show-tilde --show-dot $@
+	(alias; declare -f) | \which --tty-only --read-alias --read-functions --show-tilde --show-dot $@
 }
-killgrep()
-{
-	[[ $# != 0 ]] && \
-		ps x | \grep $1 | awk '{print $1}' | xargs kill -9 &>/dev/null
+killgrep() {
+	[[ $# != 0 ]] && ps x | \grep $1 | awk '{print $1}' | xargs kill -9 &>/dev/null
 }
-_ldot()
-{
-	if [[ $# == 0 ]]; then
-		\ls -dF .* --color=auto
-	else
-		(cd $1 && \ls -dF .* --color=auto)
-	fi
+l.() {
+	([[ $# != 0 ]] && cd $1; \ls -dF .* --color=auto)
 }
-tryssh()
-{
+tryssh() {
 	local sleeptime=5
 	[[ $# == 0 ]] && return 1
 	[[ $# == 2 ]] && sleeptime=$2
@@ -74,15 +61,14 @@ tryssh()
 	done
 	ssh $1
 }
-mkcd()
-{
+mkcd() {
 	\mkdir $1
 	cd $1
 }
 _cw() {
 	local right=${READLINE_LINE:$READLINE_POINT}
 	local left=${READLINE_LINE::$READLINE_POINT}
-	[[ $left =~ ([^[:alnum:]]|[[:digit:]]*|[[:alpha:]]*)[[:space:]]*$ ]]
+	[[ $left =~ ([a-zA-Z]+|[0-9]+|.)\ *$ ]]
 	left=${left::-${#BASH_REMATCH[0]}}
 	READLINE_LINE=$left$right
 	READLINE_POINT=${#left}
@@ -137,25 +123,7 @@ _quick_man() {
 	eval "$cmd"
 	return 0
 }
-upgrade() {
-	local uname=$(uname)
-	if [[ $uname == Linux ]]; then
-		local distro=$(grep -P -o -m1 '(?<=^ID=).*$' /etc/os-release)
-		if [[ $distro == debian ]]; then
-			sudo apt-get -qq autoremove
-			sudo apt-get -qq update
-			apt list --upgradable
-			sudo apt upgrade -y
-		fi
-	elif [[ $uname =~ NT-10.0 ]]; then
-		pacman -Qtdq | pacman -Rns --noconfirm - 2>/dev/null
-		pacman -Syu --noconfirm
-	elif [[ $uname == Darwin ]]; then
-		brew upgrade
-	fi
-}
-stopwatch()
-{
+stopwatch() {
 	local c
 	printf "%(%F %T)T\n"
 	time \
@@ -167,12 +135,27 @@ stopwatch()
 			fi
 		done
 }
+_psjobs() {
+	PSJOBS=$(jobs -p)
+	if [[ -z $PSJOBS ]]; then
+		PSJOBS=""
+	else
+		PSJOBS=$(ps --no-headers --pid $PSJOBS | wc -l)
+		if [[ $PSJOBS == 0 ]]; then
+			PSJOBS=""
+		fi
+	fi
+}
+if ! type realpath &>/dev/null; then
+	realpath() {
+		local i
+		for i in $@; do
+			(cd $i && pwd -P)
+		done
+	}
+fi
 
-. ~/dotfiles/git-prompt.sh
-complete -F _ssh tryssh
-uname=$(uname)
-# msys2 mingw64
-if [[ $uname =~ NT-10.0 ]]; then
+if [[ $_uname =~ NT-10.0 ]]; then
 	alias rg="rg --path-separator '\x2F'"
 	shopt -s completion_strip_exe
 	# phpdir=$(ls -d /c/tools/php* | tail -n1)
@@ -186,36 +169,49 @@ if [[ $uname =~ NT-10.0 ]]; then
 		alias javac="javac -encoding MS932"
 		alias java="java -Dfile.encoding=MS932"
 	fi
-fi
-if [[ $uname == Darwin ]]; then
-	[[ -r /usr/local/etc/profile.d/bash_completion.sh ]] \
-		&& . /usr/local/etc/profile.d/bash_completion.sh
-	alias batt="pmset -g batt"
-	macbin()
-	{
-		PATH="$HOME/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin:/Library/Apple/bin:/Library/TeX/texbin:/opt/X11/bin" $@
+	upgrade() {
+		pacman -Qtdq | pacman -Rns --noconfirm - 2>/dev/null
+		pacman -Syu --noconfirm
 	}
-fi
-if [[ $uname == Linux ]]; then
-	# distro=$(cat /etc/*-release)
-	pdfx()
-	{
-		if [[ $# == 0 ]]; then
-			wine start "C:\Program Files\Tracker Software\PDF Editor\PDFXEdit.exe" &>/dev/null &
+	_psjobs() {
+		PSJOBS=$(jobs -p)
+		if [[ -z $PSJOBS ]]; then
+			PSJOBS=""
 		else
-			wine start "C:\Program Files\Tracker Software\PDF Editor\PDFXEdit.exe" "$@" &>/dev/null &
+			PSJOBS=$(wc -l <<<$PSJOBS)
 		fi
 	}
-	if type fdfind &>/dev/null; then
-		alias fd="fdfind -H"
-	fi
+elif [[ $_uname == Darwin ]]; then
+	[[ -r /usr/local/etc/profile.d/bash_completion.sh ]] && . /usr/local/etc/profile.d/bash_completion.sh
+	alias batt="pmset -g batt"
+	macbin() {
+		PATH=$_OLDPATH $@
+	}
+	upgrade() {
+		brew upgrade
+	}
+elif [[ $_uname == Linux ]]; then
+	pdfx() {
+		wine start "C:\Program Files\Tracker Software\PDF Editor\PDFXEdit.exe" "$@" &>/dev/null &
+	}
 	if type explorer.exe &>/dev/null; then
 		alias e=explorer.exe
 	fi
+	# distro=$(cat /etc/*-release)
+	_distro=$(\grep -Pom1 '(?<=^ID=).*$' /etc/os-release)
+	if [[ $_distro == debian ]]; then
+		upgrade() {
+			sudo apt-get -qq autoremove
+			sudo apt-get -qq update
+			apt list --upgradable
+			sudo apt upgrade -y
+		}
+	fi
 fi
-unset uname
 
-[[ -f /etc/profile.d/bash_completion.sh ]] && . /etc/profile.d/bash_completion.sh
+[[ -r ~/dotfiles/git-prompt.sh ]] && . ~/dotfiles/git-prompt.sh
+[[ -r /etc/profile.d/bash_completion.sh ]] && . /etc/profile.d/bash_completion.sh
 type _completion_loader &>/dev/null && _completion_loader ssh
-[[ -f ~/.localbashrc.sh ]] && . ~/.localbashrc.sh
+complete -F _ssh tryssh
+[[ -r ~/.localbashrc.sh ]] && . ~/.localbashrc.sh
 true
