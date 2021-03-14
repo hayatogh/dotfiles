@@ -32,7 +32,7 @@ if [[ $uname =~ NT-10\.0 ]]; then
 	rm_ln $dotfiles/alacritty $APPDATA/alacritty
 	rm_ln $dotfiles/WindowsPowerShell $windoc/WindowsPowerShell
 elif [[ $uname == Darwin ]]; then
-	dirsinconfig="$dirsinconfig karabiner hammerspoon"
+	dirsinconfig="$dirsinconfig karabiner"
 elif [[ $(uname -r) =~ Microsoft ]]; then
 	winhome=/mnt/c/Users/$(cut -d\\ -f3 <<<$APPDATA)
 fi
