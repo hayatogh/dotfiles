@@ -9,20 +9,21 @@ PATH="$WASMTIME_HOME/bin:$PATH"
 export MANPATH="$HOME/.local/share/man:$MANPATH"
 export INFOPATH
 export DISPLAY
-export LESS=-RiWM
-export VISUAL=vim
-export EDITOR=vim
-export MANPAGER="vim +MYMANPAGER -"
-export XDG_CONFIG_HOME="$HOME/.config"
 export CHKTEXRC="$HOME/dotfiles/chktexrc"
+export EDITOR=vim
 export FZF_DEFAULT_COMMAND="fd --type f --hidden --follow --exclude .git"
 export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --color='hl:9,hl+:9,spinner:16'"
+export LESS=-RiWM
 export LYNX_CFG="$HOME/dotfiles/lynx.cfg"
+export MANPAGER="vim +MYMANPAGER -"
 export MYPY_CACHE_DIR="$HOME/.cache/mypy"
 export RIPGREP_CONFIG_PATH="$HOME/dotfiles/.ripgreprc"
 export RLWRAP_HOME="$HOME/.config/rlwrap"
 export RUST_BACKTRACE=1
 export SCREENDIR="$HOME/.screen"
+export SCREENRC="$HOME/dotfiles/.screenrc"
+export VISUAL=vim
+export XDG_CONFIG_HOME="$HOME/.config"
 
 pc='_psjobs; history -a; history -c; history -r; __git_ps1 "'
 pc=$pc'\[\e[0m\]\[\e]0;\u@\h '
