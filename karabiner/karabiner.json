@@ -2078,17 +2078,21 @@
                             "from": {
                                 "key_code": "caps_lock"
                             },
-                            "to": {
-                                "key_code": "left_control"
-                            }
+                            "to": [
+                                {
+                                    "key_code": "left_control"
+                                }
+                            ]
                         },
                         {
                             "from": {
                                 "key_code": "left_control"
                             },
-                            "to": {
-                                "key_code": "caps_lock"
-                            }
+                            "to": [
+                                {
+                                    "key_code": "caps_lock"
+                                }
+                            ]
                         }
                     ]
                 },
@@ -2108,121 +2112,151 @@
                             "from": {
                                 "key_code": "down_arrow"
                             },
-                            "to": {
-                                "key_code": "vk_none"
-                            }
+                            "to": [
+                                {
+                                    "key_code": "vk_none"
+                                }
+                            ]
                         },
                         {
                             "from": {
                                 "key_code": "end"
                             },
-                            "to": {
-                                "key_code": "page_up"
-                            }
+                            "to": [
+                                {
+                                    "key_code": "page_up"
+                                }
+                            ]
                         },
                         {
                             "from": {
                                 "key_code": "home"
                             },
-                            "to": {
-                                "key_code": "up_arrow"
-                            }
+                            "to": [
+                                {
+                                    "key_code": "up_arrow"
+                                }
+                            ]
                         },
                         {
                             "from": {
                                 "key_code": "keypad_asterisk"
                             },
-                            "to": {
-                                "key_code": "left_arrow"
-                            }
+                            "to": [
+                                {
+                                    "key_code": "left_arrow"
+                                }
+                            ]
                         },
                         {
                             "from": {
                                 "key_code": "keypad_hyphen"
                             },
-                            "to": {
-                                "key_code": "page_down"
-                            }
+                            "to": [
+                                {
+                                    "key_code": "page_down"
+                                }
+                            ]
                         },
                         {
                             "from": {
                                 "key_code": "keypad_plus"
                             },
-                            "to": {
-                                "key_code": "home"
-                            }
+                            "to": [
+                                {
+                                    "key_code": "home"
+                                }
+                            ]
                         },
                         {
                             "from": {
                                 "key_code": "keypad_slash"
                             },
-                            "to": {
-                                "key_code": "down_arrow"
-                            }
+                            "to": [
+                                {
+                                    "key_code": "down_arrow"
+                                }
+                            ]
                         },
                         {
                             "from": {
                                 "key_code": "left_arrow"
                             },
-                            "to": {
-                                "key_code": "japanese_eisuu"
-                            }
+                            "to": [
+                                {
+                                    "key_code": "japanese_eisuu"
+                                }
+                            ]
                         },
                         {
                             "from": {
                                 "key_code": "left_option"
                             },
-                            "to": {
-                                "key_code": "left_command"
-                            }
+                            "to": [
+                                {
+                                    "key_code": "left_command"
+                                }
+                            ]
                         },
                         {
                             "from": {
                                 "key_code": "page_down"
                             },
-                            "to": {
-                                "key_code": "end"
-                            }
+                            "to": [
+                                {
+                                    "key_code": "end"
+                                }
+                            ]
                         },
                         {
                             "from": {
                                 "key_code": "page_up"
                             },
-                            "to": {
-                                "key_code": "right_arrow"
-                            }
+                            "to": [
+                                {
+                                    "key_code": "right_arrow"
+                                }
+                            ]
                         },
                         {
                             "from": {
                                 "key_code": "right_arrow"
                             },
-                            "to": {
-                                "key_code": "japanese_kana"
-                            }
+                            "to": [
+                                {
+                                    "key_code": "japanese_kana"
+                                }
+                            ]
                         },
                         {
                             "from": {
                                 "key_code": "right_command"
                             },
-                            "to": {
-                                "key_code": "right_option"
-                            }
+                            "to": [
+                                {
+                                    "key_code": "right_option"
+                                }
+                            ]
                         },
                         {
                             "from": {
                                 "key_code": "right_option"
                             },
-                            "to": {
-                                "key_code": "right_command"
-                            }
+                            "to": [
+                                {
+                                    "key_code": "right_command"
+                                }
+                            ]
                         },
                         {
                             "from": {
                                 "key_code": "up_arrow"
                             },
-                            "to": {
-                                "key_code": "caps_lock"
-                            }
+                            "to": [
+                                {
+                                    "key_code": "caps_lock"
+                                }
+                            ]
                         }
                     ]
                 },
@@ -2242,17 +2276,21 @@
                             "from": {
                                 "pointing_button": "button4"
                             },
-                            "to": {
-                                "pointing_button": "button3"
-                            }
+                            "to": [
+                                {
+                                    "pointing_button": "button3"
+                                }
+                            ]
                         },
                         {
                             "from": {
                                 "pointing_button": "button5"
                             },
-                            "to": {
-                                "key_code": "vk_none"
-                            }
+                            "to": [
+                                {
+                                    "key_code": "vk_none"
+                                }
+                            ]
                         }
                     ]
                 }
@@ -2262,97 +2300,121 @@
                     "from": {
                         "key_code": "f1"
                     },
-                    "to": {
-                        "consumer_key_code": "display_brightness_decrement"
-                    }
+                    "to": [
+                        {
+                            "consumer_key_code": "display_brightness_decrement"
+                        }
+                    ]
                 },
                 {
                     "from": {
                         "key_code": "f2"
                     },
-                    "to": {
-                        "consumer_key_code": "display_brightness_increment"
-                    }
+                    "to": [
+                        {
+                            "consumer_key_code": "display_brightness_increment"
+                        }
+                    ]
                 },
                 {
                     "from": {
                         "key_code": "f3"
                     },
-                    "to": {
-                        "key_code": "mission_control"
-                    }
+                    "to": [
+                        {
+                            "key_code": "mission_control"
+                        }
+                    ]
                 },
                 {
                     "from": {
                         "key_code": "f4"
                     },
-                    "to": {
-                        "key_code": "launchpad"
-                    }
+                    "to": [
+                        {
+                            "key_code": "launchpad"
+                        }
+                    ]
                 },
                 {
                     "from": {
                         "key_code": "f5"
                     },
-                    "to": {
-                        "key_code": "illumination_decrement"
-                    }
+                    "to": [
+                        {
+                            "key_code": "illumination_decrement"
+                        }
+                    ]
                 },
                 {
                     "from": {
                         "key_code": "f6"
                     },
-                    "to": {
-                        "key_code": "illumination_increment"
-                    }
+                    "to": [
+                        {
+                            "key_code": "illumination_increment"
+                        }
+                    ]
                 },
                 {
                     "from": {
                         "key_code": "f7"
                     },
-                    "to": {
-                        "consumer_key_code": "rewind"
-                    }
+                    "to": [
+                        {
+                            "consumer_key_code": "rewind"
+                        }
+                    ]
                 },
                 {
                     "from": {
                         "key_code": "f8"
                     },
-                    "to": {
-                        "consumer_key_code": "play_or_pause"
-                    }
+                    "to": [
+                        {
+                            "consumer_key_code": "play_or_pause"
+                        }
+                    ]
                 },
                 {
                     "from": {
                         "key_code": "f9"
                     },
-                    "to": {
-                        "consumer_key_code": "fastforward"
-                    }
+                    "to": [
+                        {
+                            "consumer_key_code": "fastforward"
+                        }
+                    ]
                 },
                 {
                     "from": {
                         "key_code": "f10"
                     },
-                    "to": {
-                        "consumer_key_code": "mute"
-                    }
+                    "to": [
+                        {
+                            "consumer_key_code": "mute"
+                        }
+                    ]
                 },
                 {
                     "from": {
                         "key_code": "f11"
                     },
-                    "to": {
-                        "consumer_key_code": "volume_decrement"
-                    }
+                    "to": [
+                        {
+                            "consumer_key_code": "volume_decrement"
+                        }
+                    ]
                 },
                 {
                     "from": {
                         "key_code": "f12"
                     },
-                    "to": {
-                        "consumer_key_code": "volume_increment"
-                    }
+                    "to": [
+                        {
+                            "consumer_key_code": "volume_increment"
+                        }
+                    ]
                 }
             ],
             "name": "default",
@@ -2363,6 +2425,7 @@
             "simple_modifications": [],
             "virtual_hid_keyboard": {
                 "country_code": 0,
+                "indicate_sticky_modifier_keys_state": true,
                 "mouse_key_xy_scale": 100
             }
         }
