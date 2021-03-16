@@ -17,7 +17,6 @@ export LESS=-RiWM
 export LYNX_CFG="$HOME/dotfiles/lynx.cfg"
 export MANPAGER="vim +MYMANPAGER -"
 export MYPY_CACHE_DIR="$HOME/.cache/mypy"
-export RIPGREP_CONFIG_PATH="$HOME/dotfiles/.ripgreprc"
 export RLWRAP_HOME="$HOME/.config/rlwrap"
 export RUST_BACKTRACE=1
 export SCREENDIR="$HOME/.screen"
@@ -27,14 +26,10 @@ export XDG_CONFIG_HOME="$HOME/.config"
 
 pc='_psjobs; history -a; history -c; history -r; __git_ps1 "'
 pc=$pc'\[\e[0m\]\[\e]0;\u@\h '
-if [[ ! -z $MSYSTEM ]]; then
-	pc=$pc'$MSYSTEM '
-fi
+[[ -n $MSYSTEM ]] && pc=$pc'$MSYSTEM '
 pc=$pc'\w \d \A [\j] \a\]'
 pc=$pc'\n$PSM\[\e[32m\]\u@\h '
-if [[ ! -z $MSYSTEM ]]; then
-	pc=$pc'\[\e[35m\]$MSYSTEM '
-fi
+[[ -n $MSYSTEM ]] && pc=$pc'\[\e[35m\]$MSYSTEM '
 pc=$pc'\[\e[33m\]\w \[\e[38;5;93m\]$PSSHLVL \[\e[38;5;166m\]$PSJOBS\[\e[0m\]'
 pc=$pc'" " \[\e[38;5;245m\]\t\[\e[0m\]\n\[\ek\e\\\\\]\\$ "'
 export PROMPT_COMMAND=$pc
