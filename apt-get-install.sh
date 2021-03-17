@@ -21,7 +21,6 @@ cd $dotfiles
 
 ./install-which.sh
 ./install-vim.sh
-./install-screen.sh
 ./install-cheat.sh
 
 ./getbashcompletion.sh

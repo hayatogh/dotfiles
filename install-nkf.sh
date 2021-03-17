@@ -1,12 +1,27 @@
 #!/usr/bin/env bash
-num=$(wget -q -O - 'https://jaist.dl.osdn.jp/nkf/?C=M;O=D' | grep -Pom1 '(?<=href=")[0-9]+(?=/")')
-nkfver=$(wget -q -O - 'https://jaist.dl.osdn.jp/nkf/'$num'?C=M;O=D' | grep -Pom1 '(?<=href=")nkf-[0-9.]+(?=\.tar\.gz")')
+num=$(wget -qO- 'https://jaist.dl.osdn.jp/nkf/?C=M;O=D' | grep -Pom1 '(?<=href=")[0-9]+(?=/")')
+ver=$(wget -qO- 'https://jaist.dl.osdn.jp/nkf/'$num'?C=M;O=D' | grep -Pom1 '(?<=href="nkf-)[0-9.]+(?=\.tar\.gz")')
+dir=nkf-$ver
+url=https://jaist.dl.osdn.jp/nkf/$num/$dir.tar.gz
 
-mkdir -p /usr/local/src
-cd /usr/local/src
-wget -q -O $nkfver.tar.gz https://jaist.dl.osdn.jp/nkf/$num/$nkfver.tar.gz
-rm -rf $nkfver
-tar -xf $nkfver.tar.gz
-cd $nkfver
+msg=$(nkf --version |& grep -Po '(?<= )[0-9.]+(?= )')
+if [[ $? -ne 0 ]]; then
+	msg="Not installed"
+fi
+echo "Installed:     $msg"
+echo "Remote latest: $ver"
+
+if [[ $1 == -n || $msg == $ver && $1 != -f ]]; then
+	exit
+fi
+
+tmp=$(mktemp)
+mkdir -p ~/.local/src
+cd ~/.local/src
+wget -qO $tmp $url
+rm -rf $dir
+tar -xf $tmp
+cd $dir
 make -j4
-make install
+make prefix=~/.local install
+rm -f $tmp

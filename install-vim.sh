@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+if [[ $EUID != 0 ]]; then
+	sudo "$0" "$@"
+	exit $?
+fi
+
 mkdir -p /usr/local/src
 cd /usr/local/src
 rm -rf vim
