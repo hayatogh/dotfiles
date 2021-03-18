@@ -17,7 +17,7 @@ choco install foobar2000
 :: choco install fzf
 :: choco install git
 choco install inkscape
-choco install kindle
+:: choco install kindle
 choco install lavfilters
 choco install lockhunter
 choco install mpc-be
