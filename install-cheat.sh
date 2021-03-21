@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
 os=linux
 if [[ $(uname) == Darwin ]]; then
 	os=darwin
@@ -6,14 +8,15 @@ fi
 ver=$(wget -qO- https://github.com/cheat/cheat/releases/latest | grep -Po '(?<=/cheat/cheat/releases/download/)[0-9.]+(?=/cheat-'$os'-amd64\.gz)')
 url=https://github.com/cheat/cheat/releases/download/$ver/cheat-$os-amd64.gz
 
-msg=$(cheat --version 2>&1)
-if [[ $? -ne 0 ]]; then
-	msg="Not installed"
+loc=$(cheat --version 2>&1 || true)
+if [[ -z $loc ]]; then
+	loc="Not installed"
 fi
-echo "Installed:     $msg"
+echo "Installed:     $loc"
 echo "Remote latest: $ver"
 
-if [[ $1 == -n || $msg == $ver && $1 != -f ]]; then
+arg=${1:-""}
+if [[ $arg == -n || $loc == $ver && $arg != -f ]]; then
 	exit
 fi
 
@@ -23,3 +26,7 @@ wget -qO $tmp $url
 gzip -cd $tmp > ~/.local/bin/cheat
 chmod 755 ~/.local/bin/cheat
 rm -f $tmp
+
+# setup
+rm -rf ~/.config/cheat/cheatsheets/community
+git clone --depth 1 -- git://github.com/cheat/cheatsheets ~/.config/cheat/cheatsheets/community &>/dev/null

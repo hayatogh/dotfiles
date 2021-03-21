@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
+set -euo pipefail
 # mkdir to ensure 2nd argmment of ln exists when creating dir symlinks.
 # rm dirs when creating dir symlinks because ln can't overwrite directorys
-dotfiles=$(realpath $(dirname ${BASH_SOURCE[0]}))
+dotfiles=$(realpath $(dirname $0))
 uname=$(uname)
 
 files=".inputrc .bash_profile .bashrc .gdbinit .infokey .vim .w3m .themes"

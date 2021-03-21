@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
 if ! type -a rustup &>/dev/null; then
 	curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh -s -- -y --no-modify-path
 else

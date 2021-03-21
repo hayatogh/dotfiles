@@ -1,19 +1,22 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
 os=linux
 if [[ $(uname) == Darwin ]]; then
 	os=darwin
 fi
-ver=$(wget -qO- https://golang.org/dl/ | grep -Pom1 '(?<=/dl/go)[0-9.]+(?=\.'$os'-amd64\.tar\.gz)')
+ver=$(wget -qO- https://golang.org/dl/ | grep -Po '(?<=/dl/go)[0-9.]+(?=\.'$os'-amd64\.tar\.gz)' | head -n1)
 url=https://golang.org/dl/go$ver.$os-amd64.tar.gz
 
-msg=$(go version |& grep -Po '(?<=go)[0-9.]+')
-if [[ $? -ne 0 ]]; then
-	msg="Not installed"
+loc=$(go version |& grep -Po '(?<=go)[0-9.]+' || true)
+if [[ -z $loc ]]; then
+	loc="Not installed"
 fi
-echo "Installed:     $msg"
+echo "Installed:     $loc"
 echo "Remote latest: $ver"
 
-if [[ $1 == -n || $msg == $ver && $1 != -f ]]; then
+arg=${1:-""}
+if [[ $arg == -n || $loc == $ver && $arg != -f ]]; then
 	exit
 fi
 

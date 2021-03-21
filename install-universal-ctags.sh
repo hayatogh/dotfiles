@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
 mkdir -p ~/.local/src
 cd ~/.local/src
 rm -rf ctags

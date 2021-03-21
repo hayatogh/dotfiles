@@ -1,0 +1,22 @@
+# -Es : improved ex and batch mode
+# -N  : no compatible
+# -u  : vimrc
+# -i  : viminfo file
+# +cmd  : do ex command
+# +/pat : move to matching line
+# batch mode with vimrc
+vim -ENs -u ~/.vim/vimrc -i NONE '+MinLoad' '+q'
+# sed a file
+vi -Es '+%s/pattern/replace/g' '+wq' file
+# :global and :normal
+vi -Es '+g/./normal J' '+wq' file
+
+# horizontal split
+vim -o file1 file2
+# vertical split
+vim -O file1 file2
+# open as tabs
+vim -p file1 file2
+
+# read from stdin
+printenv | vim -

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
 pacman -Syu --noconfirm
 # pacman -S --needed --noconfirm base
 # pacman -S --needed --noconfirm base-devel

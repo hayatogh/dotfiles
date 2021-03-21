@@ -1,17 +1,20 @@
 #!/usr/bin/env bash
-num=$(wget -qO- 'https://jaist.dl.osdn.jp/nkf/?C=M;O=D' | grep -Pom1 '(?<=href=")[0-9]+(?=/")')
-ver=$(wget -qO- 'https://jaist.dl.osdn.jp/nkf/'$num'?C=M;O=D' | grep -Pom1 '(?<=href="nkf-)[0-9.]+(?=\.tar\.gz")')
+set -euo pipefail
+
+num=$(wget -qO- 'https://jaist.dl.osdn.jp/nkf/?C=M;O=D' | grep -Po '(?<=href=")[0-9]+(?=/")' | head -n1)
+ver=$(wget -qO- 'https://jaist.dl.osdn.jp/nkf/'$num'?C=M;O=D' | grep -Po '(?<=href="nkf-)[0-9.]+(?=\.tar\.gz")' | head -n1)
 dir=nkf-$ver
 url=https://jaist.dl.osdn.jp/nkf/$num/$dir.tar.gz
 
-msg=$(nkf --version |& grep -Po '(?<= )[0-9.]+(?= )')
-if [[ $? -ne 0 ]]; then
-	msg="Not installed"
+loc=$(nkf --version |& grep -Po '(?<= )[0-9.]+(?= )' || true)
+if [[ -z $loc ]]; then
+	loc="Not installed"
 fi
-echo "Installed:     $msg"
+echo "Installed:     $loc"
 echo "Remote latest: $ver"
 
-if [[ $1 == -n || $msg == $ver && $1 != -f ]]; then
+arg=${1:-""}
+if [[ $arg == -n || $loc == $ver && $arg != -f ]]; then
 	exit
 fi
 

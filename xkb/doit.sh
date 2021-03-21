@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
-xkb=$(realpath $(dirname ${BASH_SOURCE[0]}))
-[ -f /usr/share/X11/xkb/rules/evdev.xml.old ] \
-	&& echo "evdev.xml already edited." \
-	&& exit 1
+set -euo pipefail
+
+xkb=$(realpath $(dirname $0))
+if [[ -f /usr/share/X11/xkb/rules/evdev.xml.old ]]; then
+	echo "evdev.xml already edited."
+	exit 1
+fi
 
 n=$(($(grep -n "<layoutList>" /usr/share/X11/xkb/rules/evdev.xml | cut -d : -f1) + 1))
 sudo sed --in-place=.old "$n i \\

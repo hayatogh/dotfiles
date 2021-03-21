@@ -1,21 +1,24 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
 if [[ $EUID != 0 ]]; then
 	sudo "$0" "$@"
-	exit $?
+	exit
 fi
 
-ver=$(wget -qO- 'http://ftp.gnu.org/gnu/screen/?C=M;O=D' | grep -Pom1 '(?<=href="screen-)[0-9.]+(?=\.tar\.gz")')
+ver=$(wget -qO- 'http://ftp.gnu.org/gnu/screen/?C=M;O=D' | grep -Po '(?<=href="screen-)[0-9.]+(?=\.tar\.gz")' | head -n1)
 dir=screen-$ver
 url=http://ftp.gnu.org/gnu/screen/$dir.tar.gz
 
-msg=$(screen --version |& grep -Po '(?<= )[0-9.]+(?= )')
-if [[ $? -ne 0 ]]; then
-	msg="Not installed"
+loc=$(screen --version |& grep -Po '(?<= )[0-9.]+(?= )' || true)
+if [[ -z $loc ]]; then
+	loc="Not installed"
 fi
-echo "Installed:     $msg"
+echo "Installed:     $loc"
 echo "Remote latest: $ver"
 
-if [[ $1 == -n || $msg == $ver && $1 != -f ]]; then
+arg=${1:-""}
+if [[ $arg == -n || $loc == $ver && $arg != -f ]]; then
 	exit
 fi
 

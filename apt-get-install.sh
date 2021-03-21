@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
+dotfiles=$(realpath $(dirname $0))
 sudo sh -c "echo \"$USER ALL=(ALL) NOPASSWD:ALL\" >/etc/sudoers.d/$USER"
 
 sudo apt-get update
@@ -16,9 +19,8 @@ sudo apt-get -y install libncurses-dev flex bison libssl-dev bc libelf-dev
 ln -sf /usr/bin/fdfind ~/.local/bin/fd
 
 # manual install
-dotfiles=$(realpath $(dirname ${BASH_SOURCE[0]}))
 cd $dotfiles
-./dpkg-install.sh
+./install-rg.sh
 
 ./install-which.sh
 ./install-vim.sh

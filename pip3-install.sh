@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
 ## checkers
 # pip3 install --upgrade --user mypy
 pip3 install --upgrade --user python-language-server

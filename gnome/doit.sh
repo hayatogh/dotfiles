@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-gnome=$(realpath $(dirname ${BASH_SOURCE[0]}))
+set -euo pipefail
+
+gnome=$(realpath $(dirname $0))
 
 dconf load /org/gnome/ < $gnome/org.gnome.dump
 if dconf dump /org/gnome/terminal &>/dev/null; then

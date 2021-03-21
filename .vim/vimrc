@@ -630,6 +630,8 @@ augroup vimrc
 	autocmd BufWritePre *.txt call s:convertPunctuation()
 
 	autocmd BufNewFile *.go,*.pl,*.py,*.sh call s:Template()
+
+	autocmd StdinReadPost * set nomodified
 augroup END " }}}
 " pack {{{1
 " minpac {{{2

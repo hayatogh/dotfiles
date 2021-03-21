@@ -1,21 +1,24 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
 if [[ $EUID != 0 ]]; then
 	sudo "$0" "$@"
-	exit $?
+	exit
 fi
 
-ver=$(wget -qO- 'http://carlowood.github.io/which/' | grep -Pom1 '(?<=HREF="which-)[0-9.]+(?=\.tar\.gz")')
+ver=$(wget -qO- 'http://carlowood.github.io/which/' | grep -Po '(?<=HREF="which-)[0-9.]+(?=\.tar\.gz")' | head -n1)
 dir=which-$ver
 url=https://carlowood.github.io/which/$dir.tar.gz
 
-msg=$(which --version |& grep -Po '(?<=v)[0-9.]+')
-if [[ $? -ne 0 ]]; then
-	msg="Not installed"
+loc=$(which --version |& grep -Po '(?<=v)[0-9.]+' || true)
+if [[ -z $loc ]]; then
+	loc="Not installed"
 fi
-echo "Installed:     $msg"
+echo "Installed:     $loc"
 echo "Remote latest: $ver"
 
-if [[ $1 == -n || $msg == $ver && $1 != -f ]]; then
+arg=${1:-""}
+if [[ $arg == -n || $loc == $ver && $arg != -f ]]; then
 	exit
 fi
 

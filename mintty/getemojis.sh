@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
-if [[ ! $MSYS == "winsymlinks:nativestrict" ]]; then
+set -euo pipefail
+
+mintty=$(realpath $(dirname $0))
+if [[ ! $(uname) =~ NT-10\.0 ]]; then
 	echo "Couldn't installed. Run from MSYS."
 	exit
 fi
+
+cd $mintty
 rm -rf emojis
 mkdir -p emojis
 cd emojis
+
 wget -qO getemojis https://github.com/mintty/mintty/wiki/getemojis
-# Check md5sum to ensure that the script accepts the same option.
-echo "83989d0ff7836d35b60c867cfb007dca *getemojis" | md5sum -c --status
-if [[ $? != 0 ]]; then
-	echo "Script changed. Manually run and update me."
-	exit
-fi
 ./getemojis -d windows

@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-dotfiles=$(realpath $(dirname ${BASH_SOURCE[0]}))
-cd $dotfiles
-./install-go.sh
+set -euo pipefail
+
 cd
 export GO111MODULE=on # for Go 1.15 or older
 # go get gonum.org/v1/plot/...

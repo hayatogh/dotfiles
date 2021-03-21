@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
+dotfiles=$(realpath $(dirname $0))
 sh -c "echo \"$USER ALL=(ALL) NOPASSWD:ALL\" >/etc/sudoers.d/$USER"
-dotfiles=$(realpath $(dirname ${BASH_SOURCE[0]}))
 /usr/bin/ruby -e "`curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install`"
 
 brew install coreutils less gnu-which

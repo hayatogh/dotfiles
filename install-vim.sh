@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
 if [[ $EUID != 0 ]]; then
 	sudo "$0" "$@"
-	exit $?
+	exit
 fi
 
 mkdir -p /usr/local/src
