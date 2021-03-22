@@ -29,8 +29,8 @@ brew install ripgrep fd
 brew install fzf
 
 brew install --cask iterm2 xquartz
-brew install --cask karabiner-elements google-japanese-ime discretescroll scroll-reverser macs-fan-control
-brew install --cask hammerspoon
+brew install --cask karabiner-elements google-japanese-ime discretescroll scroll-reverser macs-fan-control alt-tab
+# brew install --cask hammerspoon
 brew install --cask virtualbox virtualbox-extension-pack vagrant
 brew install --cask mactex-no-gui
 brew install --cask racket
@@ -67,7 +67,7 @@ defaults write -g com.apple.mouse.scaling -integer -1
 defaults write com.apple.coreservices.uiagent CSUIRecommendSafariNextNotificationDate -date 2050-01-01T00:00:00Z
 defaults write com.apple.coreservices.uiagent CSUILastOSVersionWhereSafariRecommendationWasMade -string "20.0"
 
-defaults write org.hammerspoon.Hammerspoon MJConfigFile "~/dotfiles/hammerspoon/init.lua"
+# defaults write org.hammerspoon.Hammerspoon MJConfigFile "~/dotfiles/hammerspoon/init.lua"
 
 xcode-select --install
 
