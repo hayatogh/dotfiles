@@ -6,7 +6,7 @@ if [[ $EUID != 0 ]]; then
 	exit
 fi
 
-ver=$(wget -qO- 'http://carlowood.github.io/which/' | grep -Po '(?<=HREF="which-)[0-9.]+(?=\.tar\.gz")' | head -n1)
+ver=$(wget -qO- http://carlowood.github.io/which/ | grep -Po '(?<=HREF="which-)[0-9.]+(?=\.tar\.gz")' | head -n1)
 dir=which-$ver
 url=https://carlowood.github.io/which/$dir.tar.gz
 

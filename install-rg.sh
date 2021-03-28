@@ -6,7 +6,7 @@ if [[ $EUID != 0 ]]; then
 	exit
 fi
 
-ver=$(wget -qO- https://github.com/BurntSushi/ripgrep/releases/latest | grep -Po '(?<=/BurntSushi/ripgrep/releases/download/)([0-9.]+)(?=/ripgrep_\1_amd64\.deb)')
+ver=$(wget -qO- https://github.com/BurntSushi/ripgrep/releases/latest | grep -Po '(?<=/BurntSushi/ripgrep/releases/download/)([0-9.]+)(?=/ripgrep_\1_amd64\.deb)' | head -n1)
 fname=ripgrep_${ver}_amd64.deb
 url=https://github.com/BurntSushi/ripgrep/releases/download/$ver/$fname
 

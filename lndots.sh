@@ -8,8 +8,8 @@ uname=$(uname)
 files=".inputrc .bash_profile .bashrc .gdbinit .infokey .vim .w3m .themes"
 dirsinconfig="git yapf emacs latexmk cheat"
 
-mkdir -p ~/.screen ~/.ssh ~/.config
-chmod 700 ~/.screen ~/.ssh
+mkdir -p ~/.screen ~/.ssh ~/.config $dotfiles/.vim/swap
+chmod 700 ~/.screen ~/.ssh $dotfiles/.vim/swap
 touch ~/.ssh/authorized_keys
 chmod 600 ~/.ssh/authorized_keys
 

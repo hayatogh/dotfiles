@@ -42,27 +42,27 @@ brew install --cask osxfuse
 brew install --HEAD universal-ctags/universal-ctags/universal-ctags
 # brew install docker docker-compose docker-machine
 
-defaults write -g NSAutomaticWindowAnimationsEnabled -bool false
-defaults write -g NSScrollAnimationEnabled -bool false
-defaults write -g NSWindowResizeTime -float 0.001
-defaults write -g QLPanelAnimationDuration -float 0
-defaults write -g NSScrollViewRubberbanding -bool false
-defaults write -g NSDocumentRevisionsWindowTransformAnimation -bool false
-defaults write -g NSToolbarFullScreenAnimationDuration -float 0
-defaults write -g NSBrowserColumnAnimationSpeedMultiplier -float 0
-defaults write com.apple.dock autohide-time-modifier -float 0
-defaults write com.apple.dock autohide-delay -float 0
+# defaults write -g NSBrowserColumnAnimationSpeedMultiplier -float 0 # not working
+# defaults write -g NSDocumentRevisionsWindowTransformAnimation -bool false # not working
+# defaults write -g NSScrollAnimationEnabled -bool false # not working
+# defaults write -g NSScrollViewRubberbanding -bool false # not working
+# defaults write -g NSToolbarFullScreenAnimationDuration -float 0 # not working
+# defaults write -g NSWindowResizeTime -float 0.001 # not working
+# defaults write -g QLPanelAnimationDuration -float 0 # not working
+# defaults write com.apple.finder DisableAllAnimations -bool true # not working
+defaults write -g NSAutomaticWindowAnimationsEnabled -bool false # new window zoom effect
+defaults write -g NSTextInsertionPointBlinkPeriodOff -float 1e-45 # cursor
+defaults write -g NSTextInsertionPointBlinkPeriodOn -float 1e38 # cursor
+defaults write -g com.apple.mouse.scaling -integer -1 # mouse acceleration
+defaults write com.apple.Mail DisableReplyAnimations -bool true
+defaults write com.apple.Mail DisableSendAnimations -bool true
+defaults write com.apple.dock autohide-delay -float 0 # deley before appear
+defaults write com.apple.dock autohide-time-modifier -float 0 # autohide speed
 defaults write com.apple.dock expose-animation-duration -float 0
-defaults write com.apple.dock springboard-show-duration -float 0
+defaults write com.apple.dock no-bouncing -bool true
 defaults write com.apple.dock springboard-hide-duration -float 0
 defaults write com.apple.dock springboard-page-duration -float 0
-defaults write com.apple.finder DisableAllAnimations -bool true
-defaults write com.apple.Mail DisableSendAnimations -bool true
-defaults write com.apple.Mail DisableReplyAnimations -bool true
-defaults write -g NSTextInsertionPointBlinkPeriodOn -float 1e38
-defaults write -g NSTextInsertionPointBlinkPeriodOff -float 1e-45
-defaults write com.apple.dock no-bouncing -bool false
-defaults write -g com.apple.mouse.scaling -integer -1
+defaults write com.apple.dock springboard-show-duration -float 0
 
 defaults write com.apple.coreservices.uiagent CSUIRecommendSafariNextNotificationDate -date 2050-01-01T00:00:00Z
 defaults write com.apple.coreservices.uiagent CSUILastOSVersionWhereSafariRecommendationWasMade -string "20.0"

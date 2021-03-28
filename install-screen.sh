@@ -10,7 +10,7 @@ ver=$(wget -qO- 'http://ftp.gnu.org/gnu/screen/?C=M;O=D' | grep -Po '(?<=href="s
 dir=screen-$ver
 url=http://ftp.gnu.org/gnu/screen/$dir.tar.gz
 
-loc=$(screen --version |& grep -Po '(?<= )[0-9.]+(?= )' || true)
+loc=$(screen --version |& grep -Po '(?<= )[0-9.]+(?= )' | sed -E 's/0([0-9])/\1/g' || true)
 if [[ -z $loc ]]; then
 	loc="Not installed"
 fi

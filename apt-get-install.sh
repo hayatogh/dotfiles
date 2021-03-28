@@ -7,7 +7,7 @@ sudo sh -c "echo \"$USER ALL=(ALL) NOPASSWD:ALL\" >/etc/sudoers.d/$USER"
 sudo apt-get update
 sudo apt-get -y upgrade
 sudo apt-get -y install gcc make libc6-dev gdb automake pkg-config
-sudo apt-get -y install wget vim universal-ctags fd-find screen lshw curl uchardet nkf bash-completion rlwrap info zip
+sudo apt-get -y install wget vim universal-ctags fd-find screen lshw curl uchardet nkf bash-completion rlwrap info zip pmount
 sudo apt-get -y install python3-pip chezscheme
 # sudo apt-get -y install ripgrep
 ## kernel

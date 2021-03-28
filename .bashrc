@@ -141,7 +141,7 @@ _psjobs() {
 	if [[ -z $PSJOBS ]]; then
 		PSJOBS=""
 	else
-		PSJOBS=$(ps --no-headers --pid $PSJOBS | wc -l)
+		PSJOBS=$(ps -opid= $PSJOBS | wc -l)
 		if [[ $PSJOBS == 0 ]]; then
 			PSJOBS=""
 		fi

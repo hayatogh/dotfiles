@@ -5,10 +5,10 @@ os=linux
 if [[ $(uname) == Darwin ]]; then
 	os=darwin
 fi
-ver=$(wget -qO- https://github.com/cheat/cheat/releases/latest | grep -Po '(?<=/cheat/cheat/releases/download/)[0-9.]+(?=/cheat-'$os'-amd64\.gz)')
+ver=$(wget -qO- https://github.com/cheat/cheat/releases/latest | grep -Po '(?<=/cheat/cheat/releases/download/)[0-9.]+(?=/cheat-'$os'-amd64\.gz)' | head -n1)
 url=https://github.com/cheat/cheat/releases/download/$ver/cheat-$os-amd64.gz
 
-loc=$(cheat --version 2>&1 || true)
+loc=$(cheat --version |& grep -Po '[0-9.]+' || true)
 if [[ -z $loc ]]; then
 	loc="Not installed"
 fi
