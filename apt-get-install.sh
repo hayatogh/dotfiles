@@ -3,6 +3,7 @@ set -euo pipefail
 
 dotfiles=$(realpath $(dirname $0))
 sudo sh -c "echo \"$USER ALL=(ALL) NOPASSWD:ALL\" >/etc/sudoers.d/$USER"
+sudo timedatectl set-timezone Asia/Tokyo
 
 sudo apt-get update
 sudo apt-get -y upgrade
