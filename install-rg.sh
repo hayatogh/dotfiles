@@ -10,9 +10,9 @@ ver=$(wget -qO- https://github.com/BurntSushi/ripgrep/releases/latest | grep -Po
 fname=ripgrep_${ver}_amd64.deb
 url=https://github.com/BurntSushi/ripgrep/releases/download/$ver/$fname
 
-loc=$(rg --version |& grep -Po '(?<= )[0-9.]+(?= )' || true)
-if [[ -z $loc ]]; then
-	loc="Not installed"
+loc="Not installed"
+if type rg &>/dev/null; then
+	loc=$(rg --version | grep -Po '(?<= )[0-9.]+(?= )' || true)
 fi
 echo "Installed:     $loc"
 echo "Remote latest: $ver"

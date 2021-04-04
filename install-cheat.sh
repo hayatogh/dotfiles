@@ -8,9 +8,9 @@ fi
 ver=$(wget -qO- https://github.com/cheat/cheat/releases/latest | grep -Po '(?<=/cheat/cheat/releases/download/)[0-9.]+(?=/cheat-'$os'-amd64\.gz)' | head -n1)
 url=https://github.com/cheat/cheat/releases/download/$ver/cheat-$os-amd64.gz
 
-loc=$(cheat --version |& grep -Po '[0-9.]+' || true)
-if [[ -z $loc ]]; then
-	loc="Not installed"
+loc="Not installed"
+if type cheat &>/dev/null; then
+	loc=$(cheat --version | grep -Po '[0-9.]+' || true)
 fi
 echo "Installed:     $loc"
 echo "Remote latest: $ver"

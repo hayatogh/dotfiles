@@ -46,6 +46,7 @@ export HISTTIMEFORMAT="%c : "
 
 _uname=$(uname)
 if [[ $_uname =~ NT-10.0 ]]; then
+	export LANG=$(locale -uU)
 	PATH="/c/ProgramData/chocolatey/bin:$PATH"
 	PATH="/c/HashiCorp/Vagrant/bin:$PATH"
 	PATH="/c/Users/$USER/.cargo/bin:$PATH"

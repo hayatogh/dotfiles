@@ -11,9 +11,9 @@ ver=$(wget -qO- 'http://ftp.gnu.org/gnu/screen/?C=M;O=D' | grep -Po '(?<=href="s
 dir=screen-$ver
 url=http://ftp.gnu.org/gnu/screen/$dir.tar.gz
 
-loc=$(screen --version |& grep -Po '(?<= )[0-9.]+(?= )' || true)
-if [[ -z $loc ]]; then
-	loc="Not installed"
+loc="Not installed"
+if type screen &>/dev/null; then
+	loc=$(screen --version | grep -Po '(?<= )[0-9.]+(?= )' | sed -E 's/0([0-9])/\1/g' || true)
 fi
 echo "Installed:     $loc"
 echo "Remote latest: $ver"

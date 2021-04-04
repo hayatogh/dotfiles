@@ -8,9 +8,9 @@ fi
 ver=$(wget -qO- https://golang.org/dl/ | grep -Po '(?<=/dl/go)[0-9.]+(?=\.'$os'-amd64\.tar\.gz)' | head -n1)
 url=https://golang.org/dl/go$ver.$os-amd64.tar.gz
 
-loc=$(go version |& grep -Po '(?<=go)[0-9.]+' || true)
-if [[ -z $loc ]]; then
-	loc="Not installed"
+loc="Not installed"
+if type go &>/dev/null; then
+	loc=$(go version | grep -Po '(?<=go)[0-9.]+' || true)
 fi
 echo "Installed:     $loc"
 echo "Remote latest: $ver"

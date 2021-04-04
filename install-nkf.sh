@@ -6,9 +6,9 @@ ver=$(wget -qO- 'https://jaist.dl.osdn.jp/nkf/'$num'?C=M;O=D' | grep -Po '(?<=hr
 dir=nkf-$ver
 url=https://jaist.dl.osdn.jp/nkf/$num/$dir.tar.gz
 
-loc=$(nkf --version |& grep -Po '(?<= )[0-9.]+(?= )' || true)
-if [[ -z $loc ]]; then
-	loc="Not installed"
+loc="Not installed"
+if type nkf &>/dev/null; then
+	loc=$(nkf --version | grep -Po '(?<= )[0-9.]+(?= )' || true)
 fi
 echo "Installed:     $loc"
 echo "Remote latest: $ver"

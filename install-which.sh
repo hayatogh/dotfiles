@@ -10,9 +10,9 @@ ver=$(wget -qO- http://carlowood.github.io/which/ | grep -Po '(?<=HREF="which-)[
 dir=which-$ver
 url=https://carlowood.github.io/which/$dir.tar.gz
 
-loc=$(which --version |& grep -Po '(?<=v)[0-9.]+' || true)
-if [[ -z $loc ]]; then
-	loc="Not installed"
+loc="Not installed"
+if which --version &>/dev/null; then
+	loc=$(which --version | grep -Po '(?<=v)[0-9.]+' || true)
 fi
 echo "Installed:     $loc"
 echo "Remote latest: $ver"

@@ -350,7 +350,7 @@ command! Colortest source $VIMRUNTIME/syntax/colortest.vim
 command! -nargs=0 Cdhere cd %:p:h
 
 function! s:FixWhitespace(line1,line2) " {{{2
-	let l:save_cursor = getpos(".")
+	let l:save_cursor = getcurpos()
 	silent! execute ':' . a:line1 . ',' . a:line2 . 's/\\\@<!\s\+$//'
 	call setpos('.', l:save_cursor)
 endfunction " }}}
@@ -504,14 +504,15 @@ function! s:Template() " {{{2
 		\ 'go'    : ['package main', '', 'import "fmt"', '', 'func main() {', '	fmt.Println("Hello")', '}'],
 		\ 'perl'  : '#!/usr/bin/env perl',
 		\ 'python': '#!/usr/bin/env python3',
-		\ 'sh'    : '#!/usr/bin/env bash',
+		\ 'sh'    : ['#!/usr/bin/env bash', 'set -euxo pipefail'],
 		\ }
 	if !executable('python3')
 		let l:template['python'] = '#!/usr/bin/env python'
 	endif
 	let l:after = {
-		\ 'c' : 'call setpos(''.'', [0, 4, 2, 2])',
-		\ 'go': 'call setpos(''.'', [0, 6, 2, 2])',
+		\ 'c' : 'call cursor(4, 2)',
+		\ 'go': 'call cursor(6, 2)',
+		\ '_':  'call cursor(line(''$''), 1)',
 		\ }
 	if has_key(l:template, &filetype)
 		call append(0, l:template[&filetype])
@@ -520,6 +521,8 @@ function! s:Template() " {{{2
 		endif
 		if has_key(l:after, &filetype)
 			execute(l:after[&filetype])
+		else
+			execute(l:after['_'])
 		endif
 		echon ' Template loaded'
 	endif
