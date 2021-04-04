@@ -27,6 +27,10 @@ $if mode=vi
 	set keymap vi-command
 	"ciw": "lbcw"
 	"ciW": "lBcW"
+	"ci\"": "lT\"ct\""
+	"ci'": "lT'ct'"
+	"ci/": "lT/ct/"
+	"cib": "lT(ct)"
 	"diw": "lbdw"
 	"diW": "lBdW"
 	"ysiw\"": "lbi\"\eeea\"\ee"
@@ -48,11 +52,12 @@ $if mode=vi
 	j:history-search-forward
 	"\C-p": history-search-backward
 	k:history-search-backward
-	"\C-u": "a\C-u\e"
 	"\C-x\C-r": re-read-init-file
 	"\ep": yank
 	"\eu": copy-region-as-kill
 	"\ec": insert-comment
+	"\ew": unix-word-rubout
+	"\e/": unix-filename-rubout
 	# HOME PAGEDOWN PAGEUP END
 	"\e[1~": beginning-of-line
 	"\e[6~": history-search-forward
@@ -64,9 +69,8 @@ $if mode=vi
 		"gcc": insert-comment
 		"\C-g": "i\C-e\C-u fg || true\C-m"
 		"\eg": "i\C-e\C-u fg || true\C-m\ep"
-		"\el": "i\C-e --color=always | less\C-m"
+		"\es": "i\C-e --color=always | less\C-m"
 		"\em": "i\C-e\eu\C-a _quick_man \C-m\ep"
-		"\eh": "i\C-e\eu\C-a cheat \C-m\ep"
 	$endif
 	set keymap vi-insert
 	"\C-a": beginning-of-line
@@ -97,6 +101,7 @@ $if mode=vi
 	"\eu": copy-region-as-kill
 	"\ec": insert-comment
 	"\ew": unix-word-rubout
+	"\e/": unix-filename-rubout
 	# HOME PAGEDOWN PAGEUP END
 	"\e[1~": beginning-of-line
 	"\e[6~": history-search-forward
@@ -107,16 +112,14 @@ $if mode=vi
 	$if Bash
 		"\C-g": "\C-e\C-u fg || true\C-m"
 		"\eg": "\C-e\C-u fg || true\C-m\ep"
-		"\el": "\C-e --color=always | less\C-m"
+		"\es": "\C-e --color=always | less\C-m"
 		"\em": "\C-e\eu\C-a _quick_man \C-m\ep"
-		"\eh": "\C-e\eu\C-a cheat \C-m\ep"
 	$endif
 $endif
 $if mode=emacs
 	"\C-n": history-search-forward
 	"\C-p": history-search-backward
 	# for linux console and RH/Debian xterm
-	# HOME PAGEDOWN PAGEUP END
 	"\e[1~": beginning-of-line
 	"\e[6~": history-search-forward
 	"\e[5~": history-search-backward

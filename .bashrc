@@ -1,3 +1,4 @@
+[[ ! $- =~ i ]] && return
 shopt -s autocd cdspell checkjobs checkwinsize dotglob globstar lithist no_empty_cmd_completion nocaseglob
 if [[ $TERM =~ screen ]]; then
 	if [[ $SHLVL > 2 ]]; then
@@ -21,11 +22,11 @@ alias git_dotfiles_pull="git -C ~/dotfiles pull"
 alias git_empty_commit="git a -A && git c -m 'No commit message' && git push"
 alias grep="grep --color=auto"
 alias ls="ls --color=auto"
-alias la="\ls -AF --color=auto"
-alias ll="\ls -lhF --color=auto"
-alias al="\ls -alhF --color=auto"
-alias ltime="\ls -alhrtF --color=auto"
-alias lsize="\ls -alhrFS --color=auto"
+alias la="ls -AF"
+alias ll="ls -lhF"
+alias al="ls -alhF"
+alias ltime="ls -alhrtF"
+alias lsize="ls -alhrFS"
 alias manless="man -P less"
 alias mkdir="mkdir -p"
 alias rg="rg --hidden -g'!.git'"
@@ -39,18 +40,8 @@ alias vush="vu ; vs ; vh"
 alias vs="vagrant ssh"
 alias vh="vagrant halt"
 alias wget="wget -N"
-alias which=_which
-_which() {
-	if [[ $(type -t "${@: -1}" 2>&1) == builtin ]]; then
-		echo builtin
-	fi
-	(alias; declare -f) | \which --tty-only --read-alias --read-functions --show-tilde --show-dot $@
-}
-killgrep() {
-	[[ $# != 0 ]] && ps x | \grep $1 | awk '{print $1}' | xargs kill -9 &>/dev/null
-}
 l.() {
-	([[ $# != 0 ]] && cd $1; \ls -dF .* --color=auto)
+	([[ $# != 0 ]] && cd $1; ls -dF .*)
 }
 tryssh() {
 	local sleeptime=5
@@ -74,10 +65,8 @@ _cw() {
 	READLINE_LINE=$left$right
 	READLINE_POINT=${#left}
 }
-if [[ $- =~ i ]]; then
-	bind -m vi-insert  -x '"\C-w": _cw'
-	bind -m vi-command -x '"\C-w": _cw'
-fi
+bind -m vi-insert  -x '"\C-w": _cw'
+bind -m vi-command -x '"\C-w": _cw'
 _quick_man() {
 	local preferhelp=0    # Use "command --help" instead of man pages if possible
 	local prefercheat=1
