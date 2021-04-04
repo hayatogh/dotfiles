@@ -44,7 +44,7 @@ export HISTCONTROL=ignoreboth:erasedups
 export HISTSIZE=2000
 export HISTTIMEFORMAT="%c : "
 
-_uname=$(uname)
+export _uname=$(uname)
 if [[ $_uname =~ NT-10.0 ]]; then
 	export LANG=$(locale -uU)
 	PATH="/c/ProgramData/chocolatey/bin:$PATH"
