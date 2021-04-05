@@ -13,7 +13,7 @@ fi
 echo "Installed:     $loc"
 echo "Remote latest: $ver"
 
-arg=${1:-""}
+arg=${1:-}
 if [[ $arg == -n || $loc == $ver && $arg != -f ]]; then
 	exit
 fi
