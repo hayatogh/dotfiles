@@ -13,7 +13,7 @@ sudo apt-get -y install python3-pip chezscheme
 # sudo apt-get -y install ripgrep
 ## kernel
 # sudo apt-get -y install linux-headers-`uname -r`
-sudo apt-get -y install libncurses-dev flex bison libssl-dev bc libelf-dev
+sudo apt-get -y install libncurses-dev flex bison libssl-dev bc libelf-dev rsync
 ## syzkaller
 # sudo apt-get install -y debootstrap qemu-system-x86
 
