@@ -47,7 +47,7 @@ if has('linux') && !s:jailshell
 	let s:idirs += [ s:idir ]
 	if !empty(s:idirs)
 		for s:idir in s:idirs
-			execute "set path+=" . s:idir
+			execute 'set path+=' . s:idir
 			" let g:ale_c_gcc_options .= ' -I' . s:idir
 		endfor
 	endif
@@ -73,7 +73,7 @@ let g:CRLF = {'unix': 'LF', 'dos': 'CRLF', 'mac': 'CR'}
 let s:autoIminsertZero=1
 function! g:Imzero()
 	if s:autoIminsertZero | set iminsert=0 | endif
-	return ""
+	return ''
 endfunction
 function! g:Charcount()
 	return wordcount().chars - line('$')
@@ -96,16 +96,16 @@ function! s:tablabel(tabpagenr)
 	let l:no = len(l:buflist) == 1 ? '' : len(l:buflist)
 	let l:mod = len(filter(copy(l:buflist), 'getbufvar(v:val, "&modified")')) ? '+' : ''
 	let l:sp = (l:no . l:mod) == '' ? '' : ' '
-	let l:fname = fnamemodify(bufname(l:curbufnr), ":.")
-	let l:fname1 = fnamemodify(bufname(l:curbufnr), ":~")
+	let l:fname = fnamemodify(bufname(l:curbufnr), ':.')
+	let l:fname1 = fnamemodify(bufname(l:curbufnr), ':~')
 	let l:fname = l:fname == '' ? '_'
 		\ : strchars(l:fname) <= strchars(l:fname1) ? l:fname
 		\ : l:fname1
 	return '%' . a:tabpagenr . 'T%#Title#' . l:no . l:hi . l:mod . l:sp . l:fname . '%#TabLineFill#'
 endfunction
 function! g:Cuitabline()
-	let l:tabpages = join(map(range(1, tabpagenr('$')), 's:tablabel(v:val)'), ' ')
-	let l:info = strftime('%m/%d%a %H:%M') . ' %#TabLine#' . fnamemodify(getcwd(), ":~") . ' '
+	let l:tabpages = join(map(range(1, tabpagenr('$')), '<SID>tablabel(v:val)'), ' ')
+	let l:info = strftime('%m/%d%a %H:%M') . ' %#TabLine#' . fnamemodify(getcwd(), ':~') . ' '
 	return l:tabpages . ' %T%=' . l:info
 endfunction
 " }}}
@@ -155,10 +155,10 @@ if !has('win32')
 	let &t_SI = &t_VS
 endif
 if has('win32unix')
-	let &t_TI = ""
-	let &t_TE = ""
+	let &t_TI = ''
+	let &t_TE = ''
 endif
-if $WSL_DISTRO_NAME != "" || $MSYSTEM != ""
+if $WSL_DISTRO_NAME != '' || $MSYSTEM != ''
 	let g:ImStatus = 0
 	function! g:ImStatusFunc()
 		return g:ImStatus
@@ -171,7 +171,7 @@ if $WSL_DISTRO_NAME != "" || $MSYSTEM != ""
 	set imactivatefunc=ImActivateFunc
 endif
 let s:clipexe_ok = 0
-if executable("clip.exe") && has('linux')
+if executable('clip.exe') && has('linux')
 	let s:clipexe_ok = 1
 endif
 
@@ -187,7 +187,7 @@ map Y y$
 nnoremap <silent> mm :<C-U>nohlsearch<CR>
 nnoremap <silent> mn :<C-U>Hi0<CR>
 
-nnoremap <C-W><C-H> :<C-U>execute "tabprevious " . v:count1<CR>
+nnoremap <C-W><C-H> :<C-U>execute 'tabprevious ' . v:count1<CR>
 nnoremap <C-W><C-J> :-tabedit<CR>
 nnoremap <C-W><C-K> :tabedit<CR>
 nnoremap <C-W><C-L> :<C-U>for i in range(1, v:count1) \| tabnext \| endfor<CR>
@@ -195,7 +195,7 @@ nnoremap <C-W><C-E> :tablast \| :tabedit<CR>
 nnoremap <C-W><C-A> :tabrewind \| :-tabedit<CR>
 nnoremap <C-W><C-O> :tabonly<CR>
 nnoremap <C-W><C-Q> :tabclose<CR>
-nnoremap <C-W><C-T> :<C-U>execute "tabnext " . (v:count + 1)<CR>
+nnoremap <C-W><C-T> :<C-U>execute 'tabnext ' . (v:count + 1)<CR>
 
 nnoremap <Plug>Blankline :call append(line('.'), '')<CR>j:call repeat#set("\<Plug>Blankline")<CR>
 nmap <Leader>o <Plug>Blankline
@@ -226,7 +226,7 @@ function! s:Search(zero, word)
 	else
 		let l:pat = a:word
 	endif
-	call histadd("/", l:pat)
+	call histadd('/', l:pat)
 	let @/=l:pat
 	call <SID>copytoScreenReg(a:word)
 endfunction
@@ -262,12 +262,10 @@ function! s:getfname()
 	let l:fname = fnamemodify(bufname(), ':t') . ':' . getcurpos()[1]
 	silent! let @* = l:fname
 	silent! let @+ = l:fname
-	if &term =~# 'screen'
-		call system('screen -X register . ' . l:fname)
-	endif
+	call <SID>copytoScreenReg(l:fname)
 	return l:fname
 endfunction
-command! Getfname echo s:getfname()
+command! Getfname echo <SID>getfname()
 nnoremap <silent> yd :<C-U>echo <SID>getfname()<CR>
 
 cnoremap <Left> <Space><BS><Left>
@@ -299,7 +297,7 @@ nmap <Leader>4 :<C-U>Hi4 <C-R><C-W><CR>
 nmap <Leader>5 :<C-U>Hi5 <C-R><C-W><CR>
 nmap <Leader>6 :<C-U>Hi6 <C-R><C-W><CR>
 
-tnoremap <C-W><C-H> <C-W>:<C-U>execute "tabprevious " . v:count1<CR>
+tnoremap <C-W><C-H> <C-W>:<C-U>execute 'tabprevious ' . v:count1<CR>
 tnoremap <C-W><C-J> <C-W>:-tabnew<CR>
 tnoremap <C-W><C-K> <C-W>:tabnew<CR>
 tnoremap <C-W><C-L> <C-W>:<C-U>for i in range(1, v:count1) \| tabnext \| endfor<CR>
@@ -307,42 +305,31 @@ tnoremap <C-W><C-E> <C-W>:tablast \| :tabedit<CR>
 tnoremap <C-W><C-A> <C-W>:tabrewind \| :-tabedit<CR>
 tnoremap <C-W><C-O> <C-W>:tabonly<CR>
 tnoremap <C-W><C-Q> <C-W>:tabclose<CR>
-tnoremap <C-W><C-T> <C-W>:<C-U>execute "tabnext " . (v:count + 1)<CR>
+tnoremap <C-W><C-T> <C-W>:<C-U>execute 'tabnext ' . (v:count + 1)<CR>
+
+function! s:BackRun(cmd)
+	let l:n = bufnr('!' . a:cmd)
+	if l:n != -1
+		execute 'bdelete ' . l:n
+	endif
+	call term_start(a:cmd)
+	wincmd p
+endfunction
+nnoremap <Leader>t :call <SID>BackRun('cargo test')<CR>
+nnoremap <Leader>u :call <SID>BackRun('cargo run')<CR>
 
 " excommand {{{1
 command! DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis | wincmd p | diffthis
 
-command! Gccandrun !gcc % && ./a.out
-
-function! s:gccrunandread() " {{{2
-	set paste
-	execute "normal! o/*\<CR>*/\<ESC>k"
-	set nopaste
-	w
-	!gcc %
-	r!./a.out
-endfunction
-" }}}
-command! Gccrunandread call s:gccrunandread()
-
 function! s:readTypescript() " {{{2
-	let l:ts = map(readfile("typescript")[1:-3], {_, val -> substitute(val, '\s\+$', '', '')})
+	let l:ts = map(readfile('typescript')[1:-3], {_, val -> substitute(val, '\s\+$', '', '')})
 	if &ft == 'c'
 		let l:ts = ['/*'] + l:ts + ['*/']
 	endif
 	call append(getpos('.')[1], l:ts)
 endfunction
 " }}}
-command! Typesc call s:readTypescript()
-
-function! s:Executepdfplatex() " {{{2
-	if "tex" == &filetype
-		execute("\!C:\\w32tex\\bin\\pdfplatex.bat\ " . expand("%:p"))
-		execute("\!start\ \"C:\\Program\ Files\\Tracker\ Software\\" . "PDF\ Editor\\PDFXEdit.exe\" " . expand("%:r").".pdf")
-	endif
-endfunction
-" }}}
-command! Pdfplatex call s:Executepdfplatex()
+command! Typesc call <SID>readTypescript()
 
 command! Hitest runtime syntax/hitest.vim
 command! Colortest source $VIMRUNTIME/syntax/colortest.vim
@@ -354,50 +341,14 @@ function! s:FixWhitespace(line1,line2) " {{{2
 	silent! execute ':' . a:line1 . ',' . a:line2 . 's/\\\@<!\s\+$//'
 	call setpos('.', l:save_cursor)
 endfunction " }}}
-command! -range=% FixWhitespace call s:FixWhitespace(<line1>,<line2>)
-
-function! s:TOhi(...) " {{{2
-	if a:0 == 0
-		let l:input = escape(expand('%'), ' ')
-	else
-		let l:input = a:1
-	endif
-	let l:output = l:input . '.html'
-	let g:toimage_lastoutput = l:output
-	let l:fold = exists('g:toimage_fold') && g:toimage_fold ?
-		\ ' "+set foldmethod=marker foldlevel=0"' : ''
-	let l:nonumber = exists('g:toimage_nonumber') && g:toimage_nonumber ?
-		\ ' "+set nonumber norelativenumber"' : ''
-	let l:colorschemes = exists('g:toimage_colorschemes') ?
-		\ ' ' . join(map(g:toimage_colorschemes,
-		\ '''"+'' . v:val . ''"''')) : ''
-	let l:string = 'view -E -N -u ~/.vim/vimrc -s '
-		\ . l:input . l:fold . l:nonumber . l:colorschemes
-		\ . ' "+runtime syntax/2image.vim" "+w! '
-		\ . l:output . '" "+qa!" >/dev/null'
-	call system(l:string)
-	call s:TOi()
-endfunction " }}}
-command! -nargs=? -complete=file TOhi call s:TOhi(<f-args>)
-function! s:TOi(...) " {{{2
-	if a:0 == 0
-		if !exists('g:toimage_lastoutput') | return | endif
-		let l:input = g:toimage_lastoutput
-	else
-		let l:input = a:1
-	endif
-	let l:output = fnamemodify(l:input, ':r') . '.' . g:toimage_output
-	let l:string = g:toimage_wkhtmltoimage . ' -q --width 0 ' . l:input . ' ' . l:output
-	call system(l:string)
-endfunction " }}}
-command! -nargs=? -complete=file TOi call s:TOi(<f-args>)
+command! -range=% FixWhitespace call <SID>FixWhitespace(<line1>, <line2>)
 
 function! s:XXD(do) " {{{2
 	if a:do
 		let b:save_ft_binary = [&filetype, &l:binary]
 		let &binary = 1
 		silent edit " for binary to take effect
-		let &ft = "xxd"
+		let &ft = 'xxd'
 		%!xxd
 	else
 		if exists('b:save_ft_binary')
@@ -407,8 +358,8 @@ function! s:XXD(do) " {{{2
 		%!xxd -r
 	endif
 endfunction " }}}
-command! XXD call s:XXD(1)
-command! XXDundo call s:XXD(0)
+command! XXD call <SID>XXD(1)
+command! XXDundo call <SID>XXD(0)
 
 function! s:multiHlSetup() " {{{2
 	highlight Multihl1 ctermbg=14 ctermfg=8 guibg=#00ffff guifg=#808080
@@ -424,20 +375,20 @@ function! s:Hi(num, ...)
 	else
 		silent! call matchdelete(a:num + 5)
 		if a:0 != 0
-			call matchadd("Multihl" . a:num, a:1, 10, a:num + 5)
-			call histadd(":", "Hi" . a:num . " " . a:1)
+			call matchadd('Multihl' . a:num, a:1, 10, a:num + 5)
+			call histadd(':', 'Hi' . a:num . ' ' . a:1)
 			return
 		endif
 	endif
-	call histadd(":", "Hi" . a:num)
+	call histadd(':', 'Hi' . a:num)
 endfunction " }}}
-command! -nargs=0 Hi0 call s:Hi(0)
-command! -nargs=? Hi1 call s:Hi(1, <f-args>)
-command! -nargs=? Hi2 call s:Hi(2, <f-args>)
-command! -nargs=? Hi3 call s:Hi(3, <f-args>)
-command! -nargs=? Hi4 call s:Hi(4, <f-args>)
-command! -nargs=? Hi5 call s:Hi(5, <f-args>)
-command! -nargs=? Hi6 call s:Hi(6, <f-args>)
+command! -nargs=0 Hi0 call <SID>Hi(0)
+command! -nargs=? Hi1 call <SID>Hi(1, <f-args>)
+command! -nargs=? Hi2 call <SID>Hi(2, <f-args>)
+command! -nargs=? Hi3 call <SID>Hi(3, <f-args>)
+command! -nargs=? Hi4 call <SID>Hi(4, <f-args>)
+command! -nargs=? Hi5 call <SID>Hi(5, <f-args>)
+command! -nargs=? Hi6 call <SID>Hi(6, <f-args>)
 
 function! s:ManPager() " {{{2
 	setlocal filetype=man
@@ -445,46 +396,44 @@ function! s:ManPager() " {{{2
 	silent keepjumps keeppatterns %s/\v(.)\b\ze\1?//ge
 	silent keepjumps keeppatterns %s/\v\e\[([0-9]{1,2}(;[0-9]{1,2})?)?m//ge
 	call cursor(1, 1)
-	" let n = search(".*(.*)", "c")
-	" if n > 1 | exe "1," . n-1 . "d" | endif
 	setlocal nonumber norelativenumber nomodified nomodifiable noswapfile
 	setlocal bufhidden=hide nobuflisted buftype=nofile nofoldenable
 endfunction " }}}
-command! -nargs=0 MYMANPAGER call s:ManPager() | delcommand MYMANPAGER
+command! -nargs=0 MYMANPAGER call <SID>ManPager() | delcommand MYMANPAGER
 
 function! s:Align(cmd, line1, line2, ...) " {{{2
 	let l:save_cursor = getcurpos()
 	if a:0 == 0
-		let l:char = input("")
+		let l:char = input('')
 	else
 		let l:char = a:1
 	endif
 	execute 'normal ' . a:line1 . 'GV' . a:line2 . 'G' . a:cmd . l:char
 	call setpos('.', l:save_cursor)
 endfunction " }}}
-command! -range -nargs=? AlignRight call s:Align('gL', <line1>, <line2>, <f-args>)
-command! -range -nargs=? AlignLeft call s:Align('gl', <line1>, <line2>, <f-args>)
+command! -range -nargs=? AlignRight call <SID>Align('gL', <line1>, <line2>, <f-args>)
+command! -range -nargs=? AlignLeft call <SID>Align('gl', <line1>, <line2>, <f-args>)
 
 command! -nargs=0 Reload let s:undoreload = &undoreload | set undoreload=0 | edit | let &undoreload = s:undoreload
 
 function! s:Nkf() " {{{2
-	let l:fname = fnamemodify(expand("%"), ":p")
-	if executable("uchardet")
-		let l:enc = system("uchardet " . l:fname)
-	elseif executable("nkf")
-		let l:enc = system("nkf --guess=1 " . l:fname)
+	let l:fname = fnamemodify(expand('%'), ':p')
+	if executable('uchardet')
+		let l:enc = system('uchardet ' . l:fname)
+	elseif executable('nkf')
+		let l:enc = system('nkf --guess=1 ' . l:fname)
 	else
-		echoerr "uchardet or nkf must be installed!"
+		echoerr 'uchardet or nkf must be installed!'
 		return
 	endif
-	execute "e ++enc=" . l:enc
+	execute 'e ++enc=' . l:enc
 endfunction " }}}
-command! -nargs=0 Nkf call s:Nkf()
+command! -nargs=0 Nkf call <SID>Nkf()
 
 function! s:CommandPreview(...) " {{{2
 	let l:shcmdflag = has('win32') ? &shellcmdflag : '-ic'
 	let l:cmd = &shell . ' ' . l:shcmdflag . ' "' . join(a:000) . '"'
-	let l:opt = { "hidden": 1, "term_finish": "open", "term_opencmd": "botright sbuf %d | setl modifiable" }
+	let l:opt = { 'hidden': 1, 'term_finish': 'open', 'term_opencmd': 'botright sbuf %d | setl modifiable' }
 	call term_start(l:cmd, l:opt)
 endfunction
 function! s:BashComp(ArgLead, CmdLine, CursorPos)
@@ -493,9 +442,9 @@ function! s:BashComp(ArgLead, CmdLine, CursorPos)
 	return g:bash#complete(l:str)
 endfunction " }}}
 if has('win32')
-	command! -nargs=* -complete=file S call s:CommandPreview(<f-args>)
+	command! -nargs=* -complete=file S call <SID>CommandPreview(<f-args>)
 else
-	command! -nargs=* -complete=customlist,s:BashComp S call s:CommandPreview(<f-args>)
+	command! -nargs=* -complete=customlist,<SID>BashComp S call <SID>CommandPreview(<f-args>)
 endif
 
 function! s:Template() " {{{2
@@ -527,36 +476,36 @@ function! s:Template() " {{{2
 		echon ' Template loaded'
 	endif
 endfunction " }}}
-command! -nargs=0 Template call s:Template()
+command! -nargs=0 Template call <SID>Template()
 " autocommand {{{1
 command! AUTOiminsertzero let s:autoIminsertZero = !s:autoIminsertZero
 
-command! AUTOhltrailingwhitespaces call s:toggleAutoHlTrailingWhiteSpaces()
+command! AUTOhltrailingwhitespaces call <SID>toggleAutoHlTrailingWhiteSpaces()
 let s:autoHlTrailingWhiteSpaces = 1
 function! s:toggleAutoHlTrailingWhiteSpaces()
 	let s:autoHlTrailingWhiteSpaces = !s:autoHlTrailingWhiteSpaces
-	call s:hlTrailingWhiteSpace(1)
+	call <SID>hlTrailingWhiteSpace(1)
 endfunction
 function! s:hlTrailingWhiteSpace(isNormal)
 	silent! call matchdelete(4)
 	if !s:autoHlTrailingWhiteSpaces | return | endif
 	if a:isNormal
-		call matchadd("ExtraWhitespace", '\\\@<!\s\+$', 10, 4)
+		call matchadd('ExtraWhitespace', '\\\@<!\s\+$', 10, 4)
 	else
-		call matchadd("ExtraWhitespace", '\\\@<!\s\+\%#\@<!$', 10, 4)
+		call matchadd('ExtraWhitespace', '\\\@<!\s\+\%#\@<!$', 10, 4)
 	endif
 endfunction
 
-command! AUTOhlideographicspace call s:toggleAutoHlIdeographicSpace()
+command! AUTOhlideographicspace call <SID>toggleAutoHlIdeographicSpace()
 let s:autoHlIdeographicSpace = 1
 function! s:toggleAutoHlIdeographicSpace()
 	let s:autoHlIdeographicSpace = !s:autoHlIdeographicSpace
-	call s:hlIdeographicSpace()
+	call <SID>hlIdeographicSpace()
 endfunction
 function! s:hlIdeographicSpace()
 	silent! call matchdelete(5)
 	if !s:autoHlIdeographicSpace | return | endif
-	call matchadd("IdeographicSpace", '[\u3000]', 10, 5)
+	call matchadd('IdeographicSpace', '[\u3000]', 10, 5)
 endfunction
 
 command! AUTOhalfcommas let s:autoHalfCommas = !s:autoHalfCommas
@@ -587,20 +536,19 @@ endfunction
 
 function! s:copytoScreenRegUnnamed()
 	if v:event.regname == ''
-		call <SID>copytoScreenReg(join(v:event.regcontents))
+		call <SID>copytoScreenReg(join(v:event.regcontents, "\n"))
 	endif
 endfunction
 function! s:copytoScreenReg(str)
 	if &term =~# 'screen'
 		let l:escaped = escape(a:str, '\$^')
 		if len(l:escaped) <= 749
-			call job_start(["screen", "-X", "register", ".", l:escaped])
+			call job_start(['screen', '-X', 'register', '.', l:escaped])
 		endif
 	endif
 	if s:clipexe_ok
-		let l:escaped = shellescape(a:str)
-		let l:escaped = substitute(l:escaped, '\\\$', '$', 'g')
-		call job_start(["/bin/sh", "-c", "echo -n " . l:escaped . " | clip.exe"])
+		let l:escaped = shellescape(escape(a:str, '\'))
+		call job_start(['/bin/sh', '-c', 'echo -n ' . l:escaped . ' | clip.exe'])
 	endif
 endfunction
 
@@ -612,27 +560,27 @@ augroup vimrc
 	autocmd Colorscheme * highlight Cursor guifg=Black guibg=Cyan
 	autocmd Colorscheme * highlight CursorIM guifg=Black guibg=Magenta
 
-	autocmd BufReadPost * if line("'\"") >= 1 && line("'\"") <= line("$") && &ft !~# 'commit' | exe "normal! g`\"" | endif
+	autocmd BufReadPost * if line('''"') >= 1 && line('''"') <= line('$') && &ft !~# 'commit' | exe 'normal! g`"' | endif
 
-	autocmd CmdwinEnter * nnoremap <buffer> <F5> :let g:CmdWindowLineMark=line(".")<CR><CR>q::execute "normal ".g:CmdWindowLineMark."G"<CR>
+	autocmd CmdwinEnter * nnoremap <buffer> <F5> :let g:CmdWindowLineMark=line('.')<CR><CR>q::execute 'normal! ' . g:CmdWindowLineMark . 'G'<CR>
 
 	autocmd ColorScheme * highlight ExtraWhitespace ctermbg=darkred guibg=darkred
-	autocmd BufEnter,BufRead,BufNew * call s:hlTrailingWhiteSpace(1)
-	autocmd InsertLeave * call s:hlTrailingWhiteSpace(1)
-	autocmd InsertEnter * call s:hlTrailingWhiteSpace(0)
+	autocmd BufEnter,BufRead,BufNew * call <SID>hlTrailingWhiteSpace(1)
+	autocmd InsertLeave * call <SID>hlTrailingWhiteSpace(1)
+	autocmd InsertEnter * call <SID>hlTrailingWhiteSpace(0)
 
 	autocmd Colorscheme * highlight IdeographicSpace term=underline ctermbg=DarkGreen guibg=DarkGreen
-	autocmd BufEnter,BufRead,BufNew * call s:hlIdeographicSpace()
+	autocmd BufEnter,BufRead,BufNew * call <SID>hlIdeographicSpace()
 
-	autocmd Colorscheme * call s:multiHlSetup()
+	autocmd Colorscheme * call <SID>multiHlSetup()
 
-	autocmd BufWritePre *.tex call s:halfCommas()
+	autocmd BufWritePre *.tex call <SID>halfCommas()
 
-	autocmd TextYankPost * call s:copytoScreenRegUnnamed()
+	autocmd TextYankPost * call <SID>copytoScreenRegUnnamed()
 
-	autocmd BufWritePre *.txt call s:convertPunctuation()
+	autocmd BufWritePre *.txt call <SID>convertPunctuation()
 
-	autocmd BufNewFile *.go,*.pl,*.py,*.sh call s:Template()
+	autocmd BufNewFile *.go,*.pl,*.py,*.sh call <SID>Template()
 
 	autocmd StdinReadPost * set nomodified
 augroup END " }}}
@@ -696,7 +644,7 @@ function! s:Minpac()
 	call minpac#update()
 endfunction
 
-command! MinLoad silent! source $MYVIMRC | call s:Minpac()
+command! MinLoad silent! source $MYVIMRC | call <SID>Minpac()
 " }}}
 " previm {{{2
 let g:previm_enable_realtime = 1
@@ -723,7 +671,6 @@ if has('win32')
 elseif has('mac')
 	let g:vimtex_view_general_viewer = 'evince'
 endif
-nmap <LocalLeader>ls <plug>(vimtex-compile-ss)
 " }}}
 " lexima {{{2
 let g:lexima_enable_basic_rules = 0
@@ -764,11 +711,6 @@ let g:indentLine_fileTypeExclude = ['c', 'cpp', 'vim', 'help', 'man', 'text']
 let g:indentLine_char = '▏'
 " }}}
 " 2html {{{2
-if !has('win32unix')
-	let g:toimage_wkhtmltoimage = '/c/ProgramData/chocolatey/bin/wkhtmltoimage.exe'
-else
-	let g:toimage_wkhtmltoimage = 'wkhtmltoimage'
-endif
 let g:toimage_font_size = '20pt'
 let g:toimage_no_hyperlinks = 1
 let g:toimage_additionalCss = [
@@ -788,10 +730,22 @@ let g:toimage_output = 'png'
 " ale {{{2
 nmap <Leader>j <Plug>(ale_next)
 nmap <Leader>k <Plug>(ale_previous)
-nmap <Leader>t <Plug>(ale_toggle)
-nmap <Leader>b <Plug>(ale_toggle_buffer)
 nmap <Leader>h <Plug>(ale_hover)
-nmap <Leader>d <Plug>(ale_detail)
+
+function! s:ALEFixOnSaveToggle(vartype, value)
+	let l:new = a:value == -1 ? '!' . get(eval(a:vartype . ':'), 'ale_fix_on_save', 0) : a:value
+	execute 'let ' .  a:vartype . ':ale_fix_on_save = ' . l:new
+endfunction
+command! -bar ALEFixOnSaveToggle        call <SID>ALEFixOnSaveToggle('g', -1)
+command! -bar ALEFixOnSaveToggleBuffer  call <SID>ALEFixOnSaveToggle('b', -1)
+command! -bar ALEFixOnSaveEnable        call <SID>ALEFixOnSaveToggle('g', 1)
+command! -bar ALEFixOnSaveEnableBuffer  call <SID>ALEFixOnSaveToggle('b', 1)
+command! -bar ALEFixOnSaveDisable       call <SID>ALEFixOnSaveToggle('g', 0)
+command! -bar ALEFixOnSaveDisableBuffer call <SID>ALEFixOnSaveToggle('b', 0)
+command! -bar ALEEnableAll        ALEEnable | ALEFixOnSaveEnable
+command! -bar ALEEnableAllBuffer  ALEEnableBuffer | ALEFixOnSaveEnableBuffer
+command! -bar ALEDisableAll       ALEDisable | ALEFixOnSaveDisable
+command! -bar ALEDisableAllBuffer ALEDisableBuffer | ALEFixOnSaveDisableBuffer
 
 function! g:Tjump()
 	if tagfiles() == []
@@ -969,14 +923,14 @@ function! s:Lexima_endwise_rule_make_rule(at, end, filetype, syntax)
 		\ 'filetype': a:filetype, 'syntax': a:syntax}
 endfunction
 for s:at in ['if', 'while', 'for', 'try']
-	let s:rulelist += [s:Lexima_endwise_rule_make_rule('^\s*' . s:at . '\>.*\%#$', 'end' . s:at, 'vim', []),]
+	let s:rulelist += [<SID>Lexima_endwise_rule_make_rule('^\s*' . s:at . '\>.*\%#$', 'end' . s:at, 'vim', []),]
 endfor
 let s:rulelist += [s:Lexima_endwise_rule_make_rule('^\s*function!.*\%#$', 'endfunction', 'vim', []),
-	\ s:Lexima_endwise_rule_make_rule('^\s*augroup\s\+.\+\%#$', 'augroup END', 'vim', []),
-	\ s:Lexima_endwise_rule_make_rule('\%(^\s*#.*\)\@<!do\s*\%#$', 'end', 'elixir', []),
-	\ s:Lexima_endwise_rule_make_rule('^\s*if\>.*\%#$', 'fi', ['sh', 'zsh'], []),
-	\ s:Lexima_endwise_rule_make_rule('^\s*case\>.*\%#$', 'esac', ['sh', 'zsh'], []),
-	\ s:Lexima_endwise_rule_make_rule('\%(^\s*#.*\)\@<!do\>.*\%#$', 'done', ['sh', 'zsh'], []),]
+	\ <SID>Lexima_endwise_rule_make_rule('^\s*augroup\s\+.\+\%#$', 'augroup END', 'vim', []),
+	\ <SID>Lexima_endwise_rule_make_rule('\%(^\s*#.*\)\@<!do\s*\%#$', 'end', 'elixir', []),
+	\ <SID>Lexima_endwise_rule_make_rule('^\s*if\>.*\%#$', 'fi', ['sh', 'zsh'], []),
+	\ <SID>Lexima_endwise_rule_make_rule('^\s*case\>.*\%#$', 'esac', ['sh', 'zsh'], []),
+	\ <SID>Lexima_endwise_rule_make_rule('\%(^\s*#.*\)\@<!do\>.*\%#$', 'done', ['sh', 'zsh'], []),]
 let s:rulelist += [{'char': '<CR>', 'input': '<CR>'}] " inoremap <CR> <C-G>u<CR>
 " }}}
 " filetype specific {{{3

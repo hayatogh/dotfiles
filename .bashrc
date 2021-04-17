@@ -144,6 +144,13 @@ if ! type realpath &>/dev/null; then
 		done
 	}
 fi
+cdd() {
+	if [[ $# == 0 ]]; then
+		cd
+	else
+		cd $(dirname $1)
+	fi
+}
 
 if [[ $_uname =~ NT-10.0 ]]; then
 	alias rg="rg --path-separator '\x2F'"
