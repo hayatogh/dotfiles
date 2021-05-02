@@ -7,8 +7,7 @@ sudo timedatectl set-timezone Asia/Tokyo
 
 sudo apt-get update
 sudo apt-get -y upgrade
-sudo apt-get -y install gcc make libc6-dev gdb automake pkg-config
-sudo apt-get -y install wget vim universal-ctags fd-find screen lshw curl uchardet nkf bash-completion rlwrap info zip pmount
+sudo apt-get -y install automake bash-completion bc curl fd-find gcc gdb htop info libc6-dev libncurses-dev lshw lsof make nkf pkg-config pmount rlwrap rsync screen uchardet universal-ctags vim wget zip
 sudo apt-get -y install python3-pip chezscheme
 # sudo apt-get -y install ripgrep
 ## kernel
@@ -23,7 +22,6 @@ ln -sf /usr/bin/fdfind ~/.local/bin/fd
 cd $dotfiles
 ./install-rg.sh
 
-./install-which.sh
 ./install-vim.sh
 ./install-cheat.sh
 

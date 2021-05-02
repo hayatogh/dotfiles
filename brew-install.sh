@@ -1,43 +1,28 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-dotfiles=$(realpath $(dirname $0))
-sh -c "echo \"$USER ALL=(ALL) NOPASSWD:ALL\" >/etc/sudoers.d/$USER"
-/usr/bin/ruby -e "`curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install`"
+# xcode-select --install
 
-brew install coreutils less gnu-which
-brew install bash bash-completion@2
-brew install ed gawk gnu-sed grep
-brew install binutils
-brew install diffutils gpatch wdiff
-brew install make automake m4
-brew install findutils gzip gnu-indent gnu-tar texinfo wget
-brew install screen watch
-brew install file-formula
-brew install git openssh
+dotfiles=$(cd $(dirname $0); pwd -P)
+sudo sh -c "echo \"$USER ALL=(ALL) NOPASSWD:ALL\" >/etc/sudoers.d/$USER"
+if ! grep '/usr/local/bin/bash' /etc/shells &>/dev/null; then
+	sudo sh -c "echo /usr/local/bin/bash >>/etc/shells"
+fi
+if ! type brew &>/dev/null; then
+	/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
+
+brew install automake bash binutils coreutils diffutils ed findutils gawk grep gzip gnu-indent less m4 make gpatch screen gnu-sed gnu-tar texinfo wdiff wget
+brew install bash-completion@2 fd file-formula fzf git openssh p7zip ripgrep rlwrap vim watch
 brew install python chezscheme
-brew install vim
-brew install rlwrap
-# brew install gnutls
-# brew install rsync
-# brew install svn
-# brew install unzip
-# brew install zsh
+# brew install rsync svn unzip zsh
 
-brew install p7zip
-brew install ripgrep fd
-brew install fzf
-
-brew install --cask iterm2 xquartz
-brew install --cask karabiner-elements google-japanese-ime discretescroll scroll-reverser macs-fan-control alt-tab
-# brew install --cask hammerspoon
+brew install --cask iterm2 xquartz \
+	karabiner-elements google-japanese-ime discretescroll scroll-reverser macs-fan-control alt-tab
 brew install --cask virtualbox virtualbox-extension-pack vagrant
-brew install --cask mactex-no-gui
-brew install --cask racket
-brew install --cask slack
-brew install --cask drawio
-brew install --cask zotero
-brew install --cask osxfuse
+# brew install --cask mactex-no-gui
+brew install --cask drawio slack zotero
+# brew install --cask hammerspoon racket osxfuse
 
 brew install --HEAD universal-ctags/universal-ctags/universal-ctags
 # brew install docker docker-compose docker-machine
@@ -69,10 +54,5 @@ defaults write com.apple.coreservices.uiagent CSUILastOSVersionWhereSafariRecomm
 
 # defaults write org.hammerspoon.Hammerspoon MJConfigFile "~/dotfiles/hammerspoon/init.lua"
 
-xcode-select --install
-
 cd $dotfiles
-./pip3-install.sh
-./install-cheat.sh
-
 ./getbashcompletion.sh

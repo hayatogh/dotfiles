@@ -123,9 +123,10 @@ set wrap
 let g:c_comment_strings = 1
 let g:html_font = ['Consolas', 'Monaco']
 let g:html_pre_wrap = 0
+let g:vim_json_conceal = 0
 let g:mapleader = ' '
 let g:maplocalleader = ' '
-let g:vim_json_conceal = 0
+let g:readline_has_bash = 1
 let g:rst_style = 1
 let g:rst_syntax_code_list = {
 	\ 'c'     : ['c'],
@@ -141,9 +142,9 @@ let g:rst_syntax_code_list = {
 	\ }
 let g:rst_use_emphasis_colors = 1
 let g:rust_bang_comment_leader = 1
-let g:tex_flavor = 'latex'
 let g:tex_conceal = ''
-let g:vim_indent_cont = &shiftwidth
+let g:tex_flavor = 'latex'
+let g:vim_indent_cont = &tabstop
 
 if &term == 'xterm' || has('win32')
 	set t_Co=256
@@ -477,6 +478,15 @@ function! s:Template() " {{{2
 	endif
 endfunction " }}}
 command! -nargs=0 Template call <SID>Template()
+
+function! s:Sort() " {{{2
+	let l:save_reg = @a
+	normal! gv"ay
+	let @a = join(sort(split(eval('@a'))))
+	normal! gv"ap
+	let @a = l:save_reg
+endfunction " }}}
+command! -range Sort call <SID>Sort()
 " autocommand {{{1
 command! AUTOiminsertzero let s:autoIminsertZero = !s:autoIminsertZero
 
@@ -857,56 +867,56 @@ runtime ftplugin/man.vim
 " lexima {{{2
 " default_rules {{{3
 let s:rulelist = [
-	\ {'char': '(', 'input_after': ')'},
-	\ {'char': '(', 'at': '\\\%#'},
-	\ {'char': ')', 'at': '\%#)', 'leave': 1},
-	\ {'char': '<BS>', 'at': '(\%#)', 'delete': 1},
-	\ {'char': '<C-H>', 'at': '(\%#)', 'delete': 1},
-	\ {'char': '{', 'input_after': '}'},
-	\ {'char': '}', 'at': '\%#}', 'leave': 1},
-	\ {'char': '<BS>', 'at': '{\%#}', 'delete': 1},
-	\ {'char': '<C-H>', 'at': '{\%#}', 'delete': 1},
-	\ {'char': '[', 'input_after': ']'},
-	\ {'char': '[', 'at': '\\\%#'},
-	\ {'char': ']', 'at': '\%#]', 'leave': 1},
-	\ {'char': '<BS>', 'at': '\[\%#\]', 'delete': 1},
-	\ {'char': '<C-H>', 'at': '\[\%#\]', 'delete': 1},
+	"\ {'char': '(', 'input_after': ')'},
+	"\ {'char': '(', 'at': '\\\%#'},
+	"\ {'char': ')', 'at': '\%#)', 'leave': 1},
+	"\ {'char': '<BS>', 'at': '(\%#)', 'delete': 1},
+	"\ {'char': '<C-H>', 'at': '(\%#)', 'delete': 1},
+	"\ {'char': '{', 'input_after': '}'},
+	"\ {'char': '}', 'at': '\%#}', 'leave': 1},
+	"\ {'char': '<BS>', 'at': '{\%#}', 'delete': 1},
+	"\ {'char': '<C-H>', 'at': '{\%#}', 'delete': 1},
+	"\ {'char': '[', 'input_after': ']'},
+	"\ {'char': '[', 'at': '\\\%#'},
+	"\ {'char': ']', 'at': '\%#]', 'leave': 1},
+	"\ {'char': '<BS>', 'at': '\[\%#\]', 'delete': 1},
+	"\ {'char': '<C-H>', 'at': '\[\%#\]', 'delete': 1},
 	\ ]
 " }}}
 " default_rules 2 {{{3
 let s:rulelist += [
-	\ {'char': '"', 'input_after': '"'},
-	\ {'char': '"', 'at': '\%#"', 'leave': 1},
-	\ {'char': '"', 'at': '\\\%#'},
-	\ {'char': '"', 'at': '^\s*\%#', 'filetype': 'vim'},
-	\ {'char': '"', 'at': '\%#\s*$', 'filetype': 'vim'},
-	\ {'char': '<BS>', 'at': '"\%#"', 'delete': 1},
-	\ {'char': '<C-H>', 'at': '"\%#"', 'delete': 1},
-	\ {'char': '"', 'at': '""\%#', 'input_after': '"""'},
-	\ {'char': '"', 'at': '\%#"""', 'leave': 3},
-	\ {'char': '<BS>', 'at': '"""\%#"""', 'input': '<BS><BS><BS>', 'delete': 3},
-	\ {'char': '<C-H>', 'at': '"""\%#"""', 'input': '<BS><BS><BS>', 'delete': 3},
-	\ {'char': "'", 'input_after': "'"},
-	\ {'char': "'", 'at': '\%#''', 'leave': 1},
-	\ {'char': "'", 'at': '\w\%#''\@!'},
-	\ {'char': "'", 'at': '\\\%#'},
-	\ {'char': "'", 'at': '\\\%#', 'leave': 1, 'filetype': ['vim', 'sh', 'csh', 'ruby', 'tcsh', 'zsh']},
-	\ {'char': "'", 'filetype': ['haskell', 'lisp', 'clojure', 'ocaml', 'scala', 'rust', 'scheme', 'text']},
-	\ {'char': '<BS>', 'at': "'\\%#'", 'delete': 1},
-	\ {'char': '<C-H>', 'at': "'\\%#'", 'delete': 1},
-	\ {'char': "'", 'at': "''\\%#", 'input_after': "'''"},
-	\ {'char': "'", 'at': "\\%#'''", 'leave': 3},
-	\ {'char': '<BS>', 'at': "'''\\%#'''", 'input': '<BS><BS><BS>', 'delete': 3},
-	\ {'char': '<C-H>', 'at': "'''\\%#'''", 'input': '<BS><BS><BS>', 'delete': 3},
-	\ {'char': '`', 'input_after': '`'},
-	\ {'char': '`', 'at': '\%#`', 'leave': 1},
-	\ {'char': '<BS>', 'at': '`\%#`', 'delete': 1},
-	\ {'char': '<C-H>', 'at': '`\%#`', 'delete': 1},
-	\ {'char': '`', 'filetype': ['ocaml']},
-	\ {'char': '`', 'at': '``\%#', 'input_after': '```'},
-	\ {'char': '`', 'at': '\%#```', 'leave': 3},
-	\ {'char': '<BS>', 'at': '```\%#```', 'input': '<BS><BS><BS>', 'delete': 3},
-	\ {'char': '<C-H>', 'at': '```\%#```', 'input': '<BS><BS><BS>', 'delete': 3},
+	"\ {'char': '"', 'input_after': '"'},
+	"\ {'char': '"', 'at': '\%#"', 'leave': 1},
+	"\ {'char': '"', 'at': '\\\%#'},
+	"\ {'char': '"', 'at': '^\s*\%#', 'filetype': 'vim'},
+	"\ {'char': '"', 'at': '\%#\s*$', 'filetype': 'vim'},
+	"\ {'char': '<BS>', 'at': '"\%#"', 'delete': 1},
+	"\ {'char': '<C-H>', 'at': '"\%#"', 'delete': 1},
+	"\ {'char': '"', 'at': '""\%#', 'input_after': '"""'},
+	"\ {'char': '"', 'at': '\%#"""', 'leave': 3},
+	"\ {'char': '<BS>', 'at': '"""\%#"""', 'input': '<BS><BS><BS>', 'delete': 3},
+	"\ {'char': '<C-H>', 'at': '"""\%#"""', 'input': '<BS><BS><BS>', 'delete': 3},
+	"\ {'char': "'", 'input_after': "'"},
+	"\ {'char': "'", 'at': '\%#''', 'leave': 1},
+	"\ {'char': "'", 'at': '\w\%#''\@!'},
+	"\ {'char': "'", 'at': '\\\%#'},
+	"\ {'char': "'", 'at': '\\\%#', 'leave': 1, 'filetype': ['vim', 'sh', 'csh', 'ruby', 'tcsh', 'zsh']},
+	"\ {'char': "'", 'filetype': ['haskell', 'lisp', 'clojure', 'ocaml', 'scala', 'rust', 'scheme', 'text']},
+	"\ {'char': '<BS>', 'at': "'\\%#'", 'delete': 1},
+	"\ {'char': '<C-H>', 'at': "'\\%#'", 'delete': 1},
+	"\ {'char': "'", 'at': "''\\%#", 'input_after': "'''"},
+	"\ {'char': "'", 'at': "\\%#'''", 'leave': 3},
+	"\ {'char': '<BS>', 'at': "'''\\%#'''", 'input': '<BS><BS><BS>', 'delete': 3},
+	"\ {'char': '<C-H>', 'at': "'''\\%#'''", 'input': '<BS><BS><BS>', 'delete': 3},
+	"\ {'char': '`', 'input_after': '`'},
+	"\ {'char': '`', 'at': '\%#`', 'leave': 1},
+	"\ {'char': '<BS>', 'at': '`\%#`', 'delete': 1},
+	"\ {'char': '<C-H>', 'at': '`\%#`', 'delete': 1},
+	"\ {'char': '`', 'filetype': ['ocaml']},
+	"\ {'char': '`', 'at': '``\%#', 'input_after': '```'},
+	"\ {'char': '`', 'at': '\%#```', 'leave': 3},
+	"\ {'char': '<BS>', 'at': '```\%#```', 'input': '<BS><BS><BS>', 'delete': 3},
+	"\ {'char': '<C-H>', 'at': '```\%#```', 'input': '<BS><BS><BS>', 'delete': 3},
 	\ ]
 " }}}
 " newline {{{3
@@ -934,13 +944,11 @@ let s:rulelist += [s:Lexima_endwise_rule_make_rule('^\s*function!.*\%#$', 'endfu
 let s:rulelist += [{'char': '<CR>', 'input': '<CR>'}] " inoremap <CR> <C-G>u<CR>
 " }}}
 " filetype specific {{{3
-let s:rulelist += [{'char': '<', 'input_after': '>', 'filetype': 'pov'},
-	\ {'char': '>', 'at': '\%#' . '>', 'leave': 1, 'filetype': 'pov'},
-	\ {'char': '<C-H>', 'at': '<' . '\%#' . '>', 'delete': 1, 'filetype': 'pov'},
-	\ {'char': '<Space>', 'at': '\%#' . '>', 'delete': 1, 'filetype': 'pov'},]
-let s:rulelist += [{'char': '$', 'input_after': '$', 'filetype': 'tex'},
-	\ {'char': '$', 'at': '\%#\' . '$', 'leave': 1, 'filetype': 'tex'},
-	\ {'char': '<C-H>', 'at': '\' . '$' . '\%#\' . '$', 'delete': 1, 'filetype': 'tex'},]
+let s:rulelist += [
+	\ {'char': '$', 'input_after': '$', 'filetype': 'tex'},
+	\ {'char': '$', 'at': '\%#\$', 'leave': 1, 'filetype': 'tex'},
+	\ {'char': '<C-H>', 'at': '\$\%#\$', 'delete': 1, 'filetype': 'tex'},
+	\ ]
 " }}}
 for s:rule in s:rulelist
 	silent! call lexima#add_rule(s:rule)

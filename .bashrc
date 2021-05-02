@@ -153,11 +153,7 @@ cdd() {
 }
 
 if [[ $_uname =~ NT-10.0 ]]; then
-	alias rg="rg --path-separator '\x2F'"
 	shopt -s completion_strip_exe
-	# phpdir=$(ls -d /c/tools/php* | tail -n1)
-	# alias php="$phpdir/php.exe"
-	# unset phpdir
 	alias chocoupgrade="$HOME/dotfiles/choco-upgrade.bat"
 	alias e=explorer.exe
 	alias javac="javac -encoding UTF-8"
@@ -166,6 +162,11 @@ if [[ $_uname =~ NT-10.0 ]]; then
 		alias javac="javac -encoding MS932"
 		alias java="java -Dfile.encoding=MS932"
 	fi
+	alias open=start
+	# phpdir=$(ls -d /c/tools/php* | tail -n1)
+	# alias php="$phpdir/php.exe"
+	# unset phpdir
+	alias rg="rg --path-separator '\x2F'"
 	upgrade() {
 		pacman -Qtdq | pacman -Rns --noconfirm - 2>/dev/null
 		pacman -Syu --noconfirm
@@ -188,11 +189,15 @@ elif [[ $_uname == Darwin ]]; then
 		brew upgrade
 	}
 elif [[ $_uname == Linux ]]; then
+	alias open='xdg-open &>/dev/null'
 	pdfx() {
 		wine start "C:\Program Files\Tracker Software\PDF Editor\PDFXEdit.exe" "$@" &>/dev/null &
 	}
-	if type explorer.exe &>/dev/null; then
+	if [[ $(uname -r) =~ Microsoft ]]; then
 		alias e=explorer.exe
+		xdg-open() {
+			powershell.exe '& \\wsl$\Debian\'$(realpath $1)
+		}
 	fi
 	# distro=$(cat /etc/*-release)
 	_distro=$(\grep -Pom1 '(?<=^ID=).*$' /etc/os-release)
