@@ -36,7 +36,7 @@ brew install --HEAD universal-ctags/universal-ctags/universal-ctags
 # defaults write -g QLPanelAnimationDuration -float 0 # not working
 # defaults write com.apple.finder DisableAllAnimations -bool true # not working
 defaults write -g NSAutomaticWindowAnimationsEnabled -bool false # new window zoom effect
-defaults write -g NSTextInsertionPointBlinkPeriodOff -float 1e-45 # cursor
+defaults write -g NSTextInsertionPointBlinkPeriodOff -float 0.00001 # cursor
 defaults write -g NSTextInsertionPointBlinkPeriodOn -float 1e38 # cursor
 defaults write -g com.apple.mouse.scaling -integer -1 # mouse acceleration
 defaults write com.apple.Mail DisableReplyAnimations -bool true
