@@ -12,7 +12,7 @@ if ! type brew &>/dev/null; then
 	/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
-brew install automake bash binutils coreutils diffutils ed findutils gawk grep gzip gnu-indent less m4 make gpatch screen gnu-sed gnu-tar texinfo wdiff wget
+brew install automake bash binutils coreutils diffutils ed findutils gawk grep gzip gnu-indent less make gpatch screen gnu-sed gnu-tar texinfo wdiff wget
 brew install bash-completion@2 fd file-formula fzf git openssh p7zip ripgrep rlwrap vim watch
 brew install python chezscheme
 # brew install rsync svn unzip zsh
