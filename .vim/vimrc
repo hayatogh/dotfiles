@@ -25,6 +25,7 @@ set guicursor=a:blinkon0
 set helplang=Ja,En
 set history=1000
 set smartindent autoindent
+set lispwords-=if
 " set list listchars=eol:￩,tab:»-,extends:»,precedes:«,nbsp:◦
 set list listchars=tab:»-,extends:»,precedes:«,nbsp:◦
 set showmatch matchtime=1 matchpairs+=「:」,（:）,『:』,【:】,［:］
@@ -70,7 +71,7 @@ set suffixesadd=.tex
 set laststatus=2
 " statusline {{{2
 let g:CRLF = {'unix': 'LF', 'dos': 'CRLF', 'mac': 'CR'}
-let s:autoIminsertZero=1
+let s:autoIminsertZero=0
 function! g:Imzero()
 	if s:autoIminsertZero | set iminsert=0 | endif
 	return ''
@@ -151,25 +152,27 @@ if &term == 'xterm' || has('win32')
 endif
 if !has('win32')
 	let &t_VS = "\<Esc>]12;#00ffff\x7"
-	let &t_EI = &t_VS
-	let &t_SR = &t_VS
-	let &t_SI = &t_VS
 endif
 if has('win32unix')
 	let &t_TI = ''
 	let &t_TE = ''
 endif
 if $WSL_DISTRO_NAME != '' || $MSYSTEM != ''
-	let g:ImStatus = 0
+	let s:imStatus = 0
 	function! g:ImStatusFunc()
-		return g:ImStatus
+		return s:imStatus
 	endfunction
 	set imstatusfunc=ImStatusFunc
+	" called after entered insert mode and before leaving insert mode
 	function! g:ImActivateFunc(activate)
-		let g:ImStatus = a:activate ? 1 : 0
-		execute 'silent! !echo -ne ''\e[<' . g:ImStatus . 't''' | redraw!
+		let s:imStatus = a:activate
+		let l:seq = "\<Esc>[<" . a:activate . "t"
+		let &t_SI = l:seq
+		let &t_SR = l:seq
+		call echoraw(l:seq)
 	endfunction
 	set imactivatefunc=ImActivateFunc
+	let &t_EI = "\<Esc>[<0t"
 endif
 let s:clipexe_ok = 0
 if executable('clip.exe') && has('linux')
@@ -431,21 +434,21 @@ function! s:Nkf() " {{{2
 endfunction " }}}
 command! -nargs=0 Nkf call <SID>Nkf()
 
-function! s:CommandPreview(...) " {{{2
-	let l:shcmdflag = has('win32') ? &shellcmdflag : '-ic'
-	let l:cmd = &shell . ' ' . l:shcmdflag . ' "' . join(a:000) . '"'
-	let l:opt = { 'hidden': 1, 'term_finish': 'open', 'term_opencmd': 'botright sbuf %d | setl modifiable' }
+" {{{2
+let s:shiflag = has('win32') ? &shellcmdflag : '-ic'
+function! s:Command(is_i, ...)
+	let l:cmd = &shell . ' ' . s:shiflag . ' "' . join(a:000) . '"'
+	let l:opt = a:is_i ? { 'term_finish': 'close' } : { 'hidden': 1, 'term_finish': 'open', 'term_opencmd': 'botright sbuf %d | setl modifiable | $' }
 	call term_start(l:cmd, l:opt)
 endfunction
 function! s:BashComp(ArgLead, CmdLine, CursorPos)
-	let l:str = strpart(a:CmdLine, 0, a:CursorPos)
-	let l:str = substitute(l:str, '^S ', '', '')
-	return g:bash#complete(l:str)
+	return g:bash#complete(substitute(strpart(a:CmdLine, 0, a:CursorPos), '^\a\+ ', '', ''))
 endfunction " }}}
 if has('win32')
-	command! -nargs=* -complete=file S call <SID>CommandPreview(<f-args>)
+	command! -nargs=* -complete=file S call <SID>Command(0, <f-args>)
 else
-	command! -nargs=* -complete=customlist,<SID>BashComp S call <SID>CommandPreview(<f-args>)
+	command! -nargs=* -complete=customlist,<SID>BashComp S call <SID>Command(0, <f-args>)
+	command! -nargs=* -complete=customlist,<SID>BashComp I call <SID>Command(1, <f-args>)
 endif
 
 function! s:Template() " {{{2
@@ -479,14 +482,16 @@ function! s:Template() " {{{2
 endfunction " }}}
 command! -nargs=0 Template call <SID>Template()
 
-function! s:Sort() " {{{2
+function! s:Sort(pat) " {{{2
 	let l:save_reg = @a
 	normal! gv"ay
-	let @a = join(sort(split(eval('@a'))))
+	let @a = join(sort(split(eval('@a'), a:pat)), a:pat)
 	normal! gv"ap
 	let @a = l:save_reg
 endfunction " }}}
-command! -range Sort call <SID>Sort()
+command! -range Sort call <SID>Sort(' ')
+command! -range SortComma call <SID>Sort(', ')
+command! -nargs=1 -range SortSep call <SID>Sort(<f-args>)
 " autocommand {{{1
 command! AUTOiminsertzero let s:autoIminsertZero = !s:autoIminsertZero
 
