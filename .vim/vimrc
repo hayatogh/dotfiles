@@ -73,7 +73,10 @@ set laststatus=2
 let g:CRLF = {'unix': 'LF', 'dos': 'CRLF', 'mac': 'CR'}
 let s:autoIminsertZero=0
 function! g:Imzero()
-	if s:autoIminsertZero | set iminsert=0 | endif
+	if s:autoIminsertZero
+		set iminsert=0
+		call echoraw("\e[<0t\e[<s")
+	endif
 	return ''
 endfunction
 function! g:Charcount()
@@ -151,35 +154,33 @@ if &term == 'xterm' || has('win32')
 	set t_Co=256
 endif
 if !has('win32')
-	let &t_VS = "\<Esc>]12;#00ffff\x7"
-endif
-if has('win32unix')
-	let &t_TI = ''
-	let &t_TE = ''
+	let &t_VS .= "\e]12;#00ffff\x7"
+	let &t_EI .= "\e]12;#00ffff\x7"
 endif
 if $WSL_DISTRO_NAME != '' || $MSYSTEM != ''
-	let s:imStatus = 0
-	function! g:ImStatusFunc()
-		return s:imStatus
-	endfunction
-	set imstatusfunc=ImStatusFunc
-	" called after entered insert mode and before leaving insert mode
-	function! g:ImActivateFunc(activate)
-		let s:imStatus = a:activate
-		let l:seq = "\<Esc>[<" . a:activate . "t"
-		let &t_SI = l:seq
-		let &t_SR = l:seq
-		call echoraw(l:seq)
-	endfunction
-	set imactivatefunc=ImActivateFunc
-	let &t_EI = "\<Esc>[<0t"
+	call echoraw("\e[<0t\e[<s")
+	if &term !~# 'screen'
+		let &t_SI .= "\e[<r"
+		let &t_EI .= "\e[<s\e[<0t"
+		let &t_te .= "\e[<0t\e[<s"
+	else
+		let &t_SI .= "\eP\e[<r\e\\"
+		let &t_EI .= "\eP\e[<s\e[<0t\e\\"
+		let &t_te .= "\eP\e[<0t\e[<s\e\\"
+		let &t_BE = "\eP\e[?2004h\e\\"
+		let &t_BD = "\eP\e[?2004l\e\\"
+		exec "set t_PS=\e[200~"
+		exec "set t_PE=\e[201~"
+	endif
 endif
 let s:clipexe_ok = 0
-if executable('clip.exe') && has('linux')
+if executable('clip.exe') && $WSL_DISTRO_NAME != ''
 	let s:clipexe_ok = 1
 endif
-
-set <M-1>=1 <M-2>=2 <M-3>=3 <M-4>=4 <M-5>=5 <M-6>=6 <M-7>=7 <M-8>=8 <M-9>=9 <M-0>=0 <M-A>=a <M-B>=b <M-C>=c <M-D>=d <M-E>=e <M-F>=f <M-G>=g <M-H>=h <M-I>=i <M-J>=j <M-K>=k <M-L>=l <M-M>=m <M-N>=n <M-O>=o <M-P>=p <M-Q>=q <M-R>=r <M-S>=s <M-T>=t <M-U>=u <M-V>=v <M-W>=w <M-X>=x <M-Y>=y <M-Z>=z
+set <M-0>=0 <M-1>=1 <M-2>=2 <M-3>=3 <M-4>=4 <M-5>=5 <M-6>=6 <M-7>=7 <M-8>=8 <M-9>=9
+set <M-a>=a <M-b>=b <M-c>=c <M-d>=d <M-e>=e <M-f>=f <M-g>=g <M-h>=h <M-i>=i <M-j>=j
+set <M-k>=k <M-l>=l <M-m>=m <M-n>=n <M-o>=o <M-p>=p <M-q>=q <M-r>=r <M-s>=s <M-t>=t
+set <M-u>=u <M-v>=v <M-w>=w <M-x>=x <M-y>=y <M-z>=z
 
 filetype plugin indent on
 syntax enable
@@ -245,8 +246,6 @@ if has('win32')
 endif
 
 inoremap <C-U> <C-G>u<C-U>
-inoremap <M-9> (
-inoremap <M-0> )
 
 function! g:RestoreRegister()
 	silent! let @* = s:restore_reg
@@ -282,12 +281,12 @@ cnoremap <C-A> <Home>
 cnoremap <C-O> <C-P>
 cnoremap <C-B> <C-E><C-U>
 
-nnoremap <M-K> <C-W>+
-nnoremap <M-J> <C-W>-
-nnoremap <M-L> <C-W>>
-nnoremap <M-H> <C-W><
-cnoremap <M-B> <S-Left>
-cnoremap <M-F> <S-Right>
+nnoremap <M-k> <C-W>+
+nnoremap <M-j> <C-W>-
+nnoremap <M-l> <C-W>>
+nnoremap <M-h> <C-W><
+cnoremap <M-b> <S-Left>
+cnoremap <M-f> <S-Right>
 
 nmap ysa' ys2i'
 nmap ysa" ys2i"
