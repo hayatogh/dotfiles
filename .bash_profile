@@ -31,7 +31,7 @@ pc=$pc'\w \d \A [\j] \a\]'
 pc=$pc'\n$PSM\[\e[32m\]\u@\h '
 [[ -n $MSYSTEM ]] && pc=$pc'\[\e[35m\]$MSYSTEM '
 pc=$pc'\[\e[33m\]\w \[\e[38;5;93m\]$PSSHLVL \[\e[38;5;166m\]$PSJOBS\[\e[0m\]'
-pc=$pc'" " \[\e[38;5;245m\]\t\[\e[0m\]\n\[\ek\e\\\\\]\\$ "'
+pc=$pc'" " \[\e[38;5;245m\]\t \${PIPESTATUS[@]}\[\e[0m\]\n\[\ek\e\\\\\]\\$ "'
 export PROMPT_COMMAND=$pc
 unset pc
 export GIT_PS1_SHOWDIRTYSTATE=1

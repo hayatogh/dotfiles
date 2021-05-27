@@ -1,5 +1,5 @@
-.emacs.d/*
-!.emacs.d/init.el
+emacs/*
+!emacs/init.el
 .vim/.netrwhist
 .vim/.viminfo
 .vim/autoload

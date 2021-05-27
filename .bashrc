@@ -1,11 +1,15 @@
 [[ ! $- =~ i ]] && return
 shopt -s autocd cdspell checkjobs checkwinsize dotglob globstar lithist no_empty_cmd_completion nocaseglob
+PSSHLVL=
 if [[ $TERM =~ screen ]]; then
 	if [[ $SHLVL > 2 ]]; then
 		PSSHLVL=$(($SHLVL - 1))
 	fi
 elif [[ $SHLVL > 1 ]]; then
 	PSSHLVL=$SHLVL
+fi
+if [[ ! -v $PSM ]]; then
+	PSM=
 fi
 alias :e=vim
 alias bc="bc -l"
@@ -196,7 +200,14 @@ elif [[ $_uname == Linux ]]; then
 	if [[ $(uname -r) =~ Microsoft ]]; then
 		alias e=explorer.exe
 		xdg-open() {
-			powershell.exe '& \\wsl$\Debian\'$(realpath $1)
+			[[ $# == 0 ]] && return 1
+			local arg
+			if [[ -r $1 ]]; then
+				arg='"\\wsl$\Debian\'$(realpath $1)'"'
+			else
+				arg='"'$1'"'
+			fi
+			powershell.exe 'Start-Process '$arg
 		}
 	fi
 	# distro=$(cat /etc/*-release)
