@@ -32,7 +32,7 @@ brew install --HEAD universal-ctags/universal-ctags/universal-ctags
 # defaults write -g NSScrollAnimationEnabled -bool false # not working
 # defaults write -g NSScrollViewRubberbanding -bool false # not working
 # defaults write -g NSToolbarFullScreenAnimationDuration -float 0 # not working
-# defaults write -g NSWindowResizeTime -float 0.001 # not working
+defaults write -g NSWindowResizeTime -float 0.001 # double click title bar
 # defaults write -g QLPanelAnimationDuration -float 0 # not working
 # defaults write com.apple.finder DisableAllAnimations -bool true # not working
 defaults write -g NSAutomaticWindowAnimationsEnabled -bool false # new window zoom effect
