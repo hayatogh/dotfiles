@@ -21,7 +21,7 @@ alias cp="cp -p"
 alias dus="du -chs"
 alias diff="diff --color=auto"
 alias ee=exit
-alias fd="fd -HE.git"
+alias fd="fd -HIE.git"
 alias git_dotfiles_pull="git -C ~/dotfiles pull"
 alias git_empty_commit="git a -A && git c -m 'No commit message' && git push"
 alias grep="grep --color=auto"
@@ -36,6 +36,7 @@ alias mkdir="mkdir -p"
 alias rg="rg --hidden -g'!.git'"
 alias rm="rm -i"
 alias sc="script -qc sh"
+alias scheme="scheme ~/dotfiles/chezrc.ss"
 alias sr="screen -D -R"
 alias vi="vim --clean"
 alias vu="vagrant up"
@@ -186,6 +187,7 @@ if [[ $_uname =~ NT-10.0 ]]; then
 elif [[ $_uname == Darwin ]]; then
 	[[ -r /usr/local/etc/profile.d/bash_completion.sh ]] && . /usr/local/etc/profile.d/bash_completion.sh
 	alias batt="pmset -g batt"
+	alias scheme="chez ~/dotfiles/chezrc.ss"
 	macbin() {
 		PATH=$_OLDPATH $@
 	}
