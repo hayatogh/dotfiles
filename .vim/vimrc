@@ -72,13 +72,6 @@ set laststatus=2
 " statusline {{{2
 let g:CRLF = {'unix': 'LF', 'dos': 'CRLF', 'mac': 'CR'}
 let s:autoIminsertZero=0
-function! g:Imzero()
-	if s:autoIminsertZero
-		set iminsert=0
-		call echoraw("\e[<0t\e[<s")
-	endif
-	return ''
-endfunction
 function! g:Charcount()
 	return wordcount().chars - line('$')
 endfunction
@@ -157,6 +150,16 @@ if !has('win32')
 	let &t_VS .= "\e]12;#00ffff\x7"
 	let &t_EI .= "\e]12;#00ffff\x7"
 endif
+function! g:Imzero()
+endfunction
+if has('gui_win32')
+	function! g:Imzero()
+		if s:autoIminsertZero
+			set iminsert=0
+		endif
+		return ''
+	endfunction
+endif
 if $WSL_DISTRO_NAME != '' || $MSYSTEM != ''
 	call echoraw("\e[<0t\e[<s")
 	if &term !~# 'screen'
@@ -172,6 +175,12 @@ if $WSL_DISTRO_NAME != '' || $MSYSTEM != ''
 		exec "set t_PS=\e[200~"
 		exec "set t_PE=\e[201~"
 	endif
+	function! g:Imzero()
+		if s:autoIminsertZero
+			call echoraw(&t_te)
+		endif
+		return ''
+	endfunction
 endif
 let s:clipexe_ok = 0
 if executable('clip.exe') && $WSL_DISTRO_NAME != ''
