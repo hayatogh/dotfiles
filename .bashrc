@@ -131,14 +131,14 @@ stopwatch() {
 				continue
 			elif [[ $c == ' ' ]]; then # stop
 				printf "\n"
-				dur=$(bc -l <<<"$dur + $EPOCHREALTIME - $start")
+				dur=$(bc <<<"$dur + $EPOCHREALTIME - $start")
 				dur_sec=$(($SECONDS - $start_sec))
 				read -N 1 c
 				start=$EPOCHREALTIME
 				start_sec=$SECONDS
 				printf "\n"
 			else # quit
-				dur=$(bc -l <<<"$dur + $EPOCHREALTIME - $start")
+				dur=$(bc <<<"$dur + $EPOCHREALTIME - $start")
 				printf "\n$dur\n"
 				break
 			fi
