@@ -138,6 +138,7 @@ stopwatch() {
 				start_sec=$SECONDS
 				printf "\n"
 			else # quit
+				dur=$(bc -l <<<"$dur + $EPOCHREALTIME - $start")
 				printf "\n$dur\n"
 				break
 			fi
