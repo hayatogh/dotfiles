@@ -120,15 +120,29 @@ _quick_man() {
 }
 stopwatch() {
 	local c
+	local start_sec=$SECONDS dur_sec=0
+	local start=$EPOCHREALTIME dur=0
 	printf "%(%F %T)T\n"
-	time \
-		while true; do
-			printf "%(%F %T)T\r"
-			read -N 1 -t .5 c
-			if [[ -n $c && $c != $'\n' ]]; then
+	while true; do
+		printf "\r$(($dur_sec + $SECONDS - $start_sec))"
+		read -N 1 -t .5 c
+		if [[ -n $c ]]; then
+			if [[ $c == $'\n' ]]; then # rap
+				continue
+			elif [[ $c == ' ' ]]; then # stop
+				printf "\n"
+				dur=$(bc -l <<<"$dur + $EPOCHREALTIME - $start")
+				dur_sec=$(($SECONDS - $start_sec))
+				read -N 1 c
+				start=$EPOCHREALTIME
+				start_sec=$SECONDS
+				printf "\n"
+			else # quit
+				printf "\n$dur\n"
 				break
 			fi
-		done
+		fi
+	done
 }
 _psjobs() {
 	PSJOBS=$(jobs -p)

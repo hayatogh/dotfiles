@@ -186,10 +186,6 @@ let s:clipexe_ok = 0
 if executable('clip.exe') && $WSL_DISTRO_NAME != ''
 	let s:clipexe_ok = 1
 endif
-set <M-0>=0 <M-1>=1 <M-2>=2 <M-3>=3 <M-4>=4 <M-5>=5 <M-6>=6 <M-7>=7 <M-8>=8 <M-9>=9
-set <M-a>=a <M-b>=b <M-c>=c <M-d>=d <M-e>=e <M-f>=f <M-g>=g <M-h>=h <M-i>=i <M-j>=j
-set <M-k>=k <M-l>=l <M-m>=m <M-n>=n <M-o>=o <M-p>=p <M-q>=q <M-r>=r <M-s>=s <M-t>=t
-set <M-u>=u <M-v>=v <M-w>=w <M-x>=x <M-y>=y <M-z>=z
 
 filetype plugin indent on
 syntax enable
@@ -289,13 +285,6 @@ cnoremap <Down> <C-N>
 cnoremap <C-A> <Home>
 cnoremap <C-O> <C-P>
 cnoremap <C-B> <C-E><C-U>
-
-nnoremap <M-k> <C-W>+
-nnoremap <M-j> <C-W>-
-nnoremap <M-l> <C-W>>
-nnoremap <M-h> <C-W><
-cnoremap <M-b> <S-Left>
-cnoremap <M-f> <S-Right>
 
 nmap ysa' ys2i'
 nmap ysa" ys2i"
