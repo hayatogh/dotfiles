@@ -209,6 +209,17 @@ elif [[ $_uname == Darwin ]]; then
 	upgrade() {
 		brew upgrade
 	}
+	_psjobs() {
+		PSJOBS=$(jobs -p)
+		if [[ -z $PSJOBS ]]; then
+			PSJOBS=""
+		else
+			PSJOBS=$(ps -opid= -p$PSJOBS | wc -l)
+			if [[ $PSJOBS == 0 ]]; then
+				PSJOBS=""
+			fi
+		fi
+	}
 elif [[ $_uname == Linux ]]; then
 	alias open='xdg-open &>/dev/null'
 	pdfx() {
