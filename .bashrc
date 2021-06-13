@@ -171,6 +171,35 @@ cdd() {
 		cd $(dirname $1)
 	fi
 }
+ctags_exclude() {
+	local state arg
+	while (( "$#" )); do
+		case "$1" in
+			-h|--help)
+				echo "$0: $0 [--exclude] FILE ... --include FILE ..."
+				return
+				;;
+			--exclude)
+				state="exclude"
+				shift
+				;;
+			--include)
+				state="include"
+				shift
+				;;
+			*)
+				if [[ -z $state || $state == exclude ]]; then
+					arg="$arg--exclude=$1 "
+				else # $state == include
+					arg=$(sed 's/--exclude='$1' //g' <<<"$arg")
+				fi
+				shift
+				;;
+		esac
+	done
+	echo "ctags -R $arg"
+	ctags -R $arg
+}
 
 if [[ $_uname =~ NT-10.0 ]]; then
 	shopt -s completion_strip_exe
