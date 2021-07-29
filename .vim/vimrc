@@ -283,8 +283,18 @@ cnoremap <C-N> <Down>
 cnoremap <Up> <C-P>
 cnoremap <Down> <C-N>
 cnoremap <C-A> <Home>
-cnoremap <C-O> <C-P>
-cnoremap <C-B> <C-E><C-U>
+" cnoremap <C-O>
+" cnoremap <C-B>
+function s:RegexRubout(re)
+	let l:right = strpart(getcmdline(), getcmdpos() - 1)
+	let l:left = strpart(getcmdline(), 0, getcmdpos() - 1)
+	let l:left = substitute(l:left, a:re, '', '')
+	call setcmdpos(strlen(l:left) + 1)
+	return l:left . l:right
+endfunction
+cnoremap <Esc>/ <C-\>e<SID>RegexRubout('\v[^/ ]*/? *$')<CR>
+cnoremap <C-W>  <C-\>e<SID>RegexRubout('\v([a-zA-z]+\|[0-9]+\|.) *$')<CR>
+cnoremap <Esc>w <C-\>e<SID>RegexRubout('\v[^ ]* *$')<CR>
 
 nmap ysa' ys2i'
 nmap ysa" ys2i"
@@ -318,6 +328,11 @@ function! s:BackRun(cmd)
 endfunction
 nnoremap <Leader>t :call <SID>BackRun('cargo test')<CR>
 nnoremap <Leader>u :call <SID>BackRun('cargo run')<CR>
+
+inoremap <C-S> <Tab>
+
+nnoremap <Esc>m <C-W>-
+nnoremap <Esc>p <C-W>+
 
 " excommand {{{1
 command! DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis | wincmd p | diffthis

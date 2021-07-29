@@ -4,7 +4,7 @@ attrcolor b ".I"
 caption splitonly '%?%F%{= gW}%:%{= Kk}%?%2n%f%07=%t%='
 compacthist on
 defencoding utf-8
-defflow on interrupt
+defflow off
 defscrollback 1000
 defshell -bash
 defutf8 on

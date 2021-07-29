@@ -6,5 +6,4 @@
   (ee-bind-key "^d" (ee-compose ee-eof ee-accept))
   (ee-bind-key "^f" ee-indent)
   (ee-bind-key "^u" (ee-compose ee-set-mark ee-beginning-of-line ee-delete-between-point-and-mark))
-  (ee-bind-key "^w" (ee-compose ee-set-mark ee-backward-word ee-delete-between-point-and-mark))
-  (ee-bind-key "^c" (ee-compose ee-beginning-of-entry (ee-string-macro "#| ") ee-end-of-entry (ee-string-macro " |#") ee-accept)))
+  (ee-bind-key "^w" (ee-compose ee-set-mark ee-backward-word ee-delete-between-point-and-mark)))

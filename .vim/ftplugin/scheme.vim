@@ -1,4 +1,5 @@
 setlocal expandtab
+setlocal lispwords+=syntax-case,with-syntax
 inoremap <buffer> <C-F> <C-O>==
 nnoremap <buffer> <expr> = g:SchemeIndentExpr()
 vnoremap <buffer> <expr> = g:SchemeIndentExpr()

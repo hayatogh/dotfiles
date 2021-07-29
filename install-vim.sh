@@ -1,15 +1,9 @@
 #!/usr/bin/env bash
-set -euo pipefail
+with_sudo=1
+. install-helper.sh
 
-if [[ $EUID != 0 ]]; then
-	sudo "$0" "$@"
-	exit
-fi
-
-mkdir -p /usr/local/src
 cd /usr/local/src
-rm -rf vim
-git clone --depth 1 -- git://github.com/vim/vim
+git_clone git://github.com/vim/vim
 cd vim/src
 ./configure --prefix=/usr/local
 sed -i -E 's/install-languages|install-tool-languages//' auto/config.mk

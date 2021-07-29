@@ -10,6 +10,7 @@
 	g = log --graph --all --format=\"%x09%C(cyan bold)%<(19,trunc)%an %C(yellow nobold)%h %Creset%s%C(magenta bold)%d\"
 	l = log
 	sc = clone --depth 1 --
+	scg = !sh -c 'git clone --depth 1 -- git://github.com/$0'
 [core]
 	autocrlf = false
 	safecrlf = false

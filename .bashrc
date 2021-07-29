@@ -200,6 +200,16 @@ ctags_exclude() {
 	echo "ctags -R $arg"
 	ctags -R $arg
 }
+realwhich() {
+	realpath $(which $1)
+}
+clean_history() {
+	local pat='pwd|(|ba|da|z)sh|sr|vim?|make|l[sal.]|al|git .|cd(|\.\.| -| ..)|scheme'
+	if [[ $# == 1 ]]; then
+		pat=$1
+	fi
+	perl -0777 -pi -e 's/^#\d+\n('"$pat"') *\n//gm' .bash_history
+}
 
 if [[ $_uname =~ NT-10.0 ]]; then
 	shopt -s completion_strip_exe

@@ -4,7 +4,6 @@ choco feature enable -n allowGlobalConfirmation
 choco install 7zip.install
 choco install aquasnap
 choco install au
-choco install audacity
 choco install autohotkey.install
 choco install discord.install
 choco pin add --name discord.install
