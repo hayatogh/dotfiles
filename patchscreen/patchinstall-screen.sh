@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 with_sudo=1
-. install-helper.sh
+. ~/dotfiles/install-helper.sh
 
 patchscreen=$(realpath $(dirname $0))
 ver=$(wget -qO- 'http://ftp.gnu.org/gnu/screen/?C=M;O=D' | grep -Po '(?<=href="screen-)[0-9.]+(?=\.tar\.gz")' | head -n1)

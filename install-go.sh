@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-. install-helper.sh
+. ~/dotfiles/install-helper.sh
 
 os=linux
 if [[ $(uname) == Darwin ]]; then

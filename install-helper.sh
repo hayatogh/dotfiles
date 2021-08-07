@@ -9,9 +9,9 @@ fi
 _arg=${1:-}
 _tempfiles=
 if [[ ${with_sudo-} ]]; then
-	mkdir -p ~/.local/{bin,src}
-else
 	mkdir -p /usr/local/src
+else
+	mkdir -p ~/.local/{bin,src}
 fi
 
 helper() {
@@ -62,4 +62,7 @@ wget_tar_cd() {
 	rm -rf $dir
 	tar -xf $tmp
 	cd $dir
+}
+mv_man() {
+	mv_file $1 $2/man/man${1##*.}/$(basename $1)
 }

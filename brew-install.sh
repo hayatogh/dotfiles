@@ -17,8 +17,7 @@ brew install bash-completion@2 fd file-formula fzf git openssh p7zip ripgrep rlw
 brew install python chezscheme
 # brew install rsync svn unzip zsh
 
-brew install --cask iterm2 xquartz \
-	karabiner-elements google-japanese-ime discretescroll scroll-reverser macs-fan-control alt-tab
+brew install --cask iterm2 xquartz karabiner-elements google-japanese-ime discretescroll scroll-reverser macs-fan-control alt-tab middleclick
 brew install --cask virtualbox virtualbox-extension-pack vagrant
 # brew install --cask mactex-no-gui
 brew install --cask drawio slack zotero
