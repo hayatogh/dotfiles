@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 with_sudo=1
-. ~/dotfiles/install-helper.sh
+. $(realpath $(dirname $0))/install-helper.sh
 
 cd /usr/local/src
 git_clone git://github.com/vim/vim

@@ -38,7 +38,7 @@ alias rm="rm -i"
 alias sc="script -qc sh"
 alias scheme="scheme ~/dotfiles/chezrc.ss"
 alias sr="screen -D -R"
-alias vi="vim --clean"
+alias vi="vi --clean"
 alias vu="vagrant up"
 alias vus="vu ; vs"
 alias vush="vu ; vs ; vh"
@@ -62,16 +62,24 @@ mkcd() {
 	\mkdir $1
 	cd $1
 }
-_cw() {
+_regex_rubout() {
 	local right=${READLINE_LINE:$READLINE_POINT}
 	local left=${READLINE_LINE::$READLINE_POINT}
-	[[ $left =~ ([a-zA-Z]+|[0-9]+|.)\ *$ ]]
+	[[ $left =~ $1 ]]
 	left=${left::-${#BASH_REMATCH[0]}}
 	READLINE_LINE=$left$right
 	READLINE_POINT=${#left}
 }
+_cw() {
+	_regex_rubout '([a-zA-Z]+|[0-9]+|.) *$'
+}
 bind -m vi-insert  -x '"\C-w": _cw'
 bind -m vi-command -x '"\C-w": _cw'
+_msemicolon() {
+	_regex_rubout '[^;|<>]*(;|\||<|>)? *$'
+}
+bind -m vi-insert  -x '"\e;": _msemicolon'
+bind -m vi-command -x '"\e;": _msemicolon'
 _quick_man() {
 	local preferhelp=0    # Use "command --help" instead of man pages if possible
 	local prefercheat=1
@@ -209,6 +217,21 @@ clean_history() {
 		pat=$1
 	fi
 	perl -0777 -pi -e 's/^#\d+\n('"$pat"') *\n//gm' .bash_history
+}
+fixmod() {
+	if [[ ${1:-} == -r ]]; then
+		shift
+		fixmod "${@/%//**}"
+		return
+	fi
+	local x
+	for x in $@; do
+		if [[ -d $x ]]; then
+			chmod 755 $x
+		else
+			chmod 644 $x
+		fi
+	done
 }
 
 if [[ $_uname =~ NT-10.0 ]]; then

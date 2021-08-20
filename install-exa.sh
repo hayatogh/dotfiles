@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-. ~/dotfiles/install-helper.sh
+. $(realpath $(dirname $0))/install-helper.sh
 
 os=linux
 ver=$(wget -qO- https://github.com/ogham/exa/releases/latest | grep -Po '(?<=/ogham/exa/releases/download/v)[0-9.]+(?=/exa-'$os'-x86_64-musl-v[0-9.]+\.zip)' | head -n1)

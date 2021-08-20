@@ -19,7 +19,7 @@ set display=lastline
 set fileencodings=ucs-bom,utf-8,default,euc-jp,cp932
 set fileformats=unix,dos
 set fillchars=vert:│,fold:-
-set guioptions+=M
+set guioptions=!Mr
 set formatoptions+=mMj
 set guicursor=a:blinkon0
 set helplang=Ja,En
@@ -30,7 +30,7 @@ set lispwords-=if
 set list listchars=tab:»-,extends:»,precedes:«,nbsp:◦
 set showmatch matchtime=1 matchpairs+=「:」,（:）,『:』,【:】,［:］
 set modeline modelines=3
-set mouse=a mousemodel=extend
+set mouse=a mousemodel=extend nomousehide
 if &term == 'screen-256color'
 	set mouse=
 endif
@@ -58,12 +58,12 @@ set pumheight=10
 set report=15
 set scrolloff=3 sidescroll=1 sidescrolloff=10
 set incsearch hlsearch nowrapscan
-if has('win32')
-	set shell=powershell
-	set shellcmdflag=-c
-	set shellquote=\"
-	set shellxquote=
-endif
+" if has('win32')
+" 	set shell=powershell
+" 	set shellcmdflag=-c
+" 	set shellquote=\"
+" 	set shellxquote=
+" endif
 set shortmess=aoOtT
 set splitbelow splitright
 set suffixes+=.exe,.lock
@@ -536,7 +536,7 @@ function! s:hlIdeographicSpace()
 endfunction
 
 command! AUTOhalfcommas let s:autoHalfCommas = !s:autoHalfCommas
-let s:autoHalfCommas = 1
+let s:autoHalfCommas = 0
 function! s:halfCommas()
 	if !s:autoHalfCommas | return | endif
 	let l:curpos = getcurpos()
@@ -981,6 +981,30 @@ let s:surround_textobj = {
 	\ }
 silent! call textobj#user#plugin('surround', s:surround_textobj)
 " }}}
+" gui {{{1
+if has("gui_running") && has('win32')
+	set guifont=Consolas:h11
+	set lines=30 columns=86
+	let s:gvim_win_pos_file = expand('~/.gvimwinpos')
+	function! s:save_gvim_win_pos()
+		let s:options = [getwinposx(), getwinposy()]
+		call writefile(s:options, s:gvim_win_pos_file)
+	endfunction
+	augroup vimrc
+		autocmd VimLeavePre * call <SID>save_gvim_win_pos()
+	augroup END
+	if filereadable(s:gvim_win_pos_file)
+		let s:opt = readfile(s:gvim_win_pos_file)
+		let s:n = str2nr(strpart(v:servername, 4))
+		execute 'winpos ' . (s:opt[0] + 32 * s:n) . ' ' . (s:opt[1] + 32 * s:n)
+	endif
+
+	nnoremap <silent> <M-Space> :simalt ~<CR>
+	cnoremap <M-/> <C-\>e<SID>RegexRubout('\v[^/\\]*(/\|\\)? *$')<CR>
+	cnoremap <M-w> <C-\>e<SID>RegexRubout('\v[^ ]* *$')<CR>
+	nnoremap <M-m> <C-W>-
+	nnoremap <M-p> <C-W>+
+endif
 " footer {{{1
 if filereadable(expand($HOME . '/.localvimrc.vim'))
 	source $HOME/.localvimrc.vim

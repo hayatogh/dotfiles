@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 with_sudo=1
-. ~/dotfiles/install-helper.sh
+. $(realpath $(dirname $0))/install-helper.sh
 
 ver=$(wget -qO- http://carlowood.github.io/which/ | grep -Po '(?<=HREF="which-)[0-9.]+(?=\.tar\.gz")' | head -n1)
 dir=which-$ver

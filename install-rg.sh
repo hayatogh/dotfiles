@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 with_sudo=1
-. ~/dotfiles/install-helper.sh
+. $(realpath $(dirname $0))/install-helper.sh
 
 ver=$(wget -qO- https://github.com/BurntSushi/ripgrep/releases/latest | grep -Po '(?<=/BurntSushi/ripgrep/releases/download/)([0-9.]+)(?=/ripgrep_\1_amd64\.deb)' | head -n1)
 fname=ripgrep_${ver}_amd64.deb

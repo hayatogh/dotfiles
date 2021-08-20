@@ -96,8 +96,8 @@ elif [[ $_uname == Darwin ]]; then
 	export BASH_COMPLETION_COMPAT_DIR=/usr/local/etc/bash_completion.d
 	export BASH_COMPLETION_DIR=/usr/local/share/bash-completion
 elif [[ $(uname -r) =~ Microsoft ]]; then
-	umask 022
 	DISPLAY=localhost:0
+	LC_CTYPE=en_US.UTF-8
 fi
 
 printf "\e]12;#00ffff\a"
