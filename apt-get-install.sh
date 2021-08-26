@@ -28,4 +28,4 @@ cd $dotfiles
 ./install-vim.sh
 ./install-cheat.sh
 
-./getbashcompletion.sh
+./getbashcompletion.sh pip3

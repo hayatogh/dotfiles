@@ -11,3 +11,5 @@ rustup component add rls rust-analysis rust-src
 # curl https://wasmtime.dev/install.sh -sSf | bash
 
 cargo install runner evcxr_repl
+
+$(realpath $(dirname $0))/getbashcompletion.sh rustup cargo

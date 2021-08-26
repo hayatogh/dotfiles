@@ -54,4 +54,3 @@ defaults write com.apple.coreservices.uiagent CSUILastOSVersionWhereSafariRecomm
 # defaults write org.hammerspoon.Hammerspoon MJConfigFile "~/dotfiles/hammerspoon/init.lua"
 
 cd $dotfiles
-./getbashcompletion.sh
