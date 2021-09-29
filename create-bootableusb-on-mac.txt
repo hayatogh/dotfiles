@@ -1,4 +1,0 @@
-diskutil list
-diskutil umountDisk /dev/disk2
-sudo /bin/dd if=/path/to/iso of=/dev/rdisk2 bs=10m
-sudo dd if=/path/to/iso of=/dev/rdisk2 bs=10M status=progress

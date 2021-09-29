@@ -12,19 +12,14 @@ if ! type brew &>/dev/null; then
 	/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
-brew install automake bash binutils coreutils diffutils ed findutils gawk grep gzip gnu-indent less make gpatch screen gnu-sed gnu-tar texinfo wdiff wget
-brew install bash-completion@2 fd file-formula fzf git openssh p7zip ripgrep rlwrap vim watch
-brew install python chezscheme
-# brew install rsync svn unzip zsh
+brew install bash bash-completion@2 chezscheme coreutils fd fzf git p7zip ripgrep rlwrap screen vim wget
+# automake binutils diffutils ed file-formula findutils gawk gnu-indent gnu-sed gnu-tar gpatch grep gzip less make openssh rsync svn texinfo universal-ctags unzip watch wdiff zsh
+# docker docker-compose docker-machine
 
-brew install --cask iterm2 xquartz karabiner-elements google-japanese-ime discretescroll scroll-reverser macs-fan-control alt-tab middleclick
+brew install --cask iterm2 xquartz karabiner-elements discretescroll scroll-reverser macs-fan-control alt-tab middleclick drawio slack zotero
 brew install --cask virtualbox virtualbox-extension-pack vagrant
-# brew install --cask mactex-no-gui
-brew install --cask drawio slack zotero
-# brew install --cask hammerspoon racket osxfuse
-
-brew install --HEAD universal-ctags/universal-ctags/universal-ctags
-# brew install docker docker-compose docker-machine
+# mactex-no-gui
+# racket
 
 # defaults write -g NSBrowserColumnAnimationSpeedMultiplier -float 0 # not working
 # defaults write -g NSDocumentRevisionsWindowTransformAnimation -bool false # not working
@@ -50,7 +45,3 @@ defaults write com.apple.dock springboard-show-duration -float 0
 
 defaults write com.apple.coreservices.uiagent CSUIRecommendSafariNextNotificationDate -date 2050-01-01T00:00:00Z
 defaults write com.apple.coreservices.uiagent CSUILastOSVersionWhereSafariRecommendationWasMade -string "20.0"
-
-# defaults write org.hammerspoon.Hammerspoon MJConfigFile "~/dotfiles/hammerspoon/init.lua"
-
-cd $dotfiles

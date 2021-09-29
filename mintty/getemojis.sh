@@ -1,16 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-mintty=$(realpath $(dirname $0))
-if [[ ! $(uname) =~ NT-10\.0 ]]; then
-	echo "Couldn't installed. Run from MSYS."
-	exit
-fi
+wslpath() {
+	/bin/wslpath "$1" | tr -d '\r'
+}
+mintty=$(wslpath "$(powershell.exe 'Get-Content Env:APPDATA')")/mintty
 
 cd $mintty
 rm -rf emojis
-mkdir -p emojis
+mkdir emojis
 cd emojis
 
-wget -qO getemojis https://github.com/mintty/mintty/wiki/getemojis
+wget -qO getemojis https://github.com/mintty/mintty/raw/master/tools/getemojis
 ./getemojis -d windows

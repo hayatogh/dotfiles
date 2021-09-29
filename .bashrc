@@ -11,9 +11,7 @@ fi
 if [[ ! -v $PSM ]]; then
 	PSM=
 fi
-alias :e=vim
 alias bc="bc -l"
-alias cd..="cd .."
 alias chgrp="chgrp --preserve-root"
 alias chmod="chmod --preserve-root"
 alias chown="chown --preserve-root"
@@ -32,18 +30,12 @@ alias al="ls -alhF"
 alias ltime="ls -alhrtF"
 alias lsize="ls -alhrFS"
 alias manless="man -P less"
-alias mkdir="mkdir -p"
 alias rg="rg --hidden -g'!.git'"
 alias rm="rm -i"
 alias sc="script -qc sh"
 alias scheme="scheme ~/dotfiles/chezrc.ss"
 alias sr="screen -D -R"
 alias vi="vi --clean"
-alias vu="vagrant up"
-alias vus="vu ; vs"
-alias vush="vu ; vs ; vh"
-alias vs="vagrant ssh"
-alias vh="vagrant halt"
 alias wget="wget -N"
 l.() {
 	([[ $# != 0 ]] && cd $1; ls -dF .*)
@@ -59,7 +51,7 @@ tryssh() {
 	ssh $1
 }
 mkcd() {
-	\mkdir $1
+	mkdir $1
 	cd $1
 }
 _regex_rubout() {
@@ -80,52 +72,6 @@ _msemicolon() {
 }
 bind -m vi-insert  -x '"\e;": _msemicolon'
 bind -m vi-command -x '"\e;": _msemicolon'
-_quick_man() {
-	local preferhelp=0    # Use "command --help" instead of man pages if possible
-	local prefercheat=1
-
-	local argv argv0 argv1 tmp cmd
-	IFS=" " read -ra argv <<<$@
-	argv0=${argv[0]}
-	argv1=${argv[1]}
-	# expand bash alias
-	if [[ $(type -t $argv0 2>&1) == alias ]]; then
-		IFS=" " read -ra tmp <<<${BASH_ALIASES[$argv0]}
-		argv0=${tmp[0]}
-		if [[ ${#tmp[@]} -ge 2 ]]; then
-			argv1=${tmp[1]}
-		fi
-	fi
-	# printf "$argv0\n$argv1\n"  # debug
-
-	tmp=$(type -t $argv0 2>&1)
-	if [[ $tmp == keyword ]]; then
-		return
-	elif [[ $tmp == builtin ]]; then
-		cmd="help $argv0 | less"
-	elif [[ $tmp == function ]]; then
-		cmd="type $argv0 | less"
-	elif [[ $argv0 == git ]] && [[ ! -z $argv1 ]]; then
-		tmp=$(git config alias.$argv1 2>/dev/null)
-		if [[ -n $tmp ]]; then
-			argv1=$tmp
-		fi
-		cmd="man -S \"1\" git-$argv1"
-	elif [[ $argv0 =~ ^rustup$|^go$ ]]; then
-		cmd="$argv0 help $argv1 | less"
-	elif [[ $argv0 == cargo ]]; then
-		cmd="$argv0 help $argv1"
-	elif (( $prefercheat )) && cheat $argv0 &>/dev/null; then
-		cmd="cheat $argv0"
-	elif (( $preferhelp )) && $argv0 --help &>/dev/null; then
-		cmd="$argv0 --help | less"
-	else
-		cmd="man -S \"1:8:7\" $argv0"
-	fi
-	# printf "$cmd\n"  # debug
-	eval "$cmd"
-	return 0
-}
 stopwatch() {
 	local c
 	local start_sec=$SECONDS dur_sec=0
@@ -153,25 +99,6 @@ stopwatch() {
 		fi
 	done
 }
-_psjobs() {
-	PSJOBS=$(jobs -p)
-	if [[ -z $PSJOBS ]]; then
-		PSJOBS=""
-	else
-		PSJOBS=$(ps -opid= $PSJOBS | wc -l)
-		if [[ $PSJOBS == 0 ]]; then
-			PSJOBS=""
-		fi
-	fi
-}
-if ! type realpath &>/dev/null; then
-	realpath() {
-		local i
-		for i in $@; do
-			(cd $i && pwd -P)
-		done
-	}
-fi
 cdd() {
 	if [[ $# == 0 ]]; then
 		cd
@@ -181,7 +108,7 @@ cdd() {
 }
 ctags_exclude() {
 	local state arg
-	while (( "$#" )); do
+	while (( $# )); do
 		case "$1" in
 			-h|--help)
 				echo "$0: $0 [--exclude] FILE ... --include FILE ..."
@@ -212,11 +139,11 @@ realwhich() {
 	realpath $(which $1)
 }
 clean_history() {
-	local pat='pwd|(|ba|da|z)sh|sr|vim?|make|l[sal.]|al|git .|cd(|\.\.| -| ..)|scheme'
+	local pat='pwd|(|ba|da|z)sh|sr|vim?|make|l[sal.]|al|git .|cd(| -| ..)|scheme'
 	if [[ $# == 1 ]]; then
 		pat=$1
 	fi
-	perl -0777 -pi -e 's/^#\d+\n('"$pat"') *\n//gm' .bash_history
+	perl -0777 -pi -e 's/^#\d+\n('"$pat"') *\n//gm' $HISTFILE
 }
 fixmod() {
 	if [[ ${1:-} == -r ]]; then
@@ -234,16 +161,15 @@ fixmod() {
 	done
 }
 
-if [[ $_uname =~ NT-10.0 ]]; then
+if [[ $_uname == Msys ]]; then
 	shopt -s completion_strip_exe
-	alias chocoupgrade="$HOME/dotfiles/choco-upgrade.bat"
 	alias e=explorer.exe
-	alias javac="javac -encoding UTF-8"
-	alias java="java -Dfile.encoding=UTF-8"
-	if [[ $javaenc == MS932 ]]; then
-		alias javac="javac -encoding MS932"
-		alias java="java -Dfile.encoding=MS932"
-	fi
+	# alias javac="javac -encoding UTF-8"
+	# alias java="java -Dfile.encoding=UTF-8"
+	# if [[ $javaenc == MS932 ]]; then
+	# 	alias javac="javac -encoding MS932"
+	# 	alias java="java -Dfile.encoding=MS932"
+	# fi
 	alias open=start
 	# phpdir=$(ls -d /c/tools/php* | tail -n1)
 	# alias php="$phpdir/php.exe"
@@ -261,13 +187,10 @@ if [[ $_uname =~ NT-10.0 ]]; then
 			PSJOBS=$(wc -l <<<$PSJOBS)
 		fi
 	}
+	[[ -r /usr/share/git/git-prompt.sh ]] && . /usr/share/git/git-prompt.sh
 elif [[ $_uname == Darwin ]]; then
-	[[ -r /usr/local/etc/profile.d/bash_completion.sh ]] && . /usr/local/etc/profile.d/bash_completion.sh
 	alias batt="pmset -g batt"
 	alias scheme="chez ~/dotfiles/chezrc.ss"
-	macbin() {
-		PATH=$_OLDPATH $@
-	}
 	upgrade() {
 		brew upgrade
 	}
@@ -282,26 +205,39 @@ elif [[ $_uname == Darwin ]]; then
 			fi
 		fi
 	}
-elif [[ $_uname == Linux ]]; then
+	[[ -r /usr/local/etc/profile.d/bash_completion.sh ]] && . /usr/local/etc/profile.d/bash_completion.sh
+else
 	alias open='xdg-open &>/dev/null'
 	pdfx() {
 		wine start "C:\Program Files\Tracker Software\PDF Editor\PDFXEdit.exe" "$@" &>/dev/null &
 	}
-	if [[ $(uname -r) =~ Microsoft ]]; then
+	_psjobs() {
+		PSJOBS=$(jobs -p)
+		if [[ -z $PSJOBS ]]; then
+			PSJOBS=""
+		else
+			PSJOBS=$(ps -opid= $PSJOBS | wc -l)
+			if [[ $PSJOBS == 0 ]]; then
+				PSJOBS=""
+			fi
+		fi
+	}
+	if [[ $_uname == WSL ]]; then
 		alias e=explorer.exe
 		xdg-open() {
 			[[ $# == 0 ]] && return 1
 			local arg
 			if [[ -r $1 ]]; then
-				arg='"\\wsl$\Debian\'$(realpath $1)'"'
+				arg='"\\wsl$\Debian\'$(realpath "$1")'"'
 			else
 				arg='"'$1'"'
 			fi
-			powershell.exe 'Start-Process '$arg
+			powershell.exe 'Start-Process '"$arg"
+		}
+		wslpath() {
+			/bin/wslpath "$@" | tr -d '\r'
 		}
 	fi
-	# distro=$(cat /etc/*-release)
-	_distro=$(\grep -Pom1 '(?<=^ID=).*$' /etc/os-release)
 	if [[ $_distro == debian ]]; then
 		upgrade() {
 			sudo apt-get -qq autoremove
@@ -312,9 +248,9 @@ elif [[ $_uname == Linux ]]; then
 	fi
 fi
 
-[[ -r ~/dotfiles/git-prompt.sh ]] && . ~/dotfiles/git-prompt.sh
 [[ -r /etc/profile.d/bash_completion.sh ]] && . /etc/profile.d/bash_completion.sh
 type _completion_loader &>/dev/null && _completion_loader ssh
 complete -F _ssh tryssh
+complete -c realwhich
 [[ -r ~/.localbashrc.sh ]] && . ~/.localbashrc.sh
 true

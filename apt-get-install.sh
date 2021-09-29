@@ -9,23 +9,18 @@ fi
 
 sudo apt-get update
 sudo apt-get -y upgrade
-sudo apt-get -y install automake bash-completion bc curl fd-find gcc gdb htop info libc6-dev libncurses-dev lshw lsof make man nkf pkg-config pmount rlwrap rsync screen uchardet universal-ctags vim wget zip
+sudo apt-get -y install automake bash-completion bc command-not-found curl fd-find gcc gdb htop info libc6-dev libncurses-dev lshw lsof make man nkf pkg-config pmount rlwrap rsync screen uchardet universal-ctags vim wget zip
 sudo apt-get -y install python3-pip chezscheme
-# sudo apt-get -y install ripgrep
+# ripgrep
 ## kernel
-# sudo apt-get -y install linux-headers-`uname -r`
-sudo apt-get -y install libncurses-dev flex bison libssl-dev bc libelf-dev rsync
+# libncurses-dev flex bison libssl-dev bc libelf-dev rsync linux-headers-`uname -r`
 ## syzkaller
-# sudo apt-get install -y debootstrap qemu-system-x86
+# debootstrap qemu-system-x86
 
 mkdir -p ~/.local/bin
 ln -sf /usr/bin/fdfind ~/.local/bin/fd
 
-# manual install
 cd $dotfiles
-./install-rg.sh
-
-./install-vim.sh
 ./install-cheat.sh
 
 ./getbashcompletion.sh pip3

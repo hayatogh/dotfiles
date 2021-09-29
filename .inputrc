@@ -70,7 +70,6 @@ $if mode=vi
 		"\C-g": "i\C-e\C-u fg || true\C-m"
 		"\eg": "i\C-e\C-u fg || true\C-m\ep"
 		"\es": "i\C-e --color=always | less\C-m"
-		"\em": "i\C-e\eu\C-a _quick_man \C-m\ep"
 	$endif
 	set keymap vi-insert
 	"\C-a": beginning-of-line
@@ -113,7 +112,6 @@ $if mode=vi
 		"\C-g": "\C-e\C-u fg || true\C-m"
 		"\eg": "\C-e\C-u fg || true\C-m\ep"
 		"\es": "\C-e --color=always | less\C-m"
-		"\em": "\C-e\eu\C-a _quick_man \C-m\ep"
 	$endif
 $endif
 $if mode=emacs

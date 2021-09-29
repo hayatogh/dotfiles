@@ -1,16 +1,7 @@
-emacs/*
-!emacs/init.el
 .vim/.netrwhist
 .vim/.viminfo
-.vim/autoload
 .vim/pack
-.vim/plugged
-.vim/swap/*
-.w3m/*
-!.w3m/config
-!.w3m/keymap
+.vim/swap
 cheat/cheatsheets/community
-git-prompt.sh
 karabiner/assets
 karabiner/automatic_backups
-mintty/emojis
