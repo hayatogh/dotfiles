@@ -35,6 +35,10 @@ function prompt {
 }
 
 function choco_install {
+  Set-ExecutionPolicy Bypass -Scope Process -Force
+  [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+  iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
   choco feature enable -n allowGlobalConfirmation
   $pin = "aquasnap", "discord.install", "drawio", "slack", "steam", "thunderbird", "zotero"
   $ins = "7zip.install", "autohotkey.install", "fd", "flac", "fontforge", "foobar2000",

@@ -12,6 +12,7 @@ appdata=$(wslpath "$(powershell.exe 'Get-Content Env:APPDATA')")
 mkdir -p "$winhome"/.config
 
 rsync -a $dotfiles/latexmk/ "$winhome"/.config/latexmk
+rsync -a $dotfiles/.vimfx/ "$winhome"/.vimfx
 rsync -a $dotfiles/mintty/ "$appdata"/mintty
 rsync -a $dotfiles/alacritty/ "$appdata"/alacritty
 rsync -a $dotfiles/WindowsPowerShell/ "$windoc"/WindowsPowerShell
