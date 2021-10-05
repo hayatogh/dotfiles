@@ -1,22 +1,22 @@
 #!/usr/bin/env bash
-. $(realpath $(dirname $0))/install-helper.sh
+set -euo pipefail
 
 os=linux
-if [[ $(uname) == Darwin ]]; then
-	os=darwin
-fi
 ver=$(wget -qO- https://github.com/cheat/cheat/releases/latest | grep -Po '(?<=/cheat/cheat/releases/download/)[0-9.]+(?=/cheat-'$os'-amd64\.gz)' | head -n1)
 url=https://github.com/cheat/cheat/releases/download/$ver/cheat-$os-amd64.gz
-exe=cheat
-local_ver() {
-	cheat --version | grep -Po '[0-9.]+'
-}
-install_func() {
-	local tmp=$(mktemp_track)
-	wget -qO $tmp $url
-	gzip -cd $tmp > ~/.local/bin/cheat
-	chmod 755 ~/.local/bin/cheat
-	git_clone git://github.com/cheat/cheatsheets ~/.config/cheat/cheatsheets/community
-}
 
-helper
+echo "Installed:     $(cheat --version 2>/dev/null | grep -Po '[0-9.]+' || echo "Not installed")"
+echo "Remote latest: $ver"
+
+if [[ ${1:-} == -n ]]; then
+	exit
+fi
+
+tmp=$(mktemp)
+wget -qO $tmp $url
+mkdir -p ~/.local/bin
+gzip -cd $tmp >~/.local/bin/cheat
+chmod 755 ~/.local/bin/cheat
+rm -rf ~/.config/cheat/cheatsheets/community
+git clone --depth 1 -- git://github.com/cheat/cheatsheets ~/.config/cheat/cheatsheets/community &>/dev/null
+rm $tmp
