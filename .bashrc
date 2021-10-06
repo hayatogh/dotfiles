@@ -107,25 +107,21 @@ cdd() {
 	fi
 }
 ctags_exclude() {
-	local state arg
+	local state=exclude arg
 	while (( $# )); do
 		case "$1" in
 			-h|--help)
-				echo "$0: $0 [--exclude] FILE ... --include FILE ..."
+				echo "$0: $0 FILE ... [--include FILE ...]"
 				return
-				;;
-			--exclude)
-				state="exclude"
-				shift
 				;;
 			--include)
 				state="include"
 				shift
 				;;
 			*)
-				if [[ -z $state || $state == exclude ]]; then
+				if [[ $state == exclude ]]; then
 					arg="$arg--exclude=$1 "
-				else # $state == include
+				else
 					arg=$(sed 's/--exclude='$1' //g' <<<"$arg")
 				fi
 				shift
@@ -139,10 +135,7 @@ realwhich() {
 	realpath $(which $1)
 }
 clean_history() {
-	local pat='pwd|(|ba|da|z)sh|sr|vim?|make|l[sal.]|al|git .|cd(| -| ..)|scheme'
-	if [[ $# == 1 ]]; then
-		pat=$1
-	fi
+	local pat=${1:-pwd|(|ba|da|z)sh|sr|vim?|make|l[sal.]|al|git .|cd(| -| \.\.)|scheme}
 	perl -0777 -pi -e 's/^#\d+\n('"$pat"') *\n//gm' $HISTFILE
 }
 fixmod() {
@@ -164,16 +157,7 @@ fixmod() {
 if [[ $_uname == Msys ]]; then
 	shopt -s completion_strip_exe
 	alias e=explorer.exe
-	# alias javac="javac -encoding UTF-8"
-	# alias java="java -Dfile.encoding=UTF-8"
-	# if [[ $javaenc == MS932 ]]; then
-	# 	alias javac="javac -encoding MS932"
-	# 	alias java="java -Dfile.encoding=MS932"
-	# fi
 	alias open=start
-	# phpdir=$(ls -d /c/tools/php* | tail -n1)
-	# alias php="$phpdir/php.exe"
-	# unset phpdir
 	alias rg="rg --path-separator '\x2F'"
 	upgrade() {
 		pacman -Qtdq | pacman -Rns --noconfirm - 2>/dev/null
@@ -181,9 +165,7 @@ if [[ $_uname == Msys ]]; then
 	}
 	_psjobs() {
 		PSJOBS=$(jobs -p)
-		if [[ -z $PSJOBS ]]; then
-			PSJOBS=""
-		else
+		if [[ -n $PSJOBS ]]; then
 			PSJOBS=$(wc -l <<<$PSJOBS)
 		fi
 	}
@@ -196,9 +178,7 @@ elif [[ $_uname == Darwin ]]; then
 	}
 	_psjobs() {
 		PSJOBS=$(jobs -p)
-		if [[ -z $PSJOBS ]]; then
-			PSJOBS=""
-		else
+		if [[ -n $PSJOBS ]]; then
 			PSJOBS=$(ps -opid= -p$PSJOBS | wc -l)
 			if [[ $PSJOBS == 0 ]]; then
 				PSJOBS=""
@@ -213,9 +193,7 @@ else
 	}
 	_psjobs() {
 		PSJOBS=$(jobs -p)
-		if [[ -z $PSJOBS ]]; then
-			PSJOBS=""
-		else
+		if [[ -n $PSJOBS ]]; then
 			PSJOBS=$(ps -opid= $PSJOBS | wc -l)
 			if [[ $PSJOBS == 0 ]]; then
 				PSJOBS=""
