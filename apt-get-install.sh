@@ -9,9 +9,8 @@ fi
 
 sudo apt-get update
 sudo apt-get -y upgrade
-sudo apt-get -y install automake bash-completion bc command-not-found curl fd-find gcc gdb htop info libc6-dev libncurses-dev lshw lsof make man nkf pkg-config pmount rlwrap rsync screen tree uchardet universal-ctags vim wget zip
+sudo apt-get -y install automake bash-completion bc command-not-found curl fd-find gcc gdb htop info libc6-dev libncurses-dev lshw lsof make man nkf pkg-config pmount ripgrep rlwrap rsync screen tree uchardet universal-ctags vim wget zip
 sudo apt-get -y install python3-pip chezscheme
-# ripgrep
 ## kernel
 # libncurses-dev flex bison libssl-dev bc libelf-dev rsync linux-headers-`uname -r`
 ## syzkaller

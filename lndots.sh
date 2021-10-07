@@ -24,21 +24,21 @@ rm_ln()
 }
 if [[ $_uname == Msys ]]; then
 	export MSYS=winsymlinks:nativestrict
-	winpath() {
-		cygpath "$1"
+	pspath() {
+		cygpath "$(powershell.exe "$1")"
 	}
 elif [[ $_uname == WSL ]]; then
-	winpath() {
-		wslpath "$1" | tr -d '\r'
+	pspath() {
+		wslpath "$(powershell.exe "$1" | tr -d '\r')"
 	}
 elif [[ $_uname == Darwin ]]; then
 	dirsinconfig="$dirsinconfig karabiner"
 fi
 
 if [[ $_uname == Msys ]] || [[ $_uname == WSL ]]; then
-	winhome=$(winpath "$(powershell.exe 'Get-Content Env:USERPROFILE')")
-	windesk=$(winpath "$(powershell.exe '[Environment]::GetFolderPath("Desktop")')")
-	onedrive=$(winpath "$(powershell.exe 'Get-Content Env:OneDrive')")
+	winhome=$(pspath 'Get-Content Env:USERPROFILE')
+	windesk=$(pspath '[Environment]::GetFolderPath("Desktop")')
+	onedrive=$(pspath 'Get-Content Env:OneDrive')
 	rm_ln "$winhome" ~/WinHome
 	rm_ln "$windesk" ~/Desktop
 	rm_ln "$onedrive" ~/OneDrive

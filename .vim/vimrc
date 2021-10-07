@@ -26,7 +26,6 @@ set helplang=Ja,En
 set history=1000
 set smartindent autoindent
 set lispwords-=if
-" set list listchars=eol:￩,tab:»-,extends:»,precedes:«,nbsp:◦
 set list listchars=tab:»-,extends:»,precedes:«,nbsp:◦
 set showmatch matchtime=1 matchpairs+=「:」,（:）,『:』,【:】,［:］
 set modeline modelines=3
@@ -36,24 +35,10 @@ if &term == 'screen-256color'
 endif
 set number relativenumber
 set pastetoggle=<F10>
-" path {{{2
 if has('linux') && !s:jailshell
-	set path+=include,./include,arch/x86/include,./arch/x86/include
-	let g:ale_c_gcc_options = '-fsyntax-only -std=gnu99'
-	let s:idirs = []
 	let s:pdir = '/lib/modules/' . substitute(system('uname -r'), '\n', '', '') . '/source'
-	let s:idir = s:pdir . '/include'
-	let s:idirs += [ s:idir ]
-	let s:idir = s:pdir . '/arch/x86/include'
-	let s:idirs += [ s:idir ]
-	if !empty(s:idirs)
-		for s:idir in s:idirs
-			execute 'set path+=' . s:idir
-			" let g:ale_c_gcc_options .= ' -I' . s:idir
-		endfor
-	endif
+	let &path .= ",include,./include,arch/x86/include,./arch/x86/include," . s:pdir . '/include,' . s:pdir . '/arch/x86/include'
 endif
-" }}}
 set pumheight=10
 set report=15
 set scrolloff=3 sidescroll=1 sidescrolloff=10
@@ -69,23 +54,10 @@ set splitbelow splitright
 set suffixes+=.exe,.lock
 set suffixesadd=.tex
 set laststatus=2
-" statusline {{{2
 let g:CRLF = {'unix': 'LF', 'dos': 'CRLF', 'mac': 'CR'}
-let s:autoIminsertZero=0
-function! g:Charcount()
-	return wordcount().chars - line('$')
-endfunction
-function! g:Bomb()
-	return &l:bomb ? '(bomb)' : ''
-endfunction
-function! g:Paste()
-	return &g:paste ? '<paste>' : ''
-endfunction
-" }}}
-set statusline=[%f]%<%h%m%r[%{&fileencoding}%{g:Bomb()}][%{g:CRLF[&fileformat]}][%Y][0x%02.4B]%{g:Paste()}%=%l,%c%V\ %P\ %LL%{g:Charcount()}C%{g:Imzero()}
+set statusline=[%f]%<%h%m%r[%{&fileencoding}%{&bomb?'(bomb)':''}][%{g:CRLF[&fileformat]}][%Y][0x%02.4B]%{&paste?'<paste>':''}%=%l,%c%V\ %P\ %LL%{wordcount().chars-line('$')}C%{g:Imzero()}
 set showtabline=2
 " tabline {{{2
-" used hi Title ctermfg=166 in molokai.vim
 function! s:tablabel(tabpagenr)
 	let l:buflist = tabpagebuflist(a:tabpagenr)
 	let l:curbufnr = l:buflist[tabpagewinnr(a:tabpagenr) - 1]
@@ -107,7 +79,6 @@ function! g:Cuitabline()
 endfunction
 " }}}
 set tabline=%!Cuitabline()
-" set termguicolors
 set noexpandtab shiftwidth=0 tabstop=8
 set tags=./tags;./../../,tags;../../
 set ttimeoutlen=1
@@ -118,26 +89,10 @@ set wildmenu wildignorecase wildmode=list:longest,full
 set wrap
 
 let g:c_comment_strings = 1
-let g:html_font = ['Consolas', 'Monaco']
-let g:html_pre_wrap = 0
 let g:vim_json_conceal = 0
 let g:mapleader = ' '
 let g:maplocalleader = ' '
 let g:readline_has_bash = 1
-let g:rst_style = 1
-let g:rst_syntax_code_list = {
-	\ 'c'     : ['c'],
-	\ 'cpp'   : ['cpp', 'c++'],
-	\ 'java'  : ['java'],
-	\ 'json'  : ['json'],
-	\ 'lisp'  : ['lisp'],
-	\ 'perl'  : ['perl'],
-	\ 'php'   : ['php'],
-	\ 'python': ['python'],
-	\ 'sh'    : ['sh'],
-	\ 'vim'   : ['vim'],
-	\ }
-let g:rst_use_emphasis_colors = 1
 let g:rust_bang_comment_leader = 1
 let g:tex_conceal = ''
 let g:tex_flavor = 'latex'
@@ -152,6 +107,7 @@ if !has('win32')
 endif
 function! g:Imzero()
 endfunction
+let s:clipexe_ok = 0
 if has('gui_win32')
 	function! g:Imzero()
 		if s:autoIminsertZero
@@ -159,14 +115,20 @@ if has('gui_win32')
 		endif
 		return ''
 	endfunction
-endif
-if $WSL_DISTRO_NAME != '' || $MSYSTEM != ''
-	call echoraw("\e[<0t\e[<s")
+elseif $WSL_DISTRO_NAME != '' || $MSYSTEM != ''
 	if &term !~# 'screen'
+		call echoraw("\e[<0t\e[<s")
 		let &t_SI .= "\e[<r"
 		let &t_EI .= "\e[<s\e[<0t"
 		let &t_te .= "\e[<0t\e[<s"
+		function! g:Imzero()
+			if s:autoIminsertZero
+				call echoraw("\e[<0t\e[<s")
+			endif
+			return ''
+		endfunction
 	else
+		call echoraw("\eP\e[<0t\e[<s\e\\")
 		let &t_SI .= "\eP\e[<r\e\\"
 		let &t_EI .= "\eP\e[<s\e[<0t\e\\"
 		let &t_te .= "\eP\e[<0t\e[<s\e\\"
@@ -174,17 +136,14 @@ if $WSL_DISTRO_NAME != '' || $MSYSTEM != ''
 		let &t_BD = "\eP\e[?2004l\e\\"
 		exec "set t_PS=\e[200~"
 		exec "set t_PE=\e[201~"
+		function! g:Imzero()
+			if s:autoIminsertZero
+				call echoraw("\eP\e[<0t\e[<s\e\\")
+			endif
+			return ''
+		endfunction
 	endif
-	function! g:Imzero()
-		if s:autoIminsertZero
-			call echoraw(&t_te)
-		endif
-		return ''
-	endfunction
-endif
-let s:clipexe_ok = 0
-if executable('clip.exe') && $WSL_DISTRO_NAME != ''
-	let s:clipexe_ok = 1
+	let s:clipexe_ok = executable('clip.exe')
 endif
 
 filetype plugin indent on
@@ -506,6 +465,7 @@ command! -range SortComma call <SID>Sort(', ')
 command! -nargs=1 -range SortSep call <SID>Sort(<f-args>)
 " autocommand {{{1
 command! AUTOiminsertzero let s:autoIminsertZero = !s:autoIminsertZero
+let s:autoIminsertZero=0
 
 command! AUTOhltrailingwhitespaces call <SID>toggleAutoHlTrailingWhiteSpaces()
 let s:autoHlTrailingWhiteSpaces = 1
@@ -582,10 +542,11 @@ endfunction
 augroup vimrc
 	autocmd!
 	autocmd BufRead,BufNewFile * if &ft == 'asm' | set ft=gas | endif
-	autocmd BufRead,BufNewFile *.lalrpop set ft=lalrpop
+	autocmd BufRead,BufNewFile *.lalrpop set ft=rust
 
 	autocmd Colorscheme * highlight Cursor guifg=Black guibg=Cyan
 	autocmd Colorscheme * highlight CursorIM guifg=Black guibg=Magenta
+	autocmd Colorscheme * highlight TabLineFill guibg=#808080
 
 	autocmd BufReadPost * if line('''"') >= 1 && line('''"') <= line('$') && &ft !~# 'commit' | exe 'normal! g`"' | endif
 
@@ -832,7 +793,11 @@ silent! packadd termdebug
 silent! packadd minpac
 runtime ftplugin/man.vim
 " lexima {{{2
-" default_rules {{{3
+function! s:Lexima_endwise(at, end, filetype)
+	return {'char': '<CR>', 'input': '<CR>', 'input_after': '<CR>' . a:end,
+		\ 'at': a:at, 'except': '\C\v^(\s*)\S.*%#\n%(%(\s*|\1\s.+)\n)*\1' . a:end,
+		\ 'filetype': a:filetype}
+endfunction
 let s:rulelist = [
 	"\ {'char': '(', 'input_after': ')'},
 	"\ {'char': '(', 'at': '\\\%#'},
@@ -840,6 +805,7 @@ let s:rulelist = [
 	"\ {'char': '<BS>', 'at': '(\%#)', 'delete': 1},
 	"\ {'char': '<C-H>', 'at': '(\%#)', 'delete': 1},
 	"\ {'char': '{', 'input_after': '}'},
+	"\ {'char': '{', 'at': '\\\%#'},
 	"\ {'char': '}', 'at': '\%#}', 'leave': 1},
 	"\ {'char': '<BS>', 'at': '{\%#}', 'delete': 1},
 	"\ {'char': '<C-H>', 'at': '{\%#}', 'delete': 1},
@@ -848,75 +814,22 @@ let s:rulelist = [
 	"\ {'char': ']', 'at': '\%#]', 'leave': 1},
 	"\ {'char': '<BS>', 'at': '\[\%#\]', 'delete': 1},
 	"\ {'char': '<C-H>', 'at': '\[\%#\]', 'delete': 1},
+	\ {'char': '<CR>', 'at': '(\%#)',   'input_after': '<CR>'},
+	\ {'char': '<CR>', 'at': '{\%#}',   'input_after': '<CR>'},
+	\ {'char': '<CR>', 'at': '\[\%#\]', 'input_after': '<CR>'},
+	\ <SID>Lexima_endwise('^\s*if\>.*\%#$',         'endif',       'vim'),
+	\ <SID>Lexima_endwise('^\s*while\>.*\%#$',      'endwhile',    'vim'),
+	\ <SID>Lexima_endwise('^\s*for\>.*\%#$',        'endfor',      'vim'),
+	\ <SID>Lexima_endwise('^\s*try\>.*\%#$',        'endtry',      'vim'),
+	\ <SID>Lexima_endwise('^\s*function!.*\%#$',    'endfunction', 'vim'),
+	\ <SID>Lexima_endwise('^\s*augroup\s\+.\+\%#$', 'augroup END', 'vim'),
+	\ <SID>Lexima_endwise('\%(^\s*#.*\)\@<!do\s*\%#$', 'end', 'elixir'),
+	\ <SID>Lexima_endwise('^\s*if\>.*\%#$',             'fi',   ['sh', 'zsh']),
+	\ <SID>Lexima_endwise('^\s*case\>.*\%#$',           'esac', ['sh', 'zsh']),
+	\ <SID>Lexima_endwise('\%(^\s*#.*\)\@<!do\>.*\%#$', 'done', ['sh', 'zsh']),
+	\ {'char': '<CR>', 'input': '<CR>'}
+	"\ inoremap <CR> <C-G>u<CR>
 	\ ]
-" }}}
-" default_rules 2 {{{3
-let s:rulelist += [
-	"\ {'char': '"', 'input_after': '"'},
-	"\ {'char': '"', 'at': '\%#"', 'leave': 1},
-	"\ {'char': '"', 'at': '\\\%#'},
-	"\ {'char': '"', 'at': '^\s*\%#', 'filetype': 'vim'},
-	"\ {'char': '"', 'at': '\%#\s*$', 'filetype': 'vim'},
-	"\ {'char': '<BS>', 'at': '"\%#"', 'delete': 1},
-	"\ {'char': '<C-H>', 'at': '"\%#"', 'delete': 1},
-	"\ {'char': '"', 'at': '""\%#', 'input_after': '"""'},
-	"\ {'char': '"', 'at': '\%#"""', 'leave': 3},
-	"\ {'char': '<BS>', 'at': '"""\%#"""', 'input': '<BS><BS><BS>', 'delete': 3},
-	"\ {'char': '<C-H>', 'at': '"""\%#"""', 'input': '<BS><BS><BS>', 'delete': 3},
-	"\ {'char': "'", 'input_after': "'"},
-	"\ {'char': "'", 'at': '\%#''', 'leave': 1},
-	"\ {'char': "'", 'at': '\w\%#''\@!'},
-	"\ {'char': "'", 'at': '\\\%#'},
-	"\ {'char': "'", 'at': '\\\%#', 'leave': 1, 'filetype': ['vim', 'sh', 'csh', 'ruby', 'tcsh', 'zsh']},
-	"\ {'char': "'", 'filetype': ['haskell', 'lisp', 'clojure', 'ocaml', 'scala', 'rust', 'scheme', 'text']},
-	"\ {'char': '<BS>', 'at': "'\\%#'", 'delete': 1},
-	"\ {'char': '<C-H>', 'at': "'\\%#'", 'delete': 1},
-	"\ {'char': "'", 'at': "''\\%#", 'input_after': "'''"},
-	"\ {'char': "'", 'at': "\\%#'''", 'leave': 3},
-	"\ {'char': '<BS>', 'at': "'''\\%#'''", 'input': '<BS><BS><BS>', 'delete': 3},
-	"\ {'char': '<C-H>', 'at': "'''\\%#'''", 'input': '<BS><BS><BS>', 'delete': 3},
-	"\ {'char': '`', 'input_after': '`'},
-	"\ {'char': '`', 'at': '\%#`', 'leave': 1},
-	"\ {'char': '<BS>', 'at': '`\%#`', 'delete': 1},
-	"\ {'char': '<C-H>', 'at': '`\%#`', 'delete': 1},
-	"\ {'char': '`', 'filetype': ['ocaml']},
-	"\ {'char': '`', 'at': '``\%#', 'input_after': '```'},
-	"\ {'char': '`', 'at': '\%#```', 'leave': 3},
-	"\ {'char': '<BS>', 'at': '```\%#```', 'input': '<BS><BS><BS>', 'delete': 3},
-	"\ {'char': '<C-H>', 'at': '```\%#```', 'input': '<BS><BS><BS>', 'delete': 3},
-	\ ]
-" }}}
-" newline {{{3
-let s:rulelist += [
-	\ {'char': '<CR>', 'at': '(\%#)', 'input_after': '<CR>'},
-	\ {'char': '<CR>', 'at': '{\%#}', 'input_after': '<CR>'},
-	\ {'char': '<CR>', 'at': '\[\%#]', 'input_after': '<CR>'},
-	\ ]
-" }}}
-" endwise {{{3
-function! s:Lexima_endwise_rule_make_rule(at, end, filetype, syntax)
-	return {'char': '<CR>', 'input': '<CR>', 'input_after': '<CR>' . a:end,
-		\ 'at': a:at, 'except': '\C\v^(\s*)\S.*%#\n%(%(\s*|\1\s.+)\n)*\1' . a:end,
-		\ 'filetype': a:filetype, 'syntax': a:syntax}
-endfunction
-for s:at in ['if', 'while', 'for', 'try']
-	let s:rulelist += [<SID>Lexima_endwise_rule_make_rule('^\s*' . s:at . '\>.*\%#$', 'end' . s:at, 'vim', []),]
-endfor
-let s:rulelist += [s:Lexima_endwise_rule_make_rule('^\s*function!.*\%#$', 'endfunction', 'vim', []),
-	\ <SID>Lexima_endwise_rule_make_rule('^\s*augroup\s\+.\+\%#$', 'augroup END', 'vim', []),
-	\ <SID>Lexima_endwise_rule_make_rule('\%(^\s*#.*\)\@<!do\s*\%#$', 'end', 'elixir', []),
-	\ <SID>Lexima_endwise_rule_make_rule('^\s*if\>.*\%#$', 'fi', ['sh', 'zsh'], []),
-	\ <SID>Lexima_endwise_rule_make_rule('^\s*case\>.*\%#$', 'esac', ['sh', 'zsh'], []),
-	\ <SID>Lexima_endwise_rule_make_rule('\%(^\s*#.*\)\@<!do\>.*\%#$', 'done', ['sh', 'zsh'], []),]
-let s:rulelist += [{'char': '<CR>', 'input': '<CR>'}] " inoremap <CR> <C-G>u<CR>
-" }}}
-" filetype specific {{{3
-let s:rulelist += [
-	\ {'char': '$', 'input_after': '$', 'filetype': 'tex'},
-	\ {'char': '$', 'at': '\%#\$', 'leave': 1, 'filetype': 'tex'},
-	\ {'char': '<C-H>', 'at': '\$\%#\$', 'delete': 1, 'filetype': 'tex'},
-	\ ]
-" }}}
 for s:rule in s:rulelist
 	silent! call lexima#add_rule(s:rule)
 endfor

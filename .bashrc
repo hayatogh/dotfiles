@@ -30,7 +30,7 @@ alias al="ls -alhF"
 alias ltime="ls -alhrtF"
 alias lsize="ls -alhrFS"
 alias manless="man -P less"
-alias rg="rg --hidden -g'!.git'"
+alias rg="rg -uug'!.git'"
 alias rm="rm -i"
 alias sc="script -qc sh"
 alias scheme="scheme ~/dotfiles/chezrc.ss"
@@ -158,7 +158,7 @@ if [[ $_uname == Msys ]]; then
 	shopt -s completion_strip_exe
 	alias e=explorer.exe
 	alias open=start
-	alias rg="rg --path-separator '\x2F'"
+	alias rg="rg -uug'!.git' --path-separator '//'"
 	upgrade() {
 		pacman -Qtdq | pacman -Rns --noconfirm - 2>/dev/null
 		pacman -Syu --noconfirm
@@ -181,7 +181,7 @@ elif [[ $_uname == Darwin ]]; then
 		if [[ -n $PSJOBS ]]; then
 			PSJOBS=$(ps -opid= -p$PSJOBS | wc -l)
 			if [[ $PSJOBS == 0 ]]; then
-				PSJOBS=""
+				PSJOBS=
 			fi
 		fi
 	}
@@ -196,7 +196,7 @@ else
 		if [[ -n $PSJOBS ]]; then
 			PSJOBS=$(ps -opid= $PSJOBS | wc -l)
 			if [[ $PSJOBS == 0 ]]; then
-				PSJOBS=""
+				PSJOBS=
 			fi
 		fi
 	}
@@ -204,16 +204,11 @@ else
 		alias e=explorer.exe
 		xdg-open() {
 			[[ $# == 0 ]] && return 1
-			local arg
+			local arg=$1
 			if [[ -r $1 ]]; then
-				arg='"\\wsl$\Debian\'$(realpath "$1")'"'
-			else
-				arg='"'$1'"'
+				arg=$(wslpath -w "$1")
 			fi
-			powershell.exe 'Start-Process '"$arg"
-		}
-		wslpath() {
-			/bin/wslpath "$@" | tr -d '\r'
+			powershell.exe 'Start-Process "'"$arg"'"'
 		}
 	fi
 	if [[ $_distro == debian ]]; then
