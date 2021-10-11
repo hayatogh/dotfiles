@@ -30,7 +30,8 @@ alias al="ls -alhF"
 alias ltime="ls -alhrtF"
 alias lsize="ls -alhrFS"
 alias manless="man -P less"
-alias rg="rg -uug'!.git'"
+alias rg="rg --hidden -g'!.git'"
+alias rgall="rg -uug'!.git'"
 alias rm="rm -i"
 alias sc="script -qc sh"
 alias scheme="scheme ~/dotfiles/chezrc.ss"
@@ -154,11 +155,12 @@ fixmod() {
 	done
 }
 
-if [[ $_uname == Msys ]]; then
+if [[ $_uname == MSYS ]]; then
 	shopt -s completion_strip_exe
 	alias e=explorer.exe
 	alias open=start
-	alias rg="rg -uug'!.git' --path-separator '//'"
+	alias rg="rg --hidden -g'!.git' --path-separator '//'"
+	alias rgall="rg -uug'!.git' --path-separator '//'"
 	upgrade() {
 		pacman -Qtdq | pacman -Rns --noconfirm - 2>/dev/null
 		pacman -Syu --noconfirm

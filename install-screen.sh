@@ -4,7 +4,7 @@ if [[ $EUID != 0 ]]; then
 	exec sudo "$0" "$@"
 fi
 
-ver=$(wget -qO- 'http://ftp.gnu.org/gnu/screen/?C=M;O=D' | grep -Po '(?<=href="screen-)[0-9.]+(?=\.tar\.gz")' | head -n1)
+ver=$(curl -fsS 'http://ftp.gnu.org/gnu/screen/?C=M;O=D' | grep -Po '(?<=href="screen-)[0-9.]+(?=\.tar\.gz")' | head -n1)
 dir=screen-$ver
 url=http://ftp.gnu.org/gnu/screen/$dir.tar.gz
 
@@ -17,7 +17,7 @@ fi
 
 mkdir -p /usr/local/src
 cd /usr/local/src
-wget -qO $dir.tar.gz $url
+curl -fsSo $dir.tar.gz $url
 rm -rf $dir
 tar -xf $dir.tar.gz
 cd $dir

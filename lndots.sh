@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
-# mkdir to ensure 2nd argmment of ln exists when creating dir symlinks.
-# rm dirs when creating dir symlinks because ln can't overwrite directorys
+
 dotfiles=$(realpath $(dirname $0))
-_uname=$(uname -o 2>/dev/null || uname -s)
-if [[ $_uname == GNU/Linux ]] && [[ $(uname -r) =~ [Mm]icrosoft ]]; then
-	_uname=WSL
-fi
+case $(uname -sr) in
+	*icrosoft*) _uname=WSL;;
+	*Linux*) _uname=Linux;;
+	*Darwin*) _uname=Darwin;;
+	*_NT*) _uname=MSYS;;
+esac
 
 files=".inputrc .bash_profile .bashrc .gdbinit .infokey .vim .themes"
 dirsinconfig="git yapf latexmk cheat"
@@ -22,7 +23,7 @@ rm_ln()
 	rm -rf "$linkname"
 	ln -s "$target" "$linkname"
 }
-if [[ $_uname == Msys ]]; then
+if [[ $_uname == MSYS ]]; then
 	export MSYS=winsymlinks:nativestrict
 	pspath() {
 		cygpath "$(powershell.exe "$1")"
@@ -35,7 +36,7 @@ elif [[ $_uname == Darwin ]]; then
 	dirsinconfig="$dirsinconfig karabiner"
 fi
 
-if [[ $_uname == Msys ]] || [[ $_uname == WSL ]]; then
+if [[ $_uname == MSYS ]] || [[ $_uname == WSL ]]; then
 	winhome=$(pspath 'Get-Content Env:USERPROFILE')
 	windesk=$(pspath '[Environment]::GetFolderPath("Desktop")')
 	onedrive=$(pspath 'Get-Content Env:OneDrive')

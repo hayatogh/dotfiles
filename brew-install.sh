@@ -9,7 +9,7 @@ if ! grep '/usr/local/bin/bash' /etc/shells &>/dev/null; then
 	sudo sh -c "echo /usr/local/bin/bash >>/etc/shells"
 fi
 if ! type brew &>/dev/null; then
-	/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+	/bin/bash -c "$(curl -fsS https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
 brew install bash bash-completion@2 chezscheme coreutils fd fzf git p7zip ripgrep rlwrap screen vim wget

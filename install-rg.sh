@@ -4,7 +4,7 @@ if [[ $EUID != 0 ]]; then
 	exec sudo "$0" "$@"
 fi
 
-ver=$(wget -qO- https://github.com/BurntSushi/ripgrep/releases/latest | grep -Po '(?<=/BurntSushi/ripgrep/releases/download/)([0-9.]+)(?=/ripgrep_\1_amd64\.deb)' | head -n1)
+ver=$(curl -fsSL https://github.com/BurntSushi/ripgrep/releases/latest | grep -Po '(?<=/BurntSushi/ripgrep/releases/download/)([0-9.]+)(?=/ripgrep_\1_amd64\.deb)' | head -n1)
 fname=ripgrep_${ver}_amd64.deb
 url=https://github.com/BurntSushi/ripgrep/releases/download/$ver/$fname
 
@@ -17,5 +17,5 @@ fi
 
 mkdir -p /usr/local/src
 cd /usr/local/src
-wget -qO $fname $url
+curl -fsSo $fname $url
 dpkg -i $fname

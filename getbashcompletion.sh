@@ -12,7 +12,7 @@ rustup_comp() {
 	rustup completions bash >$dir/rustup
 }
 cargo_comp() {
-	wget -qO $dir/cargo https://raw.githubusercontent.com/rust-lang/cargo/master/src/etc/cargo.bashcomp.sh
+	curl -fsSo $dir/cargo https://raw.githubusercontent.com/rust-lang/cargo/master/src/etc/cargo.bashcomp.sh
 }
 pip3_comp() {
 	exists pip3 || return
