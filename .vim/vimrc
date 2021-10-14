@@ -321,7 +321,7 @@ endfunction
 command! XXD call <SID>XXD(1)
 command! XXDundo call <SID>XXD(0)
 
-function! MultiHlSetup()
+function! s:MultiHlSetup()
 	highlight Multihl1 ctermbg=14 ctermfg=8 guibg=#00ffff guifg=#808080
 	highlight Multihl2 ctermbg=13 ctermfg=8 guibg=#ff00ff guifg=#808080
 	highlight Multihl3 ctermbg=11 ctermfg=8 guibg=#ffff00 guifg=#808080
@@ -409,7 +409,7 @@ endif
 let s:template = {
 	\ 'c'     : ['#include <stdio.h>', '', 'int main(void) {', '	printf("Hello\n");', '	return 0;', '}'],
 	\ 'go'    : ['package main', '', 'import "fmt"', '', 'func main() {', '	fmt.Println("Hello")', '}'],
-	\ 'perl'  : '#!/usr/bin/env perl',
+	\ 'perl'  : ['#!/usr/bin/env perl', 'use strict;', 'use warnings;'],
 	\ 'python': '#!/usr/bin/env python3',
 	\ 'sh'    : ['#!/usr/bin/env bash', 'set -euxo pipefail'],
 	\ }
@@ -524,6 +524,12 @@ function! s:CopyToScreenReg(str)
 	endif
 endfunction
 
+function! s:SetScreenTitle()
+	if s:in_screen
+		call job_start(['screen', '-X', 'title', 'vim'])
+	endif
+endfunction
+
 augroup vimrc
 	autocmd!
 	autocmd BufRead,BufNewFile * if &ft == 'asm' | set ft=gas | endif
@@ -546,6 +552,7 @@ augroup vimrc
 	autocmd BufWritePre *.tex call <SID>HalfCommas()
 	autocmd BufWritePre *.txt call <SID>ConvertPunctuation()
 	autocmd TextYankPost * call <SID>CopyToScreenRegUnnamed()
+	autocmd VimResume   * call <SID>SetScreenTitle()
 augroup END
 
 " pack
