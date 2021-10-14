@@ -29,7 +29,7 @@ alias ll="ls -lhF"
 alias al="ls -alhF"
 alias ltime="ls -alhrtF"
 alias lsize="ls -alhrFS"
-alias manless="man -P less"
+alias man="_man"
 alias rg="rg --hidden -g'!.git'"
 alias rgall="rg -uug'!.git'"
 alias rm="rm -i"
@@ -153,6 +153,9 @@ fixmod() {
 			chmod 644 $x
 		fi
 	done
+}
+_man() {
+	vim +"MYMANPAGER $*"
 }
 
 if [[ $_uname == MSYS ]]; then
