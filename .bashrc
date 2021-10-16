@@ -29,7 +29,7 @@ alias ll="ls -lhF"
 alias al="ls -alhF"
 alias ltime="ls -alhrtF"
 alias lsize="ls -alhrFS"
-alias man="_man"
+alias man="manvim"
 alias rg="rg --hidden -g'!.git'"
 alias rgall="rg -uug'!.git'"
 alias rm="rm -i"
@@ -154,7 +154,7 @@ fixmod() {
 		fi
 	done
 }
-_man() {
+manvim() {
 	vim +"MYMANPAGER $*"
 }
 
