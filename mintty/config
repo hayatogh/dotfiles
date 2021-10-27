@@ -1,4 +1,4 @@
-CursorColour=0,255,255
+CursorColour=255,0,255
 CursorType=block
 CursorBlinks=no
 Font=Consolas
@@ -9,7 +9,7 @@ RightClickAction=extend
 Columns=147
 Rows=50
 KeyFunctions=t:new-window
-IMECursorColour=255,0,255
+IMECursorColour=0,0,255
 BoldAsColour=no
 Term=xterm-256color
 BellType=0

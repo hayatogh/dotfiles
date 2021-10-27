@@ -46,7 +46,7 @@ set scrolloff=3 sidescroll=1 sidescrolloff=10
 set incsearch hlsearch nowrapscan
 set shortmess=aoOtT
 set splitbelow splitright
-set suffixes+=.exe,.lock
+set suffixes=.bak,~,.swp,.o,.info,.aux,.log,.dvi,.bbl,.blg,.brf,.cb,.ind,.idx,.ilg,.inx,.out,.toc,.exe,.lock
 set suffixesadd=.tex
 set laststatus=2
 let g:CRLF = {'unix': 'LF', 'dos': 'CRLF', 'mac': 'CR'}
@@ -698,7 +698,7 @@ let g:ale_linters = {
 	\ 'c'     : [],
 	\ 'cpp'   : [],
 	\ 'ocaml' : ['ocamllsp'],
-	\ 'python': ['mypy', 'pyls'],
+	\ 'python': ['pylsp'],
 	\ 'go'    : ['govet', 'gopls'],
 	\ 'rust'  : ['rls', 'cargo'],
 	\ }
@@ -708,7 +708,6 @@ let g:ale_fixers = {
 	\ 'go'    : ['gofmt', 'goimports'],
 	\ 'rust'  : ['rustfmt'],
 	\ }
-let g:ale_python_mypy_options = '--ignore-missing-imports'
 let g:ale_rust_cargo_use_clippy = executable('cargo-clippy')
 let g:ale_completion_enabled = 1
 let g:ale_fix_on_save = 1
