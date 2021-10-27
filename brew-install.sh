@@ -12,7 +12,7 @@ if ! type brew &>/dev/null; then
 	/bin/bash -c "$(curl -fsS https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
-brew install bash bash-completion@2 chezscheme coreutils fd fzf git p7zip ripgrep rlwrap screen vim wget
+brew install bash bash-completion@2 chezscheme coreutils fd fzf git p7zip ripgrep rlwrap screen tree vim wget
 # automake binutils diffutils ed file-formula findutils gawk gnu-indent gnu-sed gnu-tar gpatch grep gzip less make openssh rsync svn texinfo universal-ctags unzip watch wdiff zsh
 # docker docker-compose docker-machine
 

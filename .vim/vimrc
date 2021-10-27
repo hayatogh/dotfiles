@@ -94,8 +94,8 @@ if &term == 'xterm' || has('win32')
 	set t_Co=256
 endif
 if !has('win32')
-	let &t_VS .= "\e]12;#00ffff\x7"
-	let &t_EI .= "\e]12;#00ffff\x7"
+	let &t_VS .= "\e]12;#ff00ff\x7"
+	let &t_EI .= "\e]12;#ff00ff\x7"
 endif
 
 function! g:Imzero()
