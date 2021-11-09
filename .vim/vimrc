@@ -37,7 +37,7 @@ set pastetoggle=<F10>
 set path+=include,./include,arch/x86/include,./arch/x86/include
 if has('linux')
 	let s:moddir = '/lib/modules/' . substitute(system('uname -r'), '\n', '', '') . '/source'
-	let &path .= "," . s:moddir . '/include,' . s:moddir . '/arch/x86/include'
+	let &path .= ',' . s:moddir . '/include,' . s:moddir . '/arch/x86/include'
 	unlet s:moddir
 endif
 set pumheight=10
@@ -59,17 +59,16 @@ function! s:Tablabel(tabpagenr)
 	let l:no = len(l:buflist) == 1 ? '' : len(l:buflist)
 	let l:mod = len(filter(copy(l:buflist), 'getbufvar(v:val, "&modified")')) ? '+' : ''
 	let l:sp = (l:no . l:mod) == '' ? '' : ' '
-	let l:fname = fnamemodify(bufname(l:curbufnr), ':.')
-	let l:fname1 = fnamemodify(bufname(l:curbufnr), ':~')
-	let l:fname = l:fname == '' ? '_' : strchars(l:fname) <= strchars(l:fname1) ? l:fname : l:fname1
+	let l:fname = fnamemodify(bufname(l:curbufnr), ':t')
+	let l:fname = l:fname == '' ? '_' : l:fname
 	return '%' . a:tabpagenr . 'T%#Title#' . l:no . l:hi . l:mod . l:sp . l:fname . '%#TabLineFill#'
 endfunction
 function! g:Cuitabline()
-	let l:tabpages = join(map(range(1, tabpagenr('$')), '<SID>Tablabel(v:val)'), ' ')
+	let l:tablabels = join(map(range(1, tabpagenr('$')), '<SID>Tablabel(v:val)'), ' ')
 	let l:info = strftime('%m/%d%a %H:%M') . ' %#TabLine#' . fnamemodify(getcwd(), ':~') . ' '
-	return l:tabpages . ' %T%=' . l:info
+	return l:tablabels . ' %T%=' . l:info
 endfunction
-set tabline=%!Cuitabline()
+set tabline=%!g:Cuitabline()
 set noexpandtab shiftwidth=0 tabstop=8
 set tags=./tags;./../../,tags;../../
 set ttimeoutlen=1
@@ -99,6 +98,7 @@ if !has('win32')
 endif
 
 function! g:Imzero()
+	return ''
 endfunction
 let s:has_clipexe = 0
 if has('gui_win32')
@@ -138,6 +138,7 @@ elseif $WSL_DISTRO_NAME != '' || $MSYSTEM != ''
 	endif
 	let s:has_clipexe = executable('clip.exe')
 endif
+let s:pythonexe = executable('python3') ? 'python3' : 'python'
 
 " mapping
 map Y y$
@@ -145,24 +146,14 @@ map Y y$
 nnoremap <silent> mm :<C-U>nohlsearch<CR>
 nnoremap <silent> mn :<C-U>Hi0<CR>
 
-nnoremap <silent> <C-W><C-H> :<C-U>execute 'tabprevious ' . v:count1<CR>
-nnoremap <silent> <C-W><C-J> :-tabedit<CR>
-nnoremap <silent> <C-W><C-K> :tabedit<CR>
-nnoremap <silent> <C-W><C-L> :<C-U>for i in range(1, v:count1) \| tabnext \| endfor<CR>
-nnoremap <silent> <C-W><C-E> :tablast \| :tabedit<CR>
-nnoremap <silent> <C-W><C-A> :tabrewind \| :-tabedit<CR>
+nnoremap <silent> <C-W><C-E> :tabedit<CR>
+nnoremap <silent> <C-W><C-L> :tabnext<CR>
+nnoremap <silent> <C-W><C-H> :tabprevious<CR>
 nnoremap <silent> <C-W><C-O> :tabonly<CR>
-nnoremap <silent> <C-W><C-Q> :tabclose<CR>
-nnoremap <silent> <C-W><C-T> :<C-U>execute 'tabnext ' . (v:count + 1)<CR>
-tnoremap <silent> <C-W><C-H> <C-W>:<C-U>execute 'tabprevious ' . v:count1<CR>
-tnoremap <silent> <C-W><C-J> <C-W>:-tabnew<CR>
-tnoremap <silent> <C-W><C-K> <C-W>:tabnew<CR>
-tnoremap <silent> <C-W><C-L> <C-W>:<C-U>for i in range(1, v:count1) \| tabnext \| endfor<CR>
-tnoremap <silent> <C-W><C-E> <C-W>:tablast \| :tabedit<CR>
-tnoremap <silent> <C-W><C-A> <C-W>:tabrewind \| :-tabedit<CR>
+tnoremap <silent> <C-W><C-E> <C-W>:tabedit<CR>
+tnoremap <silent> <C-W><C-L> <C-W>:tabnext<CR>
+tnoremap <silent> <C-W><C-H> <C-W>:tabprevious<CR>
 tnoremap <silent> <C-W><C-O> <C-W>:tabonly<CR>
-tnoremap <silent> <C-W><C-Q> <C-W>:tabclose<CR>
-tnoremap <silent> <C-W><C-T> <C-W>:<C-U>execute 'tabnext ' . (v:count + 1)<CR>
 
 nnoremap <silent> <Plug>Blankline :call append(line('.'), '')<CR>j:call repeat#set("\<Plug>Blankline")<CR>
 nmap <Leader>o <Plug>Blankline
@@ -219,7 +210,7 @@ function! s:Repl()
 	silent! let s:restore_reg = @*
 	silent! let s:restore_reg = @+
 	let s:restore_reg = @"
-	return "p@=RestoreRegister()\<CR>"
+	return "p@=g:RestoreRegister()\<CR>"
 endfunction
 vnoremap <expr> p <SID>Repl()
 
@@ -278,6 +269,9 @@ nnoremap <Leader>u :call <SID>BackRun('cargo run')<CR>
 
 nnoremap <Esc>m <C-W>-
 nnoremap <Esc>p <C-W>+
+
+cnoremap <C-G> <C-\><C-N>
+inoremap <C-G> <C-\><C-N>
 
 " excommand
 command! DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis | wincmd p | diffthis
@@ -363,7 +357,7 @@ function! s:Align(cmd, line1, line2, ...)
 	call setpos('.', l:save_cursor)
 endfunction
 command! -range -nargs=? AlignRight call <SID>Align('gL', <line1>, <line2>, <f-args>)
-command! -range -nargs=? AlignLeft call <SID>Align('gl', <line1>, <line2>, <f-args>)
+command! -range -nargs=? AlignLeft  call <SID>Align('gl', <line1>, <line2>, <f-args>)
 
 command! -nargs=0 Reload let s:undoreload = &undoreload | set undoreload=0 | edit | let &undoreload = s:undoreload
 
@@ -401,12 +395,9 @@ let s:template = {
 	\ 'c'     : ['#include <stdio.h>', '', 'int main(void) {', '	printf("Hello\n");', '	return 0;', '}'],
 	\ 'go'    : ['package main', '', 'import "fmt"', '', 'func main() {', '	fmt.Println("Hello")', '}'],
 	\ 'perl'  : ['#!/usr/bin/env perl', 'use strict;', 'use warnings;'],
-	\ 'python': '#!/usr/bin/env python3',
+	\ 'python': '#!/usr/bin/env ' . s:pythonexe,
 	\ 'sh'    : ['#!/usr/bin/env bash', 'set -euxo pipefail'],
 	\ }
-if !executable('python3')
-	let s:template['python'] = '#!/usr/bin/env python'
-endif
 let s:template_after = {
 	\ 'c' : 'call cursor(4, 2)',
 	\ 'go': 'call cursor(6, 2)',
@@ -543,7 +534,7 @@ augroup vimrc
 	autocmd BufWritePre *.tex call <SID>HalfCommas()
 	autocmd BufWritePre *.txt call <SID>ConvertPunctuation()
 	autocmd TextYankPost * call <SID>CopyToScreenRegUnnamed()
-	autocmd VimResume   * call <SID>SetScreenTitle()
+	autocmd VimResume * call <SID>SetScreenTitle()
 augroup END
 
 " pack
@@ -552,7 +543,7 @@ function! s:Minpac()
 		call system('git clone --depth 1 -- git://github.com/matsuhav/minpac.git ~/.vim/pack/minpac/opt/minpac')
 		packadd minpac
 	endif
-	call minpac#init({'jobs': 8, 'autoyes': 1})
+	call minpac#init({'jobs': 4, 'autoyes': 1})
 	call minpac#add('matsuhav/minpac', {'type': 'opt'})
 
 	call minpac#add('tpope/vim-commentary')
@@ -586,7 +577,6 @@ function! s:Minpac()
 	call minpac#add('Shirk/vim-gas')
 	call minpac#add('tpope/vim-markdown')
 	call minpac#add('previm/previm')
-	call minpac#add('PProvost/vim-ps1')
 	call minpac#add('vim-python/python-syntax')
 	call minpac#add('wlangstroth/vim-racket')
 	call minpac#add('lervag/vimtex')
@@ -615,16 +605,13 @@ if has('win32')
 	let g:vimtex_view_general_options = '-reuse-instance -forward-search @tex @line @pdf'
 endif
 " lexima
-let g:lexima_enable_basic_rules = 0
-let g:lexima_enable_newline_rules = 0
-let g:lexima_enable_space_rules = 0
-let g:lexima_enable_endwise_rules = 0
+let g:lexima_no_default_rules = 1
 let g:lexima_map_escape=''
 " quickrun
 nmap <Leader>r <Plug>(quickrun)
 let g:quickrun_config = {
 	\ 'python': {
-	\   'command': executable('python3') ? 'python3' : 'python'
+	\   'command': s:pythonexe
 	\ },
 	\ 'rust': {
 	\   'command': 'runner',
@@ -668,29 +655,17 @@ command! -bar ALEEnableAllBuffer  ALEEnableBuffer | ALEFixOnSaveEnableBuffer
 command! -bar ALEDisableAll       ALEDisable | ALEFixOnSaveDisable
 command! -bar ALEDisableAllBuffer ALEDisableBuffer | ALEFixOnSaveDisableBuffer
 
-function! g:Tjump()
+function! s:Tjump(sp)
 	if tagfiles() == []
-		return ":ALEGoToDefinition\<CR>"
+		return ":ALEGoToDefinition" . (a:sp ? ' -split' : '') . "\<CR>"
 	else
-		return "g\<C-]>"
+		return (a:sp ? "\<C-W>" : '') . "g\<C-]>"
 	endif
 endfunction
-function! g:Tjumpsp()
-	if tagfiles() == []
-		return ":ALEGoToDefinition -split\<CR>"
-	else
-		return "\<C-W>g\<C-]>"
-	endif
-endfunction
-for s:key in ['<C-]>', 'g]', 'g<C-]>']
-	execute 'nnoremap <expr> ' . s:key . ' g:Tjump()'
-	execute 'vnoremap <expr> ' . s:key . ' g:Tjump()'
-endfor
-for s:key in ['<C-W>]', '<C-W><C-]>', '<C-W>g]', '<C-W>g<C-]>']
-	execute 'nnoremap <expr> ' . s:key . ' g:Tjumpsp()'
-	execute 'vnoremap <expr> ' . s:key . ' g:Tjumpsp()'
-endfor
-unlet s:key
+nnoremap <expr> <C-]>      <SID>Tjump(0)
+vnoremap <expr> <C-]>      <SID>Tjump(0)
+nnoremap <expr> <C-W><C-]> <SID>Tjump(1)
+vnoremap <expr> <C-W><C-]> <SID>Tjump(1)
 
 let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
 let g:ale_linters = {
@@ -745,57 +720,62 @@ packadd matchit
 silent! packadd termdebug
 silent! packadd minpac
 runtime ftplugin/man.vim
+silent! colorscheme molokai
 " lexima
-function! s:Lexima_endwise(at, end, filetype)
-	return {'char': '<CR>', 'input': '<CR>', 'input_after': '<CR>' . a:end, 'at': a:at, 'except': '\C\v^(\s*)\S.*%#\n%(%(\s*|\1\s.+)\n)*\1' . a:end, 'filetype': a:filetype}
-endfunction
-let s:rulelist = [
-	"\ {'char': '(', 'input_after': ')'},
-	"\ {'char': '(', 'at': '\\\%#'},
-	"\ {'char': ')', 'at': '\%#)', 'leave': 1},
-	"\ {'char': '<BS>', 'at': '(\%#)', 'delete': 1},
-	"\ {'char': '<C-H>', 'at': '(\%#)', 'delete': 1},
-	"\ {'char': '{', 'input_after': '}'},
-	"\ {'char': '{', 'at': '\\\%#'},
-	"\ {'char': '}', 'at': '\%#}', 'leave': 1},
-	"\ {'char': '<BS>', 'at': '{\%#}', 'delete': 1},
-	"\ {'char': '<C-H>', 'at': '{\%#}', 'delete': 1},
-	"\ {'char': '[', 'input_after': ']'},
-	"\ {'char': '[', 'at': '\\\%#'},
-	"\ {'char': ']', 'at': '\%#]', 'leave': 1},
-	"\ {'char': '<BS>', 'at': '\[\%#\]', 'delete': 1},
-	"\ {'char': '<C-H>', 'at': '\[\%#\]', 'delete': 1},
-	\ {'char': '<CR>', 'at': '(\%#)',   'input_after': '<CR>'},
-	\ {'char': '<CR>', 'at': '{\%#}',   'input_after': '<CR>'},
-	\ {'char': '<CR>', 'at': '\[\%#\]', 'input_after': '<CR>'},
-	\ <SID>Lexima_endwise('^\s*if\>.*\%#$',         'endif',       'vim'),
-	\ <SID>Lexima_endwise('^\s*while\>.*\%#$',      'endwhile',    'vim'),
-	\ <SID>Lexima_endwise('^\s*for\>.*\%#$',        'endfor',      'vim'),
-	\ <SID>Lexima_endwise('^\s*try\>.*\%#$',        'endtry',      'vim'),
-	\ <SID>Lexima_endwise('^\s*function!.*\%#$',    'endfunction', 'vim'),
-	\ <SID>Lexima_endwise('^\s*augroup\s\+.\+\%#$', 'augroup END', 'vim'),
-	\ <SID>Lexima_endwise('\%(^\s*#.*\)\@<!do\s*\%#$', 'end', 'elixir'),
-	\ <SID>Lexima_endwise('^\s*if\>.*\%#$',             'fi',   ['sh', 'zsh']),
-	\ <SID>Lexima_endwise('^\s*case\>.*\%#$',           'esac', ['sh', 'zsh']),
-	\ <SID>Lexima_endwise('\%(^\s*#.*\)\@<!do\>.*\%#$', 'done', ['sh', 'zsh']),
-	\ {'char': '<CR>', 'input': '<CR>'},
-	"\ inoremap <CR> <C-G>u<CR>
-	\ ]
-delfunction s:Lexima_endwise
-for s:rule in s:rulelist
-	silent! call lexima#add_rule(s:rule)
-endfor
-unlet s:rule s:rulelist
+if exists('*lexima#add_rule')
+	function! s:Lexima_endwise(at, end, filetype)
+		return {'char': '<CR>', 'input': '<CR>', 'input_after': '<CR>' . a:end, 'at': a:at, 'except': '\C\v^(\s*)\S.*%#\n%(%(\s*|\1\s.+)\n)*\1' . a:end, 'filetype': a:filetype}
+	endfunction
+	let s:rulelist = [
+		"\ {'char': '(', 'input_after': ')'},
+		"\ {'char': ')', 'at': '\%#)', 'leave': 1},
+		"\ {'char': '<C-H>', 'at': '(\%#)', 'delete': 1},
+		"\ {'char': '{', 'input_after': '}'},
+		"\ {'char': '}', 'at': '\%#}', 'leave': 1},
+		"\ {'char': '<C-H>', 'at': '{\%#}', 'delete': 1},
+		"\ {'char': '[', 'input_after': ']'},
+		"\ {'char': ']', 'at': '\%#]', 'leave': 1},
+		"\ {'char': '<C-H>', 'at': '\[\%#\]', 'delete': 1},
+		\ {'char': '<CR>', 'at': '(\%#)',   'input_after': '<CR>'},
+		\ {'char': '<CR>', 'at': '{\%#}',   'input_after': '<CR>'},
+		\ {'char': '<CR>', 'at': '\[\%#\]', 'input_after': '<CR>'},
+		\ <SID>Lexima_endwise('^\s*if\>.*\%#$',         'endif',       'vim'),
+		\ <SID>Lexima_endwise('^\s*while\>.*\%#$',      'endwhile',    'vim'),
+		\ <SID>Lexima_endwise('^\s*for\>.*\%#$',        'endfor',      'vim'),
+		\ <SID>Lexima_endwise('^\s*try\>.*\%#$',        'endtry',      'vim'),
+		\ <SID>Lexima_endwise('^\s*function!.*\%#$',    'endfunction', 'vim'),
+		\ <SID>Lexima_endwise('^\s*augroup\s\+.\+\%#$', 'augroup END', 'vim'),
+		\ <SID>Lexima_endwise('^\s*\%(module\|def\|class\|if\|unless\|for\|while\|until\|case\)\>\%(.*[^.:@$]\<end\>\)\@!.*\%#$', 'end', 'ruby')
+		\ <SID>Lexima_endwise('^\s*\%(begin\)\s*\%#$',                                                                            'end', 'ruby')
+		\ <SID>Lexima_endwise('\%(^\s*#.*\)\@<!do\%(\s*|.*|\)\?\s*\%#$',                                                          'end', 'ruby')
+		\ <SID>Lexima_endwise('\<\%(if\|unless\)\>.*\%#$',                                                                        'end', 'ruby')
+		\ <SID>Lexima_endwise('\%(^\s*#.*\)\@<!do\s*\%#$', 'end', 'elixir'),
+		\ <SID>Lexima_endwise('^\s*if\>.*\%#$',             'fi',   ['sh', 'zsh']),
+		\ <SID>Lexima_endwise('^\s*case\>.*\%#$',           'esac', ['sh', 'zsh']),
+		\ <SID>Lexima_endwise('\%(^\s*#.*\)\@<!do\>.*\%#$', 'done', ['sh', 'zsh']),
+		\ <SID>Lexima_endwise('\%(^\s*#.*\)\@<!\<\%(module\|struct\|function\|if\|for\|while\|do\|let\|macro\)\>\%(.*\<end\>\)\@!.*\%#$', 'end', 'julia')
+		\ <SID>Lexima_endwise('\%(^\s*#.*\)\@<!\s*\<\%(begin\|try\|quote\)\s*\%#$',                                                       'end', 'julia')
+		\ {'char': '<CR>', 'input': '<CR>'},
+		"\ inoremap <CR> <C-G>u<CR>
+		\ ]
+	delfunction s:Lexima_endwise
+	for s:rule in s:rulelist
+		call lexima#add_rule(s:rule)
+	endfor
+	unlet s:rule s:rulelist
+endif
 " vim-surround
-let s:surround_textobj = {
-	\ 'surround-mk': {'pattern': ['「', '」'], 'select-a': 'amk', 'select-i': 'imk'},
-	\ 'surround-mn': {'pattern': ['『', '』'], 'select-a': 'amn', 'select-i': 'imn'},
-	\ 'surround-mb': {'pattern': ['（', '）'], 'select-a': 'amb', 'select-i': 'imb'},
-	\ 'surround-ms': {'pattern': ['【', '】'], 'select-a': 'ams', 'select-i': 'ims'},
-	\ 'surround-ma': {'pattern': ['［', '］'], 'select-a': 'ama', 'select-i': 'ima'},
-	\ }
-silent! call textobj#user#plugin('surround', s:surround_textobj)
-unlet s:surround_textobj
+if exists('*textobj#user#plugin')
+	let s:surround_textobj = {
+		\ 'surround-mk': {'pattern': ['「', '」'], 'select-a': 'amk', 'select-i': 'imk'},
+		\ 'surround-mn': {'pattern': ['『', '』'], 'select-a': 'amn', 'select-i': 'imn'},
+		\ 'surround-mb': {'pattern': ['（', '）'], 'select-a': 'amb', 'select-i': 'imb'},
+		\ 'surround-ms': {'pattern': ['【', '】'], 'select-a': 'ams', 'select-i': 'ims'},
+		\ 'surround-ma': {'pattern': ['［', '］'], 'select-a': 'ama', 'select-i': 'ima'},
+		\ }
+	call textobj#user#plugin('surround', s:surround_textobj)
+	unlet s:surround_textobj
+endif
 
 " gui
 if has("gui_running") && has('win32')
@@ -826,4 +806,3 @@ endif
 if filereadable(expand('~/.localvimrc.vim'))
 	source ~/.localvimrc.vim
 endif
-silent! colorscheme molokai
