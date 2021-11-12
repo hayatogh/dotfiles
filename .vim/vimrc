@@ -2,6 +2,7 @@ set encoding=utf-8
 scriptencoding utf-8
 
 set autoread
+set background=dark
 set backspace=indent
 set belloff=backspace,cursor,error,showmatch,esc visualbell
 set showbreak=>\  breakindent breakindentopt=shift:14,min:22
@@ -109,7 +110,7 @@ if has('gui_win32')
 		return ''
 	endfunction
 elseif $WSL_DISTRO_NAME != '' || $MSYSTEM != ''
-	if s:in_screen
+	if !s:in_screen
 		call echoraw("\e[<0t\e[<s")
 		let &t_SI .= "\e[<r"
 		let &t_EI .= "\e[<s\e[<0t"
@@ -256,16 +257,8 @@ nmap <Leader>4 :<C-U>Hi4 <C-R><C-W><CR>
 nmap <Leader>5 :<C-U>Hi5 <C-R><C-W><CR>
 nmap <Leader>6 :<C-U>Hi6 <C-R><C-W><CR>
 
-function! s:BackRun(cmd)
-	let l:n = bufnr('!' . a:cmd)
-	if l:n != -1
-		execute 'bdelete ' . l:n
-	endif
-	call term_start(a:cmd)
-	wincmd p
-endfunction
-nnoremap <Leader>t :call <SID>BackRun('cargo test')<CR>
-nnoremap <Leader>u :call <SID>BackRun('cargo run')<CR>
+nnoremap <Leader>t :call <SID>Command({}, 1, 0, 0, ['cargo', 'test'])<CR>
+nnoremap <Leader>u :call <SID>Command({}, 1, 0, 0, ['cargo', 'run'])<CR>
 
 nnoremap <Esc>m <C-W>-
 nnoremap <Esc>p <C-W>+
@@ -375,20 +368,37 @@ function! s:Nkf()
 endfunction
 command! -nargs=0 Nkf call <SID>Nkf()
 
-let s:shiflag = has('win32') ? &shellcmdflag : '-ic'
-function! s:Command(is_i, ...)
-	let l:cmd = &shell . ' ' . s:shiflag . ' "' . join(a:000) . '"'
-	let l:opt = a:is_i ? {'term_finish': 'close'} : {'hidden': 1, 'term_finish': 'open', 'term_opencmd': 'botright sbuf %d | setl modifiable | $'}
+function! s:Command(env, reuse, focus, close, arg)
+	let l:shiflag = has('win32') ? &shellcmdflag : '-ic'
+	let l:cmd = &shell . ' ' . l:shiflag . ' "' . join(a:arg) . '"'
+	let l:opt = {'term_rows': &lines / 4, 'term_cols': &columns - 7, 'term_kill': 'term', 'env': a:env}
+	if a:close
+		let l:opt['term_finish'] = 'close'
+	endif
+	if a:reuse
+		let l:n = bufnr('!' . l:cmd)
+		if l:n != -1
+			execute 'bdelete ' . l:n
+		endif
+	endif
 	call term_start(l:cmd, l:opt)
+	if !a:focus
+		wincmd p
+	endif
 endfunction
 function! s:BashComp(ArgLead, CmdLine, CursorPos)
 	return g:bash#complete(substitute(strpart(a:CmdLine, 0, a:CursorPos), '^\a\+ ', '', ''))
 endfunction
+function! s:GitComp(ArgLead, CmdLine, CursorPos)
+	return g:bash#complete(substitute(strpart(a:CmdLine, 0, a:CursorPos), '^\a\+ ', 'git ', ''))
+endfunction
 if has('win32')
-	command! -nargs=* -complete=file S call <SID>Command(0, <f-args>)
+	command! -nargs=* -complete=file S call <SID>Command({}, 0, 0, 0, [<f-args>])
 else
-	command! -nargs=* -complete=customlist,<SID>BashComp S call <SID>Command(0, <f-args>)
-	command! -nargs=* -complete=customlist,<SID>BashComp I call <SID>Command(1, <f-args>)
+	command! -nargs=* -complete=customlist,<SID>BashComp S call <SID>Command({}, 0, 0, 0, [<f-args>])
+	command! -nargs=* -complete=customlist,<SID>BashComp I call <SID>Command({}, 0, 1, 1, [<f-args>])
+	command! -nargs=* -complete=customlist,<SID>GitComp Git call <SID>Command({'GIT_PAGER': ''}, 1, 1, 0, ['git', <f-args>])
+	command! -nargs=* -complete=customlist,<SID>GitComp Gitpager call <SID>Command({}, 1, 1, 0, ['git', <f-args>])
 endif
 
 let s:template = {
@@ -720,62 +730,57 @@ packadd matchit
 silent! packadd termdebug
 silent! packadd minpac
 runtime ftplugin/man.vim
-silent! colorscheme molokai
 " lexima
-if exists('*lexima#add_rule')
-	function! s:Lexima_endwise(at, end, filetype)
-		return {'char': '<CR>', 'input': '<CR>', 'input_after': '<CR>' . a:end, 'at': a:at, 'except': '\C\v^(\s*)\S.*%#\n%(%(\s*|\1\s.+)\n)*\1' . a:end, 'filetype': a:filetype}
-	endfunction
-	let s:rulelist = [
-		"\ {'char': '(', 'input_after': ')'},
-		"\ {'char': ')', 'at': '\%#)', 'leave': 1},
-		"\ {'char': '<C-H>', 'at': '(\%#)', 'delete': 1},
-		"\ {'char': '{', 'input_after': '}'},
-		"\ {'char': '}', 'at': '\%#}', 'leave': 1},
-		"\ {'char': '<C-H>', 'at': '{\%#}', 'delete': 1},
-		"\ {'char': '[', 'input_after': ']'},
-		"\ {'char': ']', 'at': '\%#]', 'leave': 1},
-		"\ {'char': '<C-H>', 'at': '\[\%#\]', 'delete': 1},
-		\ {'char': '<CR>', 'at': '(\%#)',   'input_after': '<CR>'},
-		\ {'char': '<CR>', 'at': '{\%#}',   'input_after': '<CR>'},
-		\ {'char': '<CR>', 'at': '\[\%#\]', 'input_after': '<CR>'},
-		\ <SID>Lexima_endwise('^\s*if\>.*\%#$',         'endif',       'vim'),
-		\ <SID>Lexima_endwise('^\s*while\>.*\%#$',      'endwhile',    'vim'),
-		\ <SID>Lexima_endwise('^\s*for\>.*\%#$',        'endfor',      'vim'),
-		\ <SID>Lexima_endwise('^\s*try\>.*\%#$',        'endtry',      'vim'),
-		\ <SID>Lexima_endwise('^\s*function!.*\%#$',    'endfunction', 'vim'),
-		\ <SID>Lexima_endwise('^\s*augroup\s\+.\+\%#$', 'augroup END', 'vim'),
-		\ <SID>Lexima_endwise('^\s*\%(module\|def\|class\|if\|unless\|for\|while\|until\|case\)\>\%(.*[^.:@$]\<end\>\)\@!.*\%#$', 'end', 'ruby')
-		\ <SID>Lexima_endwise('^\s*\%(begin\)\s*\%#$',                                                                            'end', 'ruby')
-		\ <SID>Lexima_endwise('\%(^\s*#.*\)\@<!do\%(\s*|.*|\)\?\s*\%#$',                                                          'end', 'ruby')
-		\ <SID>Lexima_endwise('\<\%(if\|unless\)\>.*\%#$',                                                                        'end', 'ruby')
-		\ <SID>Lexima_endwise('\%(^\s*#.*\)\@<!do\s*\%#$', 'end', 'elixir'),
-		\ <SID>Lexima_endwise('^\s*if\>.*\%#$',             'fi',   ['sh', 'zsh']),
-		\ <SID>Lexima_endwise('^\s*case\>.*\%#$',           'esac', ['sh', 'zsh']),
-		\ <SID>Lexima_endwise('\%(^\s*#.*\)\@<!do\>.*\%#$', 'done', ['sh', 'zsh']),
-		\ <SID>Lexima_endwise('\%(^\s*#.*\)\@<!\<\%(module\|struct\|function\|if\|for\|while\|do\|let\|macro\)\>\%(.*\<end\>\)\@!.*\%#$', 'end', 'julia')
-		\ <SID>Lexima_endwise('\%(^\s*#.*\)\@<!\s*\<\%(begin\|try\|quote\)\s*\%#$',                                                       'end', 'julia')
-		\ {'char': '<CR>', 'input': '<CR>'},
-		"\ inoremap <CR> <C-G>u<CR>
-		\ ]
-	delfunction s:Lexima_endwise
-	for s:rule in s:rulelist
-		call lexima#add_rule(s:rule)
-	endfor
-	unlet s:rule s:rulelist
-endif
+function! s:Lexima_endwise(at, end, filetype)
+	return {'char': '<CR>', 'input': '<CR>', 'input_after': '<CR>' . a:end, 'at': a:at, 'except': '\C\v^(\s*)\S.*%#\n%(%(\s*|\1\s.+)\n)*\1' . a:end, 'filetype': a:filetype}
+endfunction
+let s:rulelist = [
+	"\ {'char': '(', 'input_after': ')'},
+	"\ {'char': ')', 'at': '\%#)', 'leave': 1},
+	"\ {'char': '<C-H>', 'at': '(\%#)', 'delete': 1},
+	"\ {'char': '{', 'input_after': '}'},
+	"\ {'char': '}', 'at': '\%#}', 'leave': 1},
+	"\ {'char': '<C-H>', 'at': '{\%#}', 'delete': 1},
+	"\ {'char': '[', 'input_after': ']'},
+	"\ {'char': ']', 'at': '\%#]', 'leave': 1},
+	"\ {'char': '<C-H>', 'at': '\[\%#\]', 'delete': 1},
+	\ {'char': '<CR>', 'at': '(\%#)',   'input_after': '<CR>'},
+	\ {'char': '<CR>', 'at': '{\%#}',   'input_after': '<CR>'},
+	\ {'char': '<CR>', 'at': '\[\%#\]', 'input_after': '<CR>'},
+	\ <SID>Lexima_endwise('^\s*if\>.*\%#$',         'endif',       'vim'),
+	\ <SID>Lexima_endwise('^\s*while\>.*\%#$',      'endwhile',    'vim'),
+	\ <SID>Lexima_endwise('^\s*for\>.*\%#$',        'endfor',      'vim'),
+	\ <SID>Lexima_endwise('^\s*try\>.*\%#$',        'endtry',      'vim'),
+	\ <SID>Lexima_endwise('^\s*function!.*\%#$',    'endfunction', 'vim'),
+	\ <SID>Lexima_endwise('^\s*augroup\s\+.\+\%#$', 'augroup END', 'vim'),
+	\ <SID>Lexima_endwise('^\s*\%(module\|def\|class\|if\|unless\|for\|while\|until\|case\)\>\%(.*[^.:@$]\<end\>\)\@!.*\%#$', 'end', 'ruby'),
+	\ <SID>Lexima_endwise('^\s*\%(begin\)\s*\%#$',                                                                            'end', 'ruby'),
+	\ <SID>Lexima_endwise('\%(^\s*#.*\)\@<!do\%(\s*|.*|\)\?\s*\%#$',                                                          'end', 'ruby'),
+	\ <SID>Lexima_endwise('\<\%(if\|unless\)\>.*\%#$',                                                                        'end', 'ruby'),
+	\ <SID>Lexima_endwise('\%(^\s*#.*\)\@<!do\s*\%#$', 'end', 'elixir'),
+	\ <SID>Lexima_endwise('^\s*if\>.*\%#$',             'fi',   ['sh', 'zsh']),
+	\ <SID>Lexima_endwise('^\s*case\>.*\%#$',           'esac', ['sh', 'zsh']),
+	\ <SID>Lexima_endwise('\%(^\s*#.*\)\@<!do\>.*\%#$', 'done', ['sh', 'zsh']),
+	\ <SID>Lexima_endwise('\%(^\s*#.*\)\@<!\<\%(module\|struct\|function\|if\|for\|while\|do\|let\|macro\)\>\%(.*\<end\>\)\@!.*\%#$', 'end', 'julia'),
+	\ <SID>Lexima_endwise('\%(^\s*#.*\)\@<!\s*\<\%(begin\|try\|quote\)\s*\%#$',                                                       'end', 'julia'),
+	\ {'char': '<CR>', 'input': '<CR>'},
+	"\ inoremap <CR> <C-G>u<CR>
+	\ ]
+delfunction s:Lexima_endwise
+for s:rule in s:rulelist
+	silent! call lexima#add_rule(s:rule)
+endfor
+unlet s:rule s:rulelist
 " vim-surround
-if exists('*textobj#user#plugin')
-	let s:surround_textobj = {
-		\ 'surround-mk': {'pattern': ['「', '」'], 'select-a': 'amk', 'select-i': 'imk'},
-		\ 'surround-mn': {'pattern': ['『', '』'], 'select-a': 'amn', 'select-i': 'imn'},
-		\ 'surround-mb': {'pattern': ['（', '）'], 'select-a': 'amb', 'select-i': 'imb'},
-		\ 'surround-ms': {'pattern': ['【', '】'], 'select-a': 'ams', 'select-i': 'ims'},
-		\ 'surround-ma': {'pattern': ['［', '］'], 'select-a': 'ama', 'select-i': 'ima'},
-		\ }
-	call textobj#user#plugin('surround', s:surround_textobj)
-	unlet s:surround_textobj
-endif
+let s:surround_textobj = {
+	\ 'surround-mk': {'pattern': ['「', '」'], 'select-a': 'amk', 'select-i': 'imk'},
+	\ 'surround-mn': {'pattern': ['『', '』'], 'select-a': 'amn', 'select-i': 'imn'},
+	\ 'surround-mb': {'pattern': ['（', '）'], 'select-a': 'amb', 'select-i': 'imb'},
+	\ 'surround-ms': {'pattern': ['【', '】'], 'select-a': 'ams', 'select-i': 'ims'},
+	\ 'surround-ma': {'pattern': ['［', '］'], 'select-a': 'ama', 'select-i': 'ima'},
+	\ }
+silent! call textobj#user#plugin('surround', s:surround_textobj)
+unlet s:surround_textobj
 
 " gui
 if has("gui_running") && has('win32')
@@ -806,3 +811,4 @@ endif
 if filereadable(expand('~/.localvimrc.vim'))
 	source ~/.localvimrc.vim
 endif
+silent! colorscheme molokai
