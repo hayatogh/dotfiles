@@ -529,8 +529,8 @@ augroup vimrc
 	autocmd BufReadPost * if line('''"') >= 1 && line('''"') <= line('$') && &ft !~# 'commit' | execute 'normal! g`"' | endif
 	autocmd StdinReadPost * set nomodified
 	autocmd CmdwinEnter * nnoremap <buffer> <F5> :let g:CmdwinLastLineNum=line('.')<CR><CR>q::execute g:CmdwinLastLineNum<CR>
-	autocmd Colorscheme * highlight Cursor guifg=Black guibg=Cyan
-	autocmd Colorscheme * highlight CursorIM guifg=Black guibg=Magenta
+	autocmd Colorscheme * highlight Cursor guifg=Black guibg=Magenta
+	autocmd Colorscheme * highlight CursorIM guifg=Black guibg=Blue
 	autocmd Colorscheme * highlight TabLineFill guibg=#808080
 	autocmd ColorScheme * highlight TrailingWhiteSpace ctermbg=darkred guibg=darkred
 	autocmd Colorscheme * highlight IdeographicSpace term=underline ctermbg=DarkGreen guibg=DarkGreen
