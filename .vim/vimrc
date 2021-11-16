@@ -266,6 +266,15 @@ nnoremap <Esc>p <C-W>+
 cnoremap <C-G> <C-\><C-N>
 inoremap <C-G> <C-\><C-N>
 
+function! s:StayColumn(cmd)
+	let l:save_cursor = getcurpos()
+	let l:save_cursor[4] = virtcol('.')
+	call setpos('.', l:save_cursor)
+	execute "normal! " . a:cmd
+endfunction
+nnoremap <silent> gj :<C-U>call <SID>StayColumn(v:count1 . 'gj')<CR>
+nnoremap <silent> gk :<C-U>call <SID>StayColumn(v:count1 . 'gk')<CR>
+
 " excommand
 command! DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis | wincmd p | diffthis
 
