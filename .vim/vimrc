@@ -396,10 +396,10 @@ function! s:Command(env, reuse, focus, close, arg)
 	endif
 endfunction
 function! s:BashComp(ArgLead, CmdLine, CursorPos)
-	return g:bash#complete(substitute(strpart(a:CmdLine, 0, a:CursorPos), '^\a\+ ', '', ''))
+	return g:bash#complete(substitute(strpart(a:CmdLine, 0, a:CursorPos), '^\s*\a\+ ', '', ''))
 endfunction
 function! s:GitComp(ArgLead, CmdLine, CursorPos)
-	return g:bash#complete(substitute(strpart(a:CmdLine, 0, a:CursorPos), '^\a\+ ', 'git ', ''))
+	return g:bash#complete(substitute(strpart(a:CmdLine, 0, a:CursorPos), '^\s*\a\+ ', 'git ', ''))
 endfunction
 if has('win32')
 	command! -nargs=* -complete=file S call <SID>Command({}, 0, 0, 0, [<f-args>])
