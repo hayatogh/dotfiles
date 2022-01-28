@@ -65,6 +65,7 @@ fi
 
 [[ -r ~/.opam/opam-init/init.sh ]] && . ~/.opam/opam-init/init.sh
 [[ -f ~/.ghcup/env ]] && . ~/.ghcup/env
+[[ -f ~/.emsdk/emsdk_env.sh ]] && . ~/.emsdk/emsdk_env.sh 2>/dev/null
 [[ -r ~/.bashrc ]] && . ~/.bashrc
 [[ -r ~/.localbash_profile.sh ]] && . ~/.localbash_profile.sh
 true

@@ -17,6 +17,8 @@
 [fetch]
 	prune = true
 	pruneTags = true
+[init]
+	defaultBranch = main
 [log]
 	follow = true
 [merge]
@@ -33,5 +35,3 @@
 [user]
 	name = matsuhav
 	email = 28914976+matsuhav@users.noreply.github.com
-
-# vim: ft=gitconfig

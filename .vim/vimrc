@@ -11,7 +11,6 @@ set casemap=keepascii
 set clipboard=unnamed,unnamedplus
 set colorcolumn=+1
 set completeopt=menu,menuone,preview
-set confirm
 set cursorline
 set diffopt=filler,vertical,closeoff
 set display=lastline
@@ -535,6 +534,9 @@ augroup vimrc
 	autocmd!
 	autocmd BufRead,BufNewFile * if &ft == 'asm' | set ft=gas | endif
 	autocmd BufRead,BufNewFile *.lalrpop set ft=rust
+	autocmd BufRead,BufNewFile */git/config set ft=gitconfig
+	autocmd BufRead,BufNewFile */yapf/style set ft=cfg
+	autocmd BufRead,BufNewFile .latexmkrc,latexmkrc set ft=perl
 	autocmd BufReadPost * if line('''"') >= 1 && line('''"') <= line('$') && &ft !~# 'commit' | execute 'normal! g`"' | endif
 	autocmd StdinReadPost * set nomodified
 	autocmd CmdwinEnter * nnoremap <buffer> <F5> :let g:CmdwinLastLineNum=line('.')<CR><CR>q::execute g:CmdwinLastLineNum<CR>
