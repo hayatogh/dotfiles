@@ -12,8 +12,8 @@
 	sc = clone --depth 1 --
 	scg = !sh -c 'git clone --depth 1 -- git://github.com/$0'
 [core]
-	autocrlf = false
-	safecrlf = false
+	autocrlf = input
+	safecrlf = true
 [fetch]
 	prune = true
 	pruneTags = true

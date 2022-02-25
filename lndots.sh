@@ -39,10 +39,10 @@ fi
 if [[ $_uname == MSYS ]] || [[ $_uname == WSL ]]; then
 	winhome=$(pspath 'Get-Content Env:USERPROFILE')
 	windesk=$(pspath '[Environment]::GetFolderPath("Desktop")')
-	onedrive=$(pspath 'Get-Content Env:OneDrive')
+	winbox="$winhome/Box Sync"
 	rm_ln "$winhome" ~/WinHome
 	rm_ln "$windesk" ~/Desktop
-	rm_ln "$onedrive" ~/OneDrive
+	rm_ln "$winbox" ~/Box
 fi
 for fname in $files; do
 	rm_ln $dotfiles/$fname ~/$fname
