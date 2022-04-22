@@ -7,7 +7,7 @@ fi
 mkdir -p /usr/local/src
 cd /usr/local/src
 rm -rf vim
-git clone --depth 1 -- git://github.com/vim/vim &>/dev/null
+git clone --depth 1 -- https://github.com/vim/vim &>/dev/null
 cd vim/src
 ./configure --prefix=/usr/local &>/dev/null
 sed -Ei 's/install-languages|install-tool-languages//' auto/config.mk

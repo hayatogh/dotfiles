@@ -108,10 +108,18 @@ $if mode=vi
 	"\e[4~": end-of-line
 	"\eOH": beginning-of-line
 	"\eOF": end-of-line
+
+	"\C-x\C-m": set-mark
+	"\C-x\C-x": exchange-point-and-mark
 	$if Bash
 		"\C-g": "\C-e\C-u fg || true\C-m"
 		"\eg": "\C-e\C-u fg || true\C-m\ep"
 		"\es": "\C-e --color=always | less\C-m"
+	$endif
+	$if Python
+		"\C-i": "    "
+		"\C-d": "\C-x\C-m\C-a\e[3~\e[3~\e[3~\e[3~\C-x\C-x\C-x\C-m"
+		"\C-t": "\C-x\C-m\C-a    \C-x\C-x\C-f\C-f\C-f\C-f\C-x\C-m"
 	$endif
 $endif
 $if mode=emacs

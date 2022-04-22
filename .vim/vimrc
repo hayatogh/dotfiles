@@ -537,6 +537,7 @@ augroup vimrc
 	autocmd BufRead,BufNewFile */git/config set ft=gitconfig
 	autocmd BufRead,BufNewFile */yapf/style set ft=cfg
 	autocmd BufRead,BufNewFile .latexmkrc,latexmkrc set ft=perl
+	autocmd BufRead,BufNewFile .clang-format set ft=yaml
 	autocmd BufReadPost * if line('''"') >= 1 && line('''"') <= line('$') && &ft !~# 'commit' | execute 'normal! g`"' | endif
 	autocmd StdinReadPost * set nomodified
 	autocmd CmdwinEnter * nnoremap <buffer> <F5> :let g:CmdwinLastLineNum=line('.')<CR><CR>q::execute g:CmdwinLastLineNum<CR>
@@ -561,7 +562,7 @@ augroup END
 " pack
 function! s:Minpac()
 	if !exists('*minpac#init')
-		call system('git clone --depth 1 -- git://github.com/matsuhav/minpac.git ~/.vim/pack/minpac/opt/minpac')
+		call system('git clone --depth 1 -- https://github.com/matsuhav/minpac.git ~/.vim/pack/minpac/opt/minpac')
 		packadd minpac
 	endif
 	call minpac#init({'jobs': 4, 'autoyes': 1})
@@ -690,20 +691,24 @@ vnoremap <expr> <C-W><C-]> <SID>Tjump(1)
 
 let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
 let g:ale_linters = {
-	\ 'tex'   : ['chktex'],
-	\ 'c'     : [],
-	\ 'cpp'   : [],
+	\ 'c'     : ['clangd'],
+	\ 'cpp'   : ['clangd'],
+	\ 'go'    : ['govet', 'gopls'],
 	\ 'ocaml' : ['ocamllsp'],
 	\ 'python': ['pylsp'],
-	\ 'go'    : ['govet', 'gopls'],
 	\ 'rust'  : ['rls', 'cargo'],
+	\ 'tex'   : ['chktex'],
 	\ }
 let g:ale_fixers = {
+	\ 'c'     : ['clang-format'],
+	\ 'cpp'   : ['clang-format'],
+	\ 'go'    : ['gofmt', 'goimports'],
 	\ 'ocaml' : ['ocamlformat'],
 	\ 'python': ['isort', 'yapf'],
-	\ 'go'    : ['gofmt', 'goimports'],
 	\ 'rust'  : ['rustfmt'],
 	\ }
+let g:ale_c_clangformat_style_option = '{ BasedOnStyle: Microsoft }'
+let g:ale_c_clangformat_use_local_file = 1
 let g:ale_rust_cargo_use_clippy = executable('cargo-clippy')
 let g:ale_completion_enabled = 1
 let g:ale_fix_on_save = 1

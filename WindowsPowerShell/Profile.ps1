@@ -40,7 +40,7 @@ function choco_install {
   iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
   choco feature enable -n allowGlobalConfirmation
-  $pin = "aquasnap", "discord.install", "drawio", "slack", "steam", "zotero"
+  $pin = "aquasnap", "discord.install", "drawio", "slack", "steam-client", "zotero"
   $ins = "7zip.install", "autohotkey.install", "fd", "flac", "fontforge", "foobar2000",
     "inkscape", "lavfilters", "lockhunter", "mpc-be", "pdfxchangeeditor", "ripgrep",
     "strawberryperl", "sumatrapdf.install", "vim", "winscp.install", "wsltty"

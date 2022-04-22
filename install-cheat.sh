@@ -18,5 +18,5 @@ mkdir -p ~/.local/bin
 gzip -cd $tmp >~/.local/bin/cheat
 chmod 755 ~/.local/bin/cheat
 rm -rf ~/.config/cheat/cheatsheets/community
-git clone --depth 1 -- git://github.com/cheat/cheatsheets ~/.config/cheat/cheatsheets/community &>/dev/null
+git clone --depth 1 -- https://github.com/cheat/cheatsheets ~/.config/cheat/cheatsheets/community &>/dev/null
 rm $tmp
