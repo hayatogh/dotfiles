@@ -23,6 +23,7 @@ set guicursor=a:blinkon0
 set helplang=Ja,En
 set history=1000
 set smartindent autoindent
+set keywordprg=:Man
 set lispwords-=if
 set list listchars=tab:»-,extends:»,precedes:«,nbsp:◦
 set showmatch matchtime=1 matchpairs+=「:」,（:）,『:』,【:】,［:］
@@ -646,7 +647,7 @@ let g:quickrun_config = {
 	\ '_': {
 	\   'outputter/buffer/opener': 'botright new',
 	\   'outputter/buffer/close_on_empty': 1,
-	\   'runner': 'job',
+	\   'runner': 'terminal',
 	\ },
 	\ }
 if has('win32')
@@ -707,7 +708,7 @@ let g:ale_fixers = {
 	\ 'python': ['isort', 'yapf'],
 	\ 'rust'  : ['rustfmt'],
 	\ }
-let g:ale_c_clangformat_style_option = '{ BasedOnStyle: Microsoft }'
+let g:ale_c_clangformat_style_option = '{ BasedOnStyle: LLVM, IndentWidth: 4 }'
 let g:ale_c_clangformat_use_local_file = 1
 let g:ale_rust_cargo_use_clippy = executable('cargo-clippy')
 let g:ale_completion_enabled = 1
@@ -718,7 +719,6 @@ if has('win32unix')
 endif
 " vim-markdown
 let g:markdown_fenced_languages = ['html', 'python', 'bash=sh', 'c', 'cpp']
-let g:markdown_syntax_conceal = 0
 " vim-surround
 let g:surround_dict = {
 	\ 'U' : 'https://\r/',
@@ -729,11 +729,14 @@ let g:surround_dict = {
 	\ 'ma': '［\r］',
 	\ }
 " fzf
+silent! source /usr/share/doc/fzf/examples/fzf.vim
 if has('osxdarwin')
 	silent! source /usr/local/opt/fzf/plugin/fzf.vim
-else
-	silent! source /usr/share/doc/fzf/examples/fzf.vim
 endif
+" NERDTree
+let g:NERDTreeMapActivateNode = 'e'
+let g:NERDTreeMapOpenSplit = 's'
+let g:NERDTreeMapOpenVSplit = 'v'
 " rainbow vim-gas vim-lion emmet python-syntax
 let g:rainbow_active = 1
 let g:gasCppComments = 1

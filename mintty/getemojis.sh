@@ -11,5 +11,5 @@ rm -rf emojis
 mkdir emojis
 cd emojis
 
-curl -fsSo getemojis https://github.com/mintty/mintty/raw/master/tools/getemojis
+curl -fsSLo getemojis https://github.com/mintty/mintty/raw/master/tools/getemojis
 ./getemojis -d windows
