@@ -1,21 +1,33 @@
 Set-PSReadLineOption -EditMode "Vi" -HistoryNoDuplicates -BellStyle "None" -ViModeIndicator "Prompt"
 
-Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete
+Set-PSReadlineKeyHandler -Chord Tab -Function MenuComplete
 
-Set-PSReadlineKeyHandler -Key Ctrl+h -Function BackwardDeleteChar
-Set-PSReadlineKeyHandler -Key Ctrl+w -Function BackwardDeleteWord
-Set-PSReadlineKeyHandler -Key Ctrl+k -Function ForwardDeleteLine
+Set-PSReadlineKeyHandler -Chord Ctrl+h -Function BackwardDeleteChar
+Set-PSReadlineKeyHandler -Chord Ctrl+w -Function BackwardDeleteWord
+Set-PSReadlineKeyHandler -Chord Ctrl+k -Function ForwardDeleteLine
 
-Set-PSReadlineKeyHandler -Key Ctrl+b -Function BackwardChar
-Set-PSReadlineKeyHandler -Key Ctrl+f -Function ForwardChar
-Set-PSReadlineKeyHandler -Key Alt+b -Function BackwardWord
-Set-PSReadlineKeyHandler -Key Alt+f -Function ForwardWord
-Set-PSReadlineKeyHandler -Key Ctrl+a -Function BeginningOfLine
-Set-PSReadlineKeyHandler -Key Ctrl+e -Function EndOfLine
+Set-PSReadlineKeyHandler -Chord Ctrl+b -Function BackwardChar
+Set-PSReadlineKeyHandler -Chord Ctrl+f -Function ForwardChar
+Set-PSReadlineKeyHandler -Chord Alt+b -Function BackwardWord
+Set-PSReadlineKeyHandler -Chord Alt+f -Function ForwardWord
+Set-PSReadlineKeyHandler -Chord Ctrl+a -Function BeginningOfLine
+Set-PSReadlineKeyHandler -Chord Ctrl+e -Function EndOfLine
 
-Set-PSReadlineKeyHandler -Key Ctrl+p -Function HistorySearchBackward
-Set-PSReadlineKeyHandler -Key Ctrl+n -Function HistorySearchForward
-Set-PSReadlineKeyHandler -Key Ctrl+[ -Function ViCommandMode
+Set-PSReadlineKeyHandler -Chord Ctrl+p -Function HistorySearchBackward
+Set-PSReadlineKeyHandler -Chord Ctrl+n -Function HistorySearchForward
+Set-PSReadlineKeyHandler -Chord Ctrl+[ -Function ViCommandMode
+
+Set-PSReadlineKeyHandler -Chord Alt+w -ScriptBlock { param($key, $arg) _regex_rubout('[^ ]* *$') }
+Set-PSReadlineKeyHandler -Chord Alt+/ -ScriptBlock { param($key, $arg) _regex_rubout('[^/\\ ]*(/|\\)? *$') }
+
+function _regex_rubout() {
+  param($re)
+  $line = $null
+  $cursor = $null
+  [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$line, [ref]$cursor)
+  [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$line, [ref]$cursor)
+  [Microsoft.PowerShell.PSConsoleReadLine]::Replace(0, $cursor, ($line.SubString(0, $cursor) -replace $re, ''))
+}
 
 function ee {
   exit
