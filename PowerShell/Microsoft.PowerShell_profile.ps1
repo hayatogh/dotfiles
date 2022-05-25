@@ -25,7 +25,6 @@ function _regex_rubout() {
   $line = $null
   $cursor = $null
   [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$line, [ref]$cursor)
-  [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$line, [ref]$cursor)
   [Microsoft.PowerShell.PSConsoleReadLine]::Replace(0, $cursor, ($line.SubString(0, $cursor) -replace $re, ''))
 }
 
@@ -38,12 +37,7 @@ function _type {
   if ($a) {
     $params = @{ All = $true }
   }
-  Get-Command @params @Args | % {
-    Write-Output $_
-    if ($_.GetType().Name -eq "FunctionInfo") {
-      Write-Output "" ("function " + $_.Name + " {" + $_.ScriptBlock + "}")
-    }
-  }
+  Get-Command @params @Args | % { $_ | Format-Table Name, CommandType, Definition -AutoSize -Wrap | Out-String -Width 512 }
 }
 set-alias type _type
 function ls-all {
