@@ -20,13 +20,26 @@ Set-PSReadlineKeyHandler -Key Ctrl+[ -Function ViCommandMode
 function ee {
   exit
 }
-
-function Color-Console {
-  $hosttime = (Get-ChildItem -Path $PSHOME\PowerShell.exe).CreationTime
-  $hostversion="$($Host.Version.Major)`.$($Host.Version.Minor)"
-  $Host.UI.RawUI.WindowTitle = "PowerShell $hostversion ($hosttime)"
+function _type {
+  param ([switch]$a)
+  $params = @{}
+  if ($a) {
+    $params = @{ All = $true }
+  }
+  Get-Command @params @Args | % {
+    Write-Output $_
+    if ($_.GetType().Name -eq "FunctionInfo") {
+      Write-Output "" ("function " + $_.Name + " {" + $_.ScriptBlock + "}")
+    }
+  }
 }
-Color-Console
+set-alias type _type
+function ls-all {
+    Get-ChildItem -Force
+}
+Set-Alias ll Get-ChildItem
+Set-Alias la ls-all
+Set-Alias al ls-all
 
 function prompt {
   $(if (Test-Path variable:/PSDebugContext) { '[DBG]: ' } else { '' }) +

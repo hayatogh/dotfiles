@@ -45,6 +45,9 @@ set pumheight=10
 set report=15
 set scrolloff=3 sidescroll=1 sidescrolloff=10
 set incsearch hlsearch nowrapscan
+if has('win32') && !has('gui_win32')
+	set shell=pwsh
+endif
 set shortmess=aoOtT
 set splitbelow splitright
 set suffixes=.bak,~,.swp,.o,.info,.aux,.log,.dvi,.bbl,.blg,.brf,.cb,.ind,.idx,.ilg,.inx,.out,.toc,.exe,.lock
