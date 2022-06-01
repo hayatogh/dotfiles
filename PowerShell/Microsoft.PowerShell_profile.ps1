@@ -1,24 +1,24 @@
 Set-PSReadLineOption -EditMode "Vi" -HistoryNoDuplicates -BellStyle "None" -ViModeIndicator "Prompt"
 
-Set-PSReadlineKeyHandler -Chord Tab -Function MenuComplete
+Set-PSReadlineKeyHandler Tab MenuComplete
 
-Set-PSReadlineKeyHandler -Chord Ctrl+h -Function BackwardDeleteChar
-Set-PSReadlineKeyHandler -Chord Ctrl+w -Function BackwardDeleteWord
-Set-PSReadlineKeyHandler -Chord Ctrl+k -Function ForwardDeleteLine
+Set-PSReadlineKeyHandler Ctrl+h BackwardDeleteChar
+Set-PSReadlineKeyHandler Ctrl+w BackwardDeleteWord
+Set-PSReadlineKeyHandler Ctrl+k ForwardDeleteLine
 
-Set-PSReadlineKeyHandler -Chord Ctrl+b -Function BackwardChar
-Set-PSReadlineKeyHandler -Chord Ctrl+f -Function ForwardChar
-Set-PSReadlineKeyHandler -Chord Alt+b -Function BackwardWord
-Set-PSReadlineKeyHandler -Chord Alt+f -Function ForwardWord
-Set-PSReadlineKeyHandler -Chord Ctrl+a -Function BeginningOfLine
-Set-PSReadlineKeyHandler -Chord Ctrl+e -Function EndOfLine
+Set-PSReadlineKeyHandler Ctrl+b BackwardChar
+Set-PSReadlineKeyHandler Ctrl+f ForwardChar
+Set-PSReadlineKeyHandler Alt+b BackwardWord
+Set-PSReadlineKeyHandler Alt+f ForwardWord
+Set-PSReadlineKeyHandler Ctrl+a BeginningOfLine
+Set-PSReadlineKeyHandler Ctrl+e EndOfLine
 
-Set-PSReadlineKeyHandler -Chord Ctrl+p -Function HistorySearchBackward
-Set-PSReadlineKeyHandler -Chord Ctrl+n -Function HistorySearchForward
-Set-PSReadlineKeyHandler -Chord Ctrl+[ -Function ViCommandMode
+Set-PSReadlineKeyHandler Ctrl+p HistorySearchBackward
+Set-PSReadlineKeyHandler Ctrl+n HistorySearchForward
+Set-PSReadlineKeyHandler Ctrl+[ ViCommandMode
 
-Set-PSReadlineKeyHandler -Chord Alt+w -ScriptBlock { param($key, $arg) _regex_rubout('[^ ]* *$') }
-Set-PSReadlineKeyHandler -Chord Alt+/ -ScriptBlock { param($key, $arg) _regex_rubout('[^/\\ ]*(/|\\)? *$') }
+Set-PSReadlineKeyHandler Alt+w { _regex_rubout('[^ ]* *$') }
+Set-PSReadlineKeyHandler Alt+/ { _regex_rubout('[^/\\ ]*(/|\\)? *$') }
 
 function _regex_rubout() {
   param($re)
@@ -40,12 +40,14 @@ function _type {
   Get-Command @params @Args | % { $_ | Format-Table Name, CommandType, Definition -AutoSize -Wrap | Out-String -Width 512 }
 }
 set-alias type _type
-function ls-all {
-    Get-ChildItem -Force
+function _ls_all {
+  Get-ChildItem -Force @Args
 }
 Set-Alias ll Get-ChildItem
-Set-Alias la ls-all
-Set-Alias al ls-all
+Set-Alias la _ls_all
+Set-Alias al _ls_all
+Set-Alias e explorer
+Set-Alias open Start-Process
 
 function prompt {
   $(if (Test-Path variable:/PSDebugContext) { '[DBG]: ' } else { '' }) +
@@ -54,9 +56,8 @@ function prompt {
 }
 
 function choco_install {
-  Set-ExecutionPolicy Bypass -Scope Process -Force
   [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-  iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+  Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
   choco feature enable -n allowGlobalConfirmation
   $pin = "aquasnap", "discord.install", "drawio", "slack", "steam-client", "zotero"
@@ -81,4 +82,11 @@ function choco_remove_links {
 function choco_upgrade {
   choco upgrade all
   choco_remove_links
+}
+
+Invoke-Command -ScriptBlock {
+  $local_profile = Join-Path $([System.Environment]::GetFolderPath("MyDocuments")) "\PowerShell\local_profile.psm1"
+  if (Test-Path $local_profile) {
+    Import-Module $local_profile
+  }
 }
