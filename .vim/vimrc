@@ -124,6 +124,9 @@ elseif $WSL_DISTRO_NAME != '' || $MSYSTEM != ''
 			endif
 			return ''
 		endfunction
+		function! s:FontSizeSet(amount)
+			call echoraw("\e]7770;" . a:amount . "\x7")
+		endfunction
 	else
 		call echoraw("\eP\e[<0t\e[<s\e\\")
 		let &t_SI .= "\eP\e[<r\e\\"
@@ -139,8 +142,27 @@ elseif $WSL_DISTRO_NAME != '' || $MSYSTEM != ''
 			endif
 			return ''
 		endfunction
+		function! s:FontSizeSet(amount)
+			call echoraw("\eP\e]7770;" . a:amount . "\x7\e\\")
+		endfunction
 	endif
 	let s:has_clipexe = executable('clip.exe')
+	function! s:FontSizeGet()
+		call <SID>FontSizeSet("?")
+		for l:_ in range(7)
+			call getcharstr()
+		endfor
+		let l:size = ""
+		while 1
+			let l:char = getcharstr()
+			if l:char ==# "\x7"
+				break
+			else
+				let l:size .= l:char
+			endif
+		endwhile
+		echo l:size
+	endfunction
 endif
 let s:pythonexe = executable('python3') ? 'python3' : 'python'
 
@@ -277,6 +299,10 @@ function! s:StayColumn(cmd)
 endfunction
 nnoremap <silent> gj :<C-U>call <SID>StayColumn(v:count1 . 'gj')<CR>
 nnoremap <silent> gk :<C-U>call <SID>StayColumn(v:count1 . 'gk')<CR>
+
+nnoremap <silent> <Esc>= :<C-U>call <SID>FontSizeSet("")<CR>
+nnoremap <silent> <Esc>a :<C-U>call <SID>FontSizeSet("+1")<CR>
+nnoremap <silent> <Esc>x :<C-U>call <SID>FontSizeSet("-1")<CR>
 
 " excommand
 command! DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis | wincmd p | diffthis
@@ -451,6 +477,9 @@ endfunction
 command! -range Sort call <SID>Sort(' ')
 command! -range SortComma call <SID>Sort(', ')
 command! -nargs=1 -range SortSep call <SID>Sort(<f-args>)
+
+command! FontSizeGet call <SID>FontSizeGet()
+command! FontSizeReset call <SID>FontSizeSet("")
 
 " autocommand
 command! AUTOiminsertzero let s:autoIminsertZero = !s:autoIminsertZero
