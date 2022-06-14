@@ -301,8 +301,8 @@ nnoremap <silent> gj :<C-U>call <SID>StayColumn(v:count1 . 'gj')<CR>
 nnoremap <silent> gk :<C-U>call <SID>StayColumn(v:count1 . 'gk')<CR>
 
 nnoremap <silent> <Esc>= :<C-U>call <SID>FontSizeSet("")<CR>
-nnoremap <silent> <Esc>a :<C-U>call <SID>FontSizeSet("+1")<CR>
-nnoremap <silent> <Esc>x :<C-U>call <SID>FontSizeSet("-1")<CR>
+nnoremap <silent> <Esc>+ :<C-U>call <SID>FontSizeSet("+1")<CR>
+nnoremap <silent> <Esc>- :<C-U>call <SID>FontSizeSet("-1")<CR>
 
 " excommand
 command! DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis | wincmd p | diffthis
