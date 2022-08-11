@@ -31,30 +31,37 @@ function _regex_rubout {
 function ee {
   exit
 }
-function _type {
+function which {
   param ([switch]$a)
   $params = @{}
   if ($a) {
     $params = @{ All = $true }
   }
-  Get-Command @params @args | % { $_ | Format-Table Name, CommandType, Definition -AutoSize -Wrap | Out-String -Width 512 }
+  Get-Command @params @args | % {
+    $_ | Format-Table Name, CommandType, Definition -AutoSize -Wrap | Out-String -Width 512
+  }
 }
-Set-Alias type _type
 Set-Alias ll Get-ChildItem
 function _ls_all {
   Get-ChildItem -Force @args
 }
 Set-Alias la _ls_all
 Set-Alias al _ls_all
-Set-Alias e explorer
-function _open {
-  $args | % { Start-Process $_ }
+function open {
+  param ([string[]]$a)
+  if ($a.Length -eq 0) {
+    Invoke-Item .
+  } else {
+    Invoke-Item $a
+  }
 }
-Set-Alias open _open
-function _sudo {
+Set-Alias e open
+function sudo {
   Start-Process -Verb RunAs @args
 }
-Set-Alias sudo _sudo
+function su {
+  Start-Process -Verb RunAs wt
+}
 
 function prompt {
   $(if (Test-Path variable:/PSDebugContext) { '[DBG]: ' } else { '' }) +

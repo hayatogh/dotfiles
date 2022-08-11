@@ -4,7 +4,7 @@ set -euo pipefail
 wslpath() {
 	/bin/wslpath "$1" | tr -d '\r'
 }
-mintty=$(wslpath "$(powershell.exe 'Get-Content Env:APPDATA')")/mintty
+mintty=$(wslpath "$(powershell.exe -NoProfile 'Get-Content Env:APPDATA')")/mintty
 
 cd $mintty
 rm -rf emojis

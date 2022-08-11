@@ -9,7 +9,7 @@ case $(uname -sr) in
 	*_NT*) _uname=MSYS;;
 esac
 
-files=".inputrc .bash_profile .bashrc .gdbinit .infokey .vim .themes"
+files=".inputrc .bash_profile .bashrc .gdbinit .vim .themes"
 dirsinconfig="git yapf latexmk cheat"
 
 mkdir -p ~/.screen ~/.ssh ~/.config $dotfiles/.vim/swap
@@ -26,11 +26,11 @@ rm_ln()
 if [[ $_uname == MSYS ]]; then
 	export MSYS=winsymlinks:nativestrict
 	pspath() {
-		cygpath "$(powershell.exe "$1")"
+		cygpath "$(powershell.exe -NoProfile "$1")"
 	}
 elif [[ $_uname == WSL ]]; then
 	pspath() {
-		wslpath "$(powershell.exe "$1" | tr -d '\r')"
+		wslpath "$(powershell.exe -NoProfile "$1" | tr -d '\r')"
 	}
 elif [[ $_uname == Darwin ]]; then
 	dirsinconfig="$dirsinconfig karabiner"

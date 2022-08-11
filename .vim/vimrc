@@ -769,12 +769,13 @@ endif
 let g:NERDTreeMapActivateNode = 'e'
 let g:NERDTreeMapOpenSplit = 's'
 let g:NERDTreeMapOpenVSplit = 'v'
-" rainbow vim-gas vim-lion emmet python-syntax
+" rainbow vim-gas vim-lion emmet python-syntax csv
 let g:rainbow_active = 1
 let g:gasCppComments = 1
 let g:lion_squeeze_spaces = 1
 let g:user_emmet_leader_key='<C-K>'
 let g:python_highlight_all = 1
+let g:csv_default_delim=','
 
 packloadall!
 packadd matchit
@@ -851,12 +852,32 @@ if has("gui_running") && has('win32')
 		execute 'winpos ' . (s:pos[0] + 32 * s:n) . ' ' . (s:pos[1] + 32 * s:n)
 		unlet s:pos s:n
 	endif
+	function! s:FontSizeSet(amount)
+		let l:font = split(split(&guifont, '[^\\]\zs,')[0], '[^\\]\zs:')
+		let l:size = l:font[1][1:]
+		if !exists('s:guifont_default_size')
+			let s:guifont_default_size = l:size
+		endif
+		if a:amount ==# ""
+			let l:size = s:guifont_default_size
+		else
+			let l:size = eval(l:size . a:amount)
+		endif
+		let l:font[1] = l:font[1][0] . l:size
+		let &guifont = join(l:font, ':')
+	endfunction
 
 	nnoremap <silent> <M-Space> :simalt ~<CR>
 	cnoremap <M-/> <C-\>e<SID>RegexRubout('\v[^/\\]*(/\|\\)? *$')<CR>
 	cnoremap <M-w> <C-\>e<SID>RegexRubout('\v[^ ]* *$')<CR>
 	nnoremap <M-m> <C-W>-
 	nnoremap <M-p> <C-W>+
+	nnoremap <silent> <M-=>               :<C-U>call <SID>FontSizeSet("")<CR>
+	nnoremap <silent> <M-+>               :<C-U>call <SID>FontSizeSet("+1")<CR>
+	nnoremap <silent> <M-->               :<C-U>call <SID>FontSizeSet("-1")<CR>
+	nnoremap <silent> <C-=>               :<C-U>call <SID>FontSizeSet("")<CR>
+	nnoremap <silent> <C-ScrollWheelUp>   :<C-U>call <SID>FontSizeSet("+1")<CR>
+	nnoremap <silent> <C-ScrollWheelDown> :<C-U>call <SID>FontSizeSet("-1")<CR>
 endif
 
 if filereadable(expand('~/.localvimrc.vim'))

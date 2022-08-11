@@ -23,6 +23,7 @@ alias fd="fd -HIE.git"
 alias git_dotfiles_pull="git -C ~/dotfiles pull"
 alias git_empty_commit="git a -A && git c -m 'No commit message' && git push"
 alias grep="grep --color=auto"
+alias info="info --init-file ~/dotfiles/infokey"
 alias ls="ls --color=auto"
 alias la="ls -AF"
 alias ll="ls -lhF"
@@ -192,7 +193,14 @@ elif [[ $_uname == Darwin ]]; then
 	}
 	[[ -r /usr/local/etc/profile.d/bash_completion.sh ]] && . /usr/local/etc/profile.d/bash_completion.sh
 else
-	alias open='xdg-open &>/dev/null'
+	open() {
+		if [[ $# == 0 ]]; then
+			xdg-open &>/dev/null .
+		else
+			xdg-open &>/dev/null $@
+		fi
+	}
+	alias e=open
 	pdfx() {
 		wine start "C:\Program Files\Tracker Software\PDF Editor\PDFXEdit.exe" "$@" &>/dev/null &
 	}
@@ -206,14 +214,18 @@ else
 		fi
 	}
 	if [[ $_uname == WSL ]]; then
-		alias e=explorer.exe
 		xdg-open() {
 			[[ $# == 0 ]] && return 1
-			local arg=$1
-			if [[ -r $1 ]]; then
-				arg=$(wslpath -w "$1")
-			fi
-			powershell.exe 'Start-Process "'"$arg"'"'
+			local arg
+			while (( $# )); do
+				if [[ -r $1 ]]; then
+					arg=$arg'"'$(wslpath -w "$1")'", '
+				else
+					arg=$arg'"'$1'", '
+				fi
+				shift
+			done
+			powershell.exe -NoProfile 'Invoke-Item '"${arg%, }"
 		}
 	fi
 	if [[ $_distro == debian ]]; then

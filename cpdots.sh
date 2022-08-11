@@ -3,7 +3,7 @@ set -euo pipefail
 
 dotfiles=$(realpath $(dirname $0))
 pspath() {
-	wslpath "$(powershell.exe "$1" | tr -d '\r')"
+	wslpath "$(powershell.exe -NoProfile "$1" | tr -d '\r')"
 }
 
 winhome=$(pspath 'Get-Content Env:USERPROFILE')
