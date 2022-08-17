@@ -624,6 +624,7 @@ function! s:Minpac()
 	call minpac#add('kana/vim-textobj-user')
 	call minpac#add('matsuhav/vim-bash-completion')
 	call minpac#add('tpope/vim-repeat')
+	call minpac#add('tyru/open-browser.vim')
 	" colorscheme
 	call minpac#add('tomasr/molokai')
 	" syntax and filetype plugins
@@ -642,15 +643,6 @@ endfunction
 command! MinLoad silent! source $MYVIMRC | call <SID>Minpac()
 " previm
 let g:previm_enable_realtime = 1
-if has('win32')
-	let g:previm_open_cmd = '"C:\Program Files\Firefox Developer Edition\firefox.exe"'
-elseif has('win32unix')
-	let g:previm_open_cmd = '"/c/Program Files/Firefox Developer Edition/firefox.exe"'
-elseif has('mac')
-	let g:previm_open_cmd = 'open -a Firefox'
-else
-	let g:previm_open_cmd = 'firefox'
-endif
 let g:loaded_previm = 1
 command! -nargs=0 PrevimOpen unlet g:loaded_previm | runtime plugin/previm.vim | doautocmd Previm FileType | PrevimOpen
 " vimtex
@@ -769,6 +761,16 @@ endif
 let g:NERDTreeMapActivateNode = 'e'
 let g:NERDTreeMapOpenSplit = 's'
 let g:NERDTreeMapOpenVSplit = 'v'
+" openbrowser
+nmap gx <Plug>(openbrowser-smart-search)
+vmap gx <Plug>(openbrowser-smart-search)
+nmap gX :<C-U>call openbrowser#search(expand('<cword>'), 'x')<CR>
+vmap gX :<C-U>call openbrowser#search(expand('<cword>'), 'x')<CR>
+let g:openbrowser_default_search = 'bing'
+let g:openbrowser_search_engines = {
+	\ 'bing': 'https://www.bing.com/search?q={query}',
+	\ 'x':    'https://www.oxfordlearnersdictionaries.com/search/english/?q={query}',
+	\ }
 " rainbow vim-gas vim-lion emmet python-syntax csv
 let g:rainbow_active = 1
 let g:gasCppComments = 1
