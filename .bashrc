@@ -75,29 +75,23 @@ _msemicolon() {
 bind -m vi-insert  -x '"\e;": _msemicolon'
 bind -m vi-command -x '"\e;": _msemicolon'
 stopwatch() {
-	local c
-	local start_sec=$SECONDS dur_sec=0
-	local start=$EPOCHREALTIME dur=0
-	printf "%(%F %T)T\n"
+	local c t acc=0 start=${EPOCHREALTIME/./} int=${1:-.1}
+	[[ $int < 0.1 ]] && read -N 1 -t .1 c
 	while true; do
-		printf "\r$(($dur_sec + $SECONDS - $start_sec))"
-		read -N 1 -t .5 c
-		if [[ -n $c ]]; then
-			if [[ $c == $'\n' ]]; then # rap
-				continue
-			elif [[ $c == ' ' ]]; then # stop
-				printf "\n"
-				dur=$(bc <<<"$dur + $EPOCHREALTIME - $start")
-				dur_sec=$(($SECONDS - $start_sec))
-				read -N 1 c
-				start=$EPOCHREALTIME
-				start_sec=$SECONDS
-				printf "\n"
-			else # quit
-				dur=$(bc <<<"$dur + $EPOCHREALTIME - $start")
-				printf "\n$dur\n"
-				break
-			fi
+		read -N 1 -t $int c
+		t=$(($acc + ${EPOCHREALTIME/./} - $start))
+		printf "\r${t:: -6}.${t: -6}"
+
+		if [[ -z $c || $c == $'\n' ]]; then
+			continue
+		elif [[ $c == ' ' ]]; then
+			printf "\n"
+			acc=$t
+			read -N 1 c
+			start=${EPOCHREALTIME/./}
+			printf "\n"
+		else
+			break
 		fi
 	done
 }
