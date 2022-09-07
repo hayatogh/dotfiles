@@ -229,6 +229,8 @@ else
 			apt list --upgradable
 			sudo apt upgrade -y
 		}
+	elif [[ $_distro =~ ^(fedora|centos|rhel)$ ]]; then
+		[[ -r /usr/share/git-core/contrib/completion/git-prompt.sh ]] && . /usr/share/git-core/contrib/completion/git-prompt.sh
 	fi
 fi
 
