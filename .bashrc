@@ -37,7 +37,7 @@ alias rm="rm -i"
 alias sc="script -qc sh"
 alias scheme="scheme ~/dotfiles/chezrc.ss"
 alias sr="screen -D -R"
-alias vi="vi --clean"
+alias vi="vim --clean"
 alias wget="wget -N"
 l.() {
 	([[ $# != 0 ]] && cd $1; ls -dF .*)
@@ -229,7 +229,7 @@ else
 			apt list --upgradable
 			sudo apt upgrade -y
 		}
-	elif [[ $_distro =~ ^(fedora|centos|rhel)$ ]]; then
+	elif [[ $_distro =~ fedora|centos|rhel ]]; then
 		[[ -r /usr/share/git-core/contrib/completion/git-prompt.sh ]] && . /usr/share/git-core/contrib/completion/git-prompt.sh
 	fi
 fi
