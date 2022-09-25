@@ -5,7 +5,7 @@ set autoread
 set background=dark
 set backspace=indent
 set belloff=backspace,cursor,error,showmatch,esc visualbell
-set showbreak=>\  breakindent breakindentopt=shift:14,min:22
+" set showbreak=▸ breakindent breakindentopt=shift:-1 cpoptions+=n
 set ignorecase smartcase
 set casemap=keepascii
 set clipboard=unnamed,unnamedplus
@@ -753,9 +753,10 @@ let g:surround_dict = {
 	\ 'ma': '［\r］',
 	\ }
 " fzf
-silent! source /usr/share/doc/fzf/examples/fzf.vim
-if has('osxdarwin')
-	silent! source /usr/local/opt/fzf/plugin/fzf.vim
+if filereadable('/usr/share/doc/fzf/examples/fzf.vim')
+	source /usr/share/doc/fzf/examples/fzf.vim
+elseif has('osxdarwin') && filereadable('/usr/local/opt/fzf/plugin/fzf.vim')
+	source /usr/local/opt/fzf/plugin/fzf.vim
 endif
 " NERDTree
 let g:NERDTreeMapActivateNode = 'e'
@@ -771,6 +772,14 @@ let g:openbrowser_search_engines = {
 	\ 'bing': 'https://www.bing.com/search?q={query}',
 	\ 'x':    'https://www.oxfordlearnersdictionaries.com/search/english/?q={query}',
 	\ }
+" global
+if filereadable('/usr/local/share/gtags/gtags.vim')
+	source /usr/local/share/gtags/gtags.vim
+elseif filereadable('/usr/share/vim/addons/plugin/gtags.vim')
+	source /usr/share/vim/addons/plugin/gtags.vim
+elseif filereadable('/usr/share/gtags/gtags.vim')
+	source /usr/share/gtags/gtags.vim
+endif
 " rainbow vim-gas vim-lion emmet python-syntax csv
 let g:rainbow_active = 1
 let g:gasCppComments = 1

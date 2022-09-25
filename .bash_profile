@@ -33,6 +33,7 @@ export GIT_PS1_HIDE_IF_PWD_IGNORED=1
 export HISTCONTROL=ignoreboth:erasedups
 export HISTSIZE=2000
 export HISTTIMEFORMAT="%c : "
+export NPM_CONFIG_USERCONFIG="$HOME/dotfiles/npmrc"
 
 export _uname
 case $(uname -sr) in
@@ -65,7 +66,6 @@ fi
 
 [[ -r ~/.opam/opam-init/init.sh ]] && . ~/.opam/opam-init/init.sh
 [[ -f ~/.ghcup/env ]] && . ~/.ghcup/env
-[[ -f ~/.emsdk/emsdk_env.sh ]] && . ~/.emsdk/emsdk_env.sh 2>/dev/null
 [[ -r ~/.bashrc ]] && . ~/.bashrc
 [[ -r ~/.localbash_profile.sh ]] && . ~/.localbash_profile.sh
 true

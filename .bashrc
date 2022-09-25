@@ -18,10 +18,12 @@ alias chown="chown --preserve-root"
 alias cp="cp -p"
 alias dus="du -chs"
 alias diff="diff --color=auto"
+alias diffc="sh -c 'git diff --no-index --minimal --word-diff --word-diff-regex=. -U\$(cat \"\$0\" \"\$1\" | wc -l) -- \"\$0\" \"\$1\"'"
+alias diffl="sh -c 'git diff --no-index --minimal -U\$(cat \"\$0\" \"\$1\" | wc -l) -- \"\$0\" \"\$1\"'"
 alias ee=exit
 alias fd="fd -HIE.git"
 alias git_dotfiles_pull="git -C ~/dotfiles pull"
-alias git_empty_commit="git a -A && git c -m 'No commit message' && git push"
+alias git_empty_commit="git add -A && git commit -m 'No commit message' && git push"
 alias grep="grep --color=auto"
 alias info="info --init-file ~/dotfiles/infokey"
 alias ls="ls --color=auto"
@@ -37,8 +39,10 @@ alias rm="rm -i"
 alias sc="script -qc sh"
 alias scheme="scheme ~/dotfiles/chezrc.ss"
 alias sr="screen -D -R"
+alias sudo_proxy="sudo --preserve-env=https_proxy,http_proxy,ftp_proxy,no_proxy"
 alias vi="vim --clean"
 alias wget="wget -N"
+alias l. &>/dev/null && unalias l. || true
 l.() {
 	([[ $# != 0 ]] && cd $1; ls -dF .*)
 }
