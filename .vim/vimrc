@@ -5,7 +5,7 @@ set autoread
 set background=dark
 set backspace=indent
 set belloff=backspace,cursor,error,showmatch,esc visualbell
-" set showbreak=▸ breakindent breakindentopt=shift:-1 cpoptions+=n
+set showbreak= breakindent breakindentopt=shift:2 cpoptions+=n
 set ignorecase smartcase
 set casemap=keepascii
 set clipboard=unnamed,unnamedplus
@@ -374,8 +374,6 @@ command! -nargs=? Hi3 call <SID>Hi(3, <f-args>)
 command! -nargs=? Hi4 call <SID>Hi(4, <f-args>)
 command! -nargs=? Hi5 call <SID>Hi(5, <f-args>)
 command! -nargs=? Hi6 call <SID>Hi(6, <f-args>)
-
-command! -nargs=+ MYMANPAGER execute "Man " . <q-args> | only
 
 function! s:Align(cmd, line1, line2, ...)
 	let l:save_cursor = getcurpos()

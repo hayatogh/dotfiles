@@ -9,7 +9,7 @@ fi
 
 sudo apt-get update
 sudo apt-get -y upgrade
-sudo apt-get -y install automake bash-completion bc clangd clang-format command-not-found curl fd-find gcc gdb global gnutls-dev htop info libc-dev libncurses-dev lshw lsof make man-db nkf pkg-config pmount ripgrep rlwrap rsync screen texinfo tree uchardet universal-ctags vim wget zip
+sudo apt-get -y install aha automake bash-completion bc clang-format clangd command-not-found curl fd-find gcc gdb global gnutls-dev htop info lftp libc-dev libncurses-dev lshw lsof make man-db moreutils nkf pkg-config pmount ripgrep rlwrap rsync screen texinfo tree uchardet universal-ctags vim wget xfsprogs zip
 sudo apt-get -y install python3-pip chezscheme
 ## kernel
 # libncurses-dev flex bison libssl-dev bc libelf-dev rsync linux-headers-`uname -r`
