@@ -4,7 +4,8 @@
 	a = add
 	c = commit
 	d = diff
-	dc = diff --word-diff --word-diff-regex=.
+	dc = diff --word-diff-regex=.
+	dw = diff --word-diff-regex='\\S+|[^\\S]'
 	ds = diff --staged
 	dn = !git -P diff --numstat
 	dt = !git -P diff --stat

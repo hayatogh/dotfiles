@@ -2,7 +2,7 @@
 set -euo pipefail
 
 os=linux
-ver=$(curl -fsSL https://github.com/cheat/cheat/releases/latest | grep -Po '(?<=/cheat/cheat/releases/download/)[0-9.]+(?=/cheat-'$os'-amd64\.gz)' | head -n1)
+ver=$(curl -fsSL https://api.github.com/repos/cheat/cheat/releases/latest | grep -Po '(?<=/cheat/cheat/releases/download/)[0-9.]+(?=/cheat-'$os'-amd64\.gz)' | head -n1)
 url=https://github.com/cheat/cheat/releases/download/$ver/cheat-$os-amd64.gz
 
 echo "Installed:     $(cheat --version 2>/dev/null | grep -Po '[0-9.]+' || echo "Not installed")"
@@ -13,7 +13,7 @@ if [[ ${1:-} == -n ]]; then
 fi
 
 tmp=$(mktemp)
-curl -fsSo $tmp $url
+curl -fsSLo $tmp $url
 mkdir -p ~/.local/bin
 gzip -cd $tmp >~/.local/bin/cheat
 chmod 755 ~/.local/bin/cheat

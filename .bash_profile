@@ -19,12 +19,11 @@ export SCREENDIR="$HOME/.screen"
 export SCREENRC="$HOME/dotfiles/screenrc"
 export VISUAL=vim
 
-pc='_psjobs; history -a; history -c; history -r; __git_ps1 "'
-pc=$pc'\[\e]0;\u@\h \w \d \A [\j] \a\]'
-pc=$pc'\[\e[0m\]\n$PSM\[\e[32m\]\u@\h \[\e[33m\]\w \[\e[38;5;93m\]$PSSHLVL \[\e[38;5;166m\]$PSJOBS\[\e[0m\]'
-pc=$pc'" " \[\e[38;5;245m\]\t \${PIPESTATUS[@]}\[\e[0m\]\n\[\ek\e\\\\\]\\$ "'
-export PROMPT_COMMAND=$pc
-unset pc
+export _pc0='_psjobs; history -a; history -c; history -r'
+export _pc1='\[\e]0;\u@\h \w \d \A [\j] \a\]'
+_pc1=$_pc1'\[\e[0m\]\n$PSM\[\e[32m\]\u@\h \[\e[33m\]\w \[\e[38;5;93m\]$PSSHLVL \[\e[38;5;166m\]$PSJOBS\[\e[0m\]'
+export _pc2=' \[\e[38;5;245m\]\t ${PIPESTATUS[@]}\[\e[0m\]\n\[\ek\e\\\]\$ '
+export PROMPT_COMMAND=$_pc0"; __git_ps1 '"$_pc1"' '"$_pc2"'"
 export GIT_PS1_SHOWDIRTYSTATE=1
 export GIT_PS1_SHOWSTASHSTATE=1
 export GIT_PS1_SHOWUNTRACKEDFILES=1
@@ -65,8 +64,11 @@ elif [[ $_uname == WSL ]]; then
 	LC_CTYPE=en_US.UTF-8
 fi
 
-[[ -r ~/.opam/opam-init/init.sh ]] && . ~/.opam/opam-init/init.sh
-[[ -f ~/.ghcup/env ]] && . ~/.ghcup/env
-[[ -r ~/.bashrc ]] && . ~/.bashrc
-[[ -r ~/.localbash_profile.sh ]] && . ~/.localbash_profile.sh
+export _home=$(realpath $(dirname ${BASH_SOURCE[0]}))
+if [[ $_home == $HOME ]]; then
+	[[ -r ~/.opam/opam-init/init.sh ]] && . ~/.opam/opam-init/init.sh
+	[[ -f ~/.ghcup/env ]] && . ~/.ghcup/env
+	[[ -r ~/.bashrc ]] && . ~/.bashrc
+	[[ -r ~/.localbash_profile.sh ]] && . ~/.localbash_profile.sh
+fi
 true

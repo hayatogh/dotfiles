@@ -18,8 +18,9 @@ alias chown="chown --preserve-root"
 alias cp="cp -p"
 alias dus="du -chs"
 alias diff="diff --color=auto"
-alias diffc="sh -c 'git diff --no-index --minimal --word-diff --word-diff-regex=. -U\$(cat \"\$0\" \"\$1\" | wc -l) -- \"\$0\" \"\$1\"'"
-alias diffl="sh -c 'git diff --no-index --minimal -U\$(cat \"\$0\" \"\$1\" | wc -l) -- \"\$0\" \"\$1\"'"
+alias diffl="git diff --no-index --minimal -U2147483647"
+alias diffc="diffl --word-diff-regex=."
+alias diffw="diffl --word-diff-regex='\S+|[^\S]'"
 alias ee=exit
 alias fd="fd -HIE.git"
 alias git_dotfiles_pull="git -C ~/dotfiles pull"
@@ -152,6 +153,9 @@ fixmod() {
 		fi
 	done
 }
+vrg() {
+	vim $(rg -l $@)
+}
 
 if [[ $_uname == MSYS ]]; then
 	shopt -s completion_strip_exe
@@ -229,6 +233,7 @@ else
 			apt list --upgradable
 			sudo apt upgrade -y
 		}
+		# [[ -r /usr/lib/git-core/git-sh-prompt ]] && . /usr/lib/git-core/git-sh-prompt
 	elif [[ $_distro =~ fedora|centos|rhel ]]; then
 		[[ -r /usr/share/git-core/contrib/completion/git-prompt.sh ]] && . /usr/share/git-core/contrib/completion/git-prompt.sh
 	fi
@@ -241,5 +246,13 @@ printf "\e[2 q"
 type _completion_loader &>/dev/null && _completion_loader ssh
 complete -F _ssh tryssh
 complete -c realwhich
-[[ -r ~/.localbashrc.sh ]] && . ~/.localbashrc.sh
+
+if ! type __git_ps1 >&/dev/null; then
+	PROMPT_COMMAND=$_pc0
+	PS1=$_pc1$_pc2
+fi
+
+if [[ $_home == $HOME ]]; then
+	[[ -r ~/.localbashrc.sh ]] && . ~/.localbashrc.sh
+fi
 true
