@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-dotfiles=$(realpath $(dirname $0))
+dotfiles=$(cd $(dirname $0); pwd -P)
 sudo sh -c "echo \"$USER ALL=(ALL) NOPASSWD:ALL\" >/etc/sudoers.d/$USER"
 if [[ $(ps -p 1 -o comm=) == systemd ]]; then
 	sudo timedatectl set-timezone Asia/Tokyo

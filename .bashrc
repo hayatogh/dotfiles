@@ -8,9 +8,7 @@ if [[ $TERM =~ screen ]]; then
 elif [[ $SHLVL > 1 ]]; then
 	PSSHLVL=$SHLVL
 fi
-if [[ ! -v $PSM ]]; then
-	PSM=
-fi
+PSM=${PSM:-}
 alias bc="bc -l"
 alias chgrp="chgrp --preserve-root"
 alias chmod="chmod --preserve-root"

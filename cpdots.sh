@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-dotfiles=$(realpath $(dirname $0))
+dotfiles=$(cd $(dirname $0); pwd -P)
 pspath() {
 	wslpath "$(powershell.exe -NoProfile "$1" | tr -d '\r')"
 }

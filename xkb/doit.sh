@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-xkb=$(realpath $(dirname $0))
+xkb=$(cd $(dirname $0); pwd -P)
 if [[ -f /usr/share/X11/xkb/rules/evdev.xml.old ]]; then
 	echo "evdev.xml already edited."
 	exit 1

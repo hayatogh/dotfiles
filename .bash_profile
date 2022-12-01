@@ -64,7 +64,7 @@ elif [[ $_uname == WSL ]]; then
 	LC_CTYPE=en_US.UTF-8
 fi
 
-export _home=$(realpath $(dirname ${BASH_SOURCE[0]}))
+export _home=$(cd $(dirname ${BASH_SOURCE[0]}); pwd -P)
 if [[ $_home == $HOME ]]; then
 	[[ -r ~/.opam/opam-init/init.sh ]] && . ~/.opam/opam-init/init.sh
 	[[ -f ~/.ghcup/env ]] && . ~/.ghcup/env
