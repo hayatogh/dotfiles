@@ -18,7 +18,7 @@ alias dus="du -chs"
 alias diff="diff --color=auto"
 alias diffl="git diff --no-index --minimal -U2147483647"
 alias diffc="diffl --word-diff-regex=."
-alias diffw="diffl --word-diff-regex='\S+|[^\S]'"
+alias diffw='diffl --word-diff-regex='\''\S+|[^\S]'\'''
 alias ee=exit
 alias fd="fd -HIE.git"
 alias git_dotfiles_pull="git -C ~/dotfiles pull"
@@ -40,9 +40,9 @@ alias sr="screen -D -R"
 alias sudo_proxy="sudo --preserve-env=https_proxy,http_proxy,ftp_proxy,no_proxy"
 alias vi="vim --clean"
 alias wget="wget -N"
-alias l. &>/dev/null && unalias l. || true
+alias l. &>/dev/null && unalias l.
 l.() {
-	([[ $# != 0 ]] && cd $1; ls -dF .*)
+	([[ $# != 0 ]] && cd "$1"; ls -dF .*)
 }
 tryssh() {
 	local sleeptime=5
@@ -55,8 +55,8 @@ tryssh() {
 	ssh $1
 }
 mkcd() {
-	mkdir $1
-	cd $1
+	mkdir "$1"
+	cd "$1"
 }
 _regex_rubout() {
 	local right=${READLINE_LINE:$READLINE_POINT}
@@ -98,11 +98,7 @@ stopwatch() {
 	done
 }
 cdd() {
-	if [[ $# == 0 ]]; then
-		cd
-	else
-		cd $(dirname $1)
-	fi
+	cd "$(dirname "$1")"
 }
 ctags_exclude() {
 	local state=exclude arg
@@ -113,7 +109,7 @@ ctags_exclude() {
 				return
 				;;
 			--include)
-				state="include"
+				state=include
 				shift
 				;;
 			*)
@@ -130,7 +126,7 @@ ctags_exclude() {
 	ctags -R $arg
 }
 realwhich() {
-	realpath $(which $1)
+	realpath "$(which "$1")"
 }
 clean_history() {
 	local pat=${1:-pwd|(|ba|da|z)sh|sr|vim?|make|l[sal.]|al|git .|cd(| -| \.\.)|scheme}
@@ -143,16 +139,16 @@ fixmod() {
 		return
 	fi
 	local x
-	for x in $@; do
+	for x in "$@"; do
 		if [[ -d $x ]]; then
-			chmod 755 $x
+			chmod 755 "$x"
 		else
-			chmod 644 $x
+			chmod 644 "$x"
 		fi
 	done
 }
 vrg() {
-	vim $(rg -l $@)
+	vim $(rg -l "$@")
 }
 
 if [[ $_uname == MSYS ]]; then
@@ -165,12 +161,6 @@ if [[ $_uname == MSYS ]]; then
 		pacman -Qtdq | pacman -Rns --noconfirm - 2>/dev/null
 		pacman -Syu --noconfirm
 	}
-	_psjobs() {
-		PSJOBS=$(jobs -p)
-		if [[ -n $PSJOBS ]]; then
-			PSJOBS=$(wc -l <<<$PSJOBS)
-		fi
-	}
 	[[ -r /usr/share/git/git-prompt.sh ]] && . /usr/share/git/git-prompt.sh
 elif [[ $_uname == Darwin ]]; then
 	alias batt="pmset -g batt"
@@ -178,36 +168,18 @@ elif [[ $_uname == Darwin ]]; then
 	upgrade() {
 		brew upgrade
 	}
-	_psjobs() {
-		PSJOBS=$(jobs -p)
-		if [[ -n $PSJOBS ]]; then
-			PSJOBS=$(ps -opid= -p$PSJOBS | wc -l)
-			if [[ $PSJOBS == 0 ]]; then
-				PSJOBS=
-			fi
-		fi
-	}
 	[[ -r /usr/local/etc/profile.d/bash_completion.sh ]] && . /usr/local/etc/profile.d/bash_completion.sh
 else
 	open() {
 		if [[ $# == 0 ]]; then
 			xdg-open &>/dev/null .
 		else
-			xdg-open &>/dev/null $@
+			xdg-open &>/dev/null "$@"
 		fi
 	}
 	alias e=open
 	pdfx() {
 		wine start 'C:\Program Files\Tracker Software\PDF Editor\PDFXEdit.exe' "$@" &>/dev/null &
-	}
-	_psjobs() {
-		PSJOBS=$(jobs -p)
-		if [[ -n $PSJOBS ]]; then
-			PSJOBS=$(ps -opid= $PSJOBS | wc -l)
-			if [[ $PSJOBS == 0 ]]; then
-				PSJOBS=
-			fi
-		fi
 	}
 	if [[ $_uname == WSL ]]; then
 		xdg-open() {
@@ -224,7 +196,14 @@ else
 			powershell.exe -NoProfile 'Invoke-Item '"${arg%, }"
 		}
 		diffh() {
-			WinMergeU.exe -noninteractive -or "diff_$(basename $1)_$(basename $2).html" $1 $2
+			local f='sed -E '\''s:.*/::; s/(.+)\.[a-zA-Z0-9]+$/\1/'\'
+			local l=$(eval $f <<<"$1")
+			local r=$(eval $f <<<"$2")
+			local out="diff_${l}_$r.html"
+			if [[ $l == $r ]]; then
+				out="diff_$l.html"
+			fi
+			WinMergeU.exe -noninteractive -or "$out" "$(wslpath -w "$1")" "$(wslpath -w "$2")"
 		}
 	fi
 	if [[ $_distro == debian ]]; then
@@ -244,7 +223,7 @@ printf "\e]12;#ff00ff\a"
 printf "\e[2 q"
 
 [[ -r /etc/profile.d/bash_completion.sh ]] && . /etc/profile.d/bash_completion.sh
-type _completion_loader &>/dev/null && _completion_loader ssh
+type _completion_loader &>/dev/null && ! _completion_loader ssh
 complete -F _ssh tryssh
 complete -c realwhich
 
