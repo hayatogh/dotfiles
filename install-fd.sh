@@ -4,10 +4,13 @@ if [[ $EUID != 0 ]]; then
 	exec sudo "$0" "$@"
 fi
 
-distro=$(grep -Po '(?<=^ID=).*$' /etc/os-release 2>/dev/null || echo "Unknown")
+use_deb=0
+if grep -Pq '^ID=(debian|ubuntu)$' /etc/os-release 2>/dev/null; then
+	use_deb=1
+fi
 ver=$(curl -fsSL https://api.github.com/repos/sharkdp/fd/releases/latest | grep -Po '(?<=/sharkdp/fd/releases/download/v)([0-9.]+)(?=/fd_\1_amd64\.deb)' | head -n1)
 binname=fd
-if [[ $distro =~ debian|ubuntu ]]; then
+if [[ $use_deb ]]; then
 	if type fdfind &>/dev/null; then
 		binname=fdfind
 	fi
@@ -32,8 +35,8 @@ fi
 mkdir -p /usr/local/src
 cd /usr/local/src
 curl -fsSLo $fname $url
-if [[ $distro =~ debian|ubuntu ]]; then
-	dpkg -i $fname
+if [[ $use_deb ]]; then
+	dpkg -i $fname || apt -f install fd
 else
 	tar -xf $fname
 	cd $dir

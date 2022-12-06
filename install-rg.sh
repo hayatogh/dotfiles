@@ -4,10 +4,13 @@ if [[ $EUID != 0 ]]; then
 	exec sudo "$0" "$@"
 fi
 
-distro=$(grep -Po '(?<=^ID=).*$' /etc/os-release 2>/dev/null || echo "Unknown")
+use_deb=0
+if grep -Pq '^ID=(debian|ubuntu)$' /etc/os-release 2>/dev/null; then
+	use_deb=1
+fi
 arch=$(uname -m)
 ver=$(curl -fsSL https://api.github.com/repos/BurntSushi/ripgrep/releases/latest | grep -Po '(?<=/BurntSushi/ripgrep/releases/download/)([0-9.]+)(?=/ripgrep_\1_amd64\.deb)' | head -n1)
-if [[ $distro =~ debian|ubuntu ]]; then
+if [[ $use_deb ]]; then
 	fname=ripgrep_${ver}_amd64.deb
 else
 	dir=ripgrep-$ver-x86_64-unknown-linux-musl
@@ -25,8 +28,8 @@ fi
 mkdir -p /usr/local/src
 cd /usr/local/src
 curl -fsSLo $fname $url
-if [[ $distro =~ debian|ubuntu ]]; then
-	dpkg -i $fname
+if [[ $use_deb ]]; then
+	dpkg -i $fname || apt -f install ripgrep
 else
 	tar -xf $fname
 	cd $dir

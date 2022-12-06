@@ -198,7 +198,7 @@ else
 	}
 	alias e=open
 	pdfx() {
-		wine start "C:\Program Files\Tracker Software\PDF Editor\PDFXEdit.exe" "$@" &>/dev/null &
+		wine start 'C:\Program Files\Tracker Software\PDF Editor\PDFXEdit.exe' "$@" &>/dev/null &
 	}
 	_psjobs() {
 		PSJOBS=$(jobs -p)
@@ -222,6 +222,9 @@ else
 				shift
 			done
 			powershell.exe -NoProfile 'Invoke-Item '"${arg%, }"
+		}
+		diffh() {
+			WinMergeU.exe -noninteractive -or "diff_$(basename $1)_$(basename $2).html" $1 $2
 		}
 	fi
 	if [[ $_distro == debian ]]; then
