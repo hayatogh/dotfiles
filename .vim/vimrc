@@ -104,7 +104,6 @@ endif
 function! g:Imzero()
 	return ''
 endfunction
-let s:has_clipexe = 0
 if has('gui_win32')
 	function! g:Imzero()
 		if s:autoIminsertZero
@@ -112,7 +111,7 @@ if has('gui_win32')
 		endif
 		return ''
 	endfunction
-elseif $WSL_DISTRO_NAME != '' || $MSYSTEM != ''
+else
 	if !s:in_screen
 		call echoraw("\e[<0t\e[<s")
 		let &t_SI .= "\e[<r"
@@ -127,6 +126,16 @@ elseif $WSL_DISTRO_NAME != '' || $MSYSTEM != ''
 		function! s:FontSizeSet(amount)
 			call echoraw("\e]7770;" . a:amount . "\x7")
 		endfunction
+		function! s:SetScreenTitle()
+		endfunction
+		function! s:CopyToScreenReg(str)
+		endfunction
+		function! s:CopyToClip_OSC52(str)
+			let l:escaped = shellescape(a:str)
+			let l:enc = systemlist('echo -n ' . l:escaped . ' | base64 -w0')[0]
+			call echoraw("\e]52;c;" . l:enc . "\x7")
+		endfunction
+
 	else
 		call echoraw("\eP\e[<0t\e[<s\e\\")
 		let &t_SI .= "\eP\e[<r\e\\"
@@ -145,8 +154,31 @@ elseif $WSL_DISTRO_NAME != '' || $MSYSTEM != ''
 		function! s:FontSizeSet(amount)
 			call echoraw("\eP\e]7770;" . a:amount . "\x7\e\\")
 		endfunction
+		function! s:SetScreenTitle()
+			call job_start(['screen', '-X', 'title', 'vim'])
+		endfunction
+		function! s:CopyToScreenReg(str)
+			let l:escaped = escape(a:str, '\$^')
+			if len(l:escaped) <= 749
+				call job_start(['screen', '-X', 'register', '.', l:escaped])
+			endif
+		endfunction
+		function! s:CopyToClip_OSC52(str)
+			let l:escaped = shellescape(a:str)
+			let l:enc = systemlist('echo -n ' . l:escaped . ' | base64 -w0')[0]
+			call echoraw("\eP\e]52;c;" . l:enc . "\x7\e\\")
+		endfunction
 	endif
-	let s:has_clipexe = executable('clip.exe')
+	if !executable('base64')
+		function! s:CopyToClip_OSC52(str)
+		endfunction
+	endif
+	" if executable('clip.exe')
+	" 	function! s:CopyToClip_clipexe(str)
+	" 		let l:escaped = shellescape(escape(a:str, '\'))
+	" 		call job_start(['/bin/sh', '-c', 'echo -n ' . l:escaped . ' | clip.exe'])
+	" 	endfunction
+	" endif
 	function! s:FontSizeGet()
 		call <SID>FontSizeSet("?")
 		for l:_ in range(7)
@@ -537,27 +569,13 @@ function! s:ConvertPunctuation()
 	call setpos('.', l:curpos)
 endfunction
 
-function! s:CopyToScreenRegUnnamed()
+function! s:CopyToOther()
+	call <SID>CopyToScreenReg(join(v:event.regcontents, "\n"))
+	call <SID>CopyToClip_OSC52(join(v:event.regcontents, "\n"))
+endfunction
+function! s:CopyToOtherUnnamed()
 	if v:event.regname == ''
-		call <SID>CopyToScreenReg(join(v:event.regcontents, "\n"))
-	endif
-endfunction
-function! s:CopyToScreenReg(str)
-	if s:in_screen
-		let l:escaped = escape(a:str, '\$^')
-		if len(l:escaped) <= 749
-			call job_start(['screen', '-X', 'register', '.', l:escaped])
-		endif
-	endif
-	if s:has_clipexe
-		let l:escaped = shellescape(escape(a:str, '\'))
-		call job_start(['/bin/sh', '-c', 'echo -n ' . l:escaped . ' | clip.exe'])
-	endif
-endfunction
-
-function! s:SetScreenTitle()
-	if s:in_screen
-		call job_start(['screen', '-X', 'title', 'vim'])
+		call <SID>CopyToOther()
 	endif
 endfunction
 
@@ -586,7 +604,7 @@ augroup vimrc
 	autocmd BufNewFile *.go,*.pl,*.py,*.sh call <SID>Template()
 	autocmd BufWritePre *.tex call <SID>HalfCommas()
 	autocmd BufWritePre *.txt call <SID>ConvertPunctuation()
-	autocmd TextYankPost * call <SID>CopyToScreenRegUnnamed()
+	autocmd TextYankPost * call <SID>CopyToOtherUnnamed()
 	autocmd VimResume * call <SID>SetScreenTitle()
 augroup END
 

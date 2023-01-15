@@ -8,13 +8,19 @@ RightClickAction=extend
 MiddleClickAction=paste
 Columns=106
 Rows=50
-KeyFunctions=t:new-window
+RewrapOnResize=yes
+AllowSetSelection=true
 IMECursorColour=0,0,255
 BoldAsColour=no
 Term=xterm-256color
 BellType=0
 BellTaskbar=no
 DisplaySpeedup=0
+
+# 2560x1440
 X=910
 Y=189
-RewrapOnResize=yes
+
+# 1920x1080
+# X=938
+# Y=48

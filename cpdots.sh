@@ -16,4 +16,7 @@ rsync -a --delete $dotfiles/.vimfx/ "$winhome/.vimfx"
 rsync -a --delete $dotfiles/mintty/ "$appdata/mintty"
 rsync -a --delete $dotfiles/alacritty/ "$appdata/alacritty"
 rsync -a --delete $dotfiles/PowerShell/ "$windoc/PowerShell"
+if [[ ${1:-} == novim ]]; then
+	exit
+fi
 rsync -az --exclude=.git/ --exclude=/.netrwhist --exclude=/.viminfo --exclude=/swap --delete $dotfiles/.vim/ "$winhome/vimfiles"

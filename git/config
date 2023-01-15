@@ -11,8 +11,9 @@
 	dt = !git -P diff --stat
 	g = log --graph --all --format=\"%x09%C(cyan bold)%<(19,trunc)%an %C(yellow nobold)%h %Creset%s%C(magenta bold)%d\"
 	l = log
-	sc = clone --depth 1 --
-	scg = !sh -c 'git clone --depth 1 -- https://github.com/$0'
+	cl = !sh -c 'git clone $0 && cd $(basename $0 .git) && git status'
+	sc = !sh -c 'git clone --depth 1 -- $0 && cd $(basename $0 .git) && git status'
+	scg = !sh -c 'git clone --depth 1 -- https://github.com/$0 && cd $(basename $0 .git) && git status'
 [core]
 	autocrlf = input
 	safecrlf = true
