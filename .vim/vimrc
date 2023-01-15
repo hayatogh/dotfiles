@@ -96,106 +96,101 @@ syntax enable
 if &term == 'xterm' || has('win32')
 	set t_Co=256
 endif
-if !has('win32')
-	let &t_VS .= "\e]12;#ff00ff\x7"
-	let &t_EI .= "\e]12;#ff00ff\x7"
-endif
 
-function! g:Imzero()
-	return ''
-endfunction
-if has('gui_win32')
+let s:cursor_bg = '#ff0000'
+if !s:in_screen
+	let &t_VS .= "\e]12;" . s:cursor_bg . "\x7"
+	let &t_EI .= "\e]12;" . s:cursor_bg . "\x7"
+	call echoraw("\e[<0t\e[<s")
+	let &t_SI .= "\e[<r"
+	let &t_EI .= "\e[<s\e[<0t"
+	let &t_te .= "\e[<0t\e[<s"
 	function! g:Imzero()
 		if s:autoIminsertZero
-			set iminsert=0
+			call echoraw("\e[<0t\e[<s")
 		endif
 		return ''
 	endfunction
+	function! s:FontSizeSet(amount)
+		call echoraw("\e]7770;" . a:amount . "\x7")
+	endfunction
+	function! s:SetScreenTitle()
+	endfunction
+	function! s:CopyToScreenReg(str)
+	endfunction
+	function! s:CopyToClip_OSC52(str)
+		if a:str == ''
+			return
+		endif
+		let l:escaped = shellescape(a:str)
+		let l:enc = systemlist('echo -n ' . l:escaped . ' | base64 -w0')[0]
+		call echoraw("\e]52;c;" . l:enc . "\x7")
+	endfunction
 else
-	if !s:in_screen
-		call echoraw("\e[<0t\e[<s")
-		let &t_SI .= "\e[<r"
-		let &t_EI .= "\e[<s\e[<0t"
-		let &t_te .= "\e[<0t\e[<s"
-		function! g:Imzero()
-			if s:autoIminsertZero
-				call echoraw("\e[<0t\e[<s")
-			endif
-			return ''
-		endfunction
-		function! s:FontSizeSet(amount)
-			call echoraw("\e]7770;" . a:amount . "\x7")
-		endfunction
-		function! s:SetScreenTitle()
-		endfunction
-		function! s:CopyToScreenReg(str)
-		endfunction
-		function! s:CopyToClip_OSC52(str)
-			let l:escaped = shellescape(a:str)
-			let l:enc = systemlist('echo -n ' . l:escaped . ' | base64 -w0')[0]
-			call echoraw("\e]52;c;" . l:enc . "\x7")
-		endfunction
-
-	else
-		call echoraw("\eP\e[<0t\e[<s\e\\")
-		let &t_SI .= "\eP\e[<r\e\\"
-		let &t_EI .= "\eP\e[<s\e[<0t\e\\"
-		let &t_te .= "\eP\e[<0t\e[<s\e\\"
-		let &t_BE = "\eP\e[?2004h\e\\"
-		let &t_BD = "\eP\e[?2004l\e\\"
-		let &t_PS = "\e[200~"
-		let &t_PE = "\e[201~"
-		function! g:Imzero()
-			if s:autoIminsertZero
-				call echoraw("\eP\e[<0t\e[<s\e\\")
-			endif
-			return ''
-		endfunction
-		function! s:FontSizeSet(amount)
-			call echoraw("\eP\e]7770;" . a:amount . "\x7\e\\")
-		endfunction
-		function! s:SetScreenTitle()
-			call job_start(['screen', '-X', 'title', 'vim'])
-		endfunction
-		function! s:CopyToScreenReg(str)
-			let l:escaped = escape(a:str, '\$^')
-			if len(l:escaped) <= 749
-				call job_start(['screen', '-X', 'register', '.', l:escaped])
-			endif
-		endfunction
-		function! s:CopyToClip_OSC52(str)
-			let l:escaped = shellescape(a:str)
-			let l:enc = systemlist('echo -n ' . l:escaped . ' | base64 -w0')[0]
-			call echoraw("\eP\e]52;c;" . l:enc . "\x7\e\\")
-		endfunction
-	endif
-	if !executable('base64')
-		function! s:CopyToClip_OSC52(str)
-		endfunction
-	endif
-	" if executable('clip.exe')
-	" 	function! s:CopyToClip_clipexe(str)
-	" 		let l:escaped = shellescape(escape(a:str, '\'))
-	" 		call job_start(['/bin/sh', '-c', 'echo -n ' . l:escaped . ' | clip.exe'])
-	" 	endfunction
-	" endif
-	function! s:FontSizeGet()
-		call <SID>FontSizeSet("?")
-		for l:_ in range(7)
-			call getcharstr()
-		endfor
-		let l:size = ""
-		while 1
-			let l:char = getcharstr()
-			if l:char ==# "\x7"
-				break
-			else
-				let l:size .= l:char
-			endif
-		endwhile
-		echo l:size
+	let &t_VS .= "\eP\e]12;" . s:cursor_bg . "\x7\e\\"
+	let &t_EI .= "\eP\e]12;" . s:cursor_bg . "\x7\e\\"
+	call echoraw("\eP\e[<0t\e[<s\e\\")
+	let &t_SI .= "\eP\e[<r\e\\"
+	let &t_EI .= "\eP\e[<s\e[<0t\e\\"
+	let &t_te .= "\eP\e[<0t\e[<s\e\\"
+	let &t_BE = "\eP\e[?2004h\e\\"
+	let &t_BD = "\eP\e[?2004l\e\\"
+	let &t_PS = "\e[200~"
+	let &t_PE = "\e[201~"
+	function! g:Imzero()
+		if s:autoIminsertZero
+			call echoraw("\eP\e[<0t\e[<s\e\\")
+		endif
+		return ''
+	endfunction
+	function! s:FontSizeSet(amount)
+		call echoraw("\eP\e]7770;" . a:amount . "\x7\e\\")
+	endfunction
+	function! s:SetScreenTitle()
+		call job_start(['screen', '-X', 'title', 'vim'])
+	endfunction
+	function! s:CopyToScreenReg(str)
+		let l:escaped = escape(a:str, '\$^')
+		if len(l:escaped) <= 749
+			call job_start(['screen', '-X', 'register', '.', l:escaped])
+		endif
+	endfunction
+	function! s:CopyToClip_OSC52(str)
+		if a:str == ''
+			return
+		endif
+		let l:escaped = shellescape(a:str)
+		let l:enc = systemlist('echo -n ' . l:escaped . ' | base64 -w0')[0]
+		call echoraw("\eP\e]52;c;" . l:enc . "\x7\e\\")
 	endfunction
 endif
+unlet s:cursor_bg
+if !executable('base64')
+	function! s:CopyToClip_OSC52(str)
+	endfunction
+endif
+" if executable('clip.exe')
+" 	function! s:CopyToClip_clipexe(str)
+" 		let l:escaped = shellescape(escape(a:str, '\'))
+" 		call job_start(['/bin/sh', '-c', 'echo -n ' . l:escaped . ' | clip.exe'])
+" 	endfunction
+" endif
+function! s:FontSizeGet()
+	call <SID>FontSizeSet("?")
+	for l:_ in range(7)
+		call getcharstr()
+	endfor
+	let l:size = ""
+	while 1
+		let l:char = getcharstr()
+		if l:char ==# "\x7"
+			break
+		else
+			let l:size .= l:char
+		endif
+	endwhile
+	echo l:size
+endfunction
 let s:pythonexe = executable('python3') ? 'python3' : 'python'
 
 " mapping
@@ -590,7 +585,7 @@ augroup vimrc
 	autocmd BufReadPost * if line('''"') >= 1 && line('''"') <= line('$') && &ft !~# 'commit' | execute 'normal! g`"' | endif
 	autocmd StdinReadPost * set nomodified
 	autocmd CmdwinEnter * nnoremap <buffer> <F5> :let g:CmdwinLastLineNum=line('.')<CR><CR>q::execute g:CmdwinLastLineNum<CR>
-	autocmd Colorscheme * highlight Cursor guifg=Black guibg=Magenta
+	autocmd Colorscheme * highlight Cursor guifg=fg guibg=Red
 	autocmd Colorscheme * highlight CursorIM guifg=Black guibg=Blue
 	autocmd Colorscheme * highlight TabLineFill guibg=#808080
 	autocmd ColorScheme * highlight TrailingWhiteSpace ctermbg=darkred guibg=darkred
@@ -879,6 +874,12 @@ if has("gui_running") && has('win32')
 		execute 'winpos ' . (s:pos[0] + 32 * s:n) . ' ' . (s:pos[1] + 32 * s:n)
 		unlet s:pos s:n
 	endif
+	function! g:Imzero()
+		if s:autoIminsertZero
+			set iminsert=0
+		endif
+		return ''
+	endfunction
 	function! s:FontSizeSet(amount)
 		let l:font = split(split(&guifont, '[^\\]\zs,')[0], '[^\\]\zs:')
 		let l:size = l:font[1][1:]
@@ -892,6 +893,8 @@ if has("gui_running") && has('win32')
 		endif
 		let l:font[1] = l:font[1][0] . l:size
 		let &guifont = join(l:font, ':')
+	endfunction
+	function! s:CopyToClip_OSC52(str)
 	endfunction
 
 	nnoremap <silent> <M-Space> :simalt ~<CR>

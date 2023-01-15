@@ -220,7 +220,7 @@ else
 	fi
 fi
 
-printf "\e]12;#ff00ff\a"
+printf "\e]12;#ff0000\a"
 printf "\e[2 q"
 
 [[ -r /etc/profile.d/bash_completion.sh ]] && . /etc/profile.d/bash_completion.sh
