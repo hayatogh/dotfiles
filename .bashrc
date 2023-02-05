@@ -39,6 +39,7 @@ alias sc="script -qc sh"
 alias scheme="scheme ~/dotfiles/chezrc.ss"
 alias sr="screen -D -R"
 alias sudo_proxy="sudo --preserve-env=https_proxy,http_proxy,ftp_proxy,no_proxy"
+alias tm="tmux new -ADX"
 alias vi="vim --clean"
 alias wget="wget -N"
 alias l. &>/dev/null && unalias l.

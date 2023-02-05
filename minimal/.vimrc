@@ -35,5 +35,11 @@ nnoremap <Leader>w :w<CR>
 nnoremap <Leader>n :n<CR>
 nnoremap <Leader>p :N<CR>
 
+cnoremap <Left> <Space><BS><Left>
+cnoremap <Right> <Space><BS><Right>
 cnoremap <C-P> <Up>
 cnoremap <C-N> <Down>
+cnoremap <Up> <C-P>
+cnoremap <Down> <C-N>
+
+colorscheme ron

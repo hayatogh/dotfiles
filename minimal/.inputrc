@@ -58,7 +58,6 @@ $if mode=vi
 
 	$if Bash
 		"\C-g": "\C-e\C-u fg || true\C-m"
-		"\eg": "\C-e\C-u fg || true\C-m\ep"
 		"\es": "\C-e --color=always | less\C-m"
 	$endif
 $endif
