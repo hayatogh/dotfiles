@@ -519,6 +519,7 @@ endfunction
 function! s:HlTrailingWhiteSpace(isNormal)
 	silent! call matchdelete(4)
 	if !s:autoHlTrailingWhiteSpaces | return | endif
+	if !get(b:, 'autoHlTrailingWhiteSpaces', 1) | return | endif
 	if a:isNormal
 		call matchadd('TrailingWhiteSpace', '\\\@<!\s\+$', 10, 4)
 	else
