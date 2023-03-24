@@ -235,6 +235,6 @@ if ! type __git_ps1 &>/dev/null; then
 fi
 
 if [[ $_home == $HOME ]]; then
-	[[ -r ~/.localbashrc.sh ]] && . ~/.localbashrc.sh
+	[[ -r ~/.localbashrc.bash ]] && . ~/.localbashrc.bash
 fi
 true
