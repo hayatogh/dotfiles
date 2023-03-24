@@ -33,12 +33,12 @@ $if mode=vi
 	"cib": "lT(ct)"
 	"diw": "lbdw"
 	"diW": "lBdW"
-	"ysiw\"": "lbi\"\eeea\"\ee"
-	"ysiW\"": "lBi\"\eeEa\"\ee"
-	"ysiw'": "lbi'\eeea'\ee"
-	"ysiW'": "lBi'\eeEa'\ee"
-	"ysiwb": "lbi(\eeea)\ee"
-	"ysiWb": "lBi(\eeEa)\ee"
+	"ysiw\"": "lbi\"\e\eea\"\e\e"
+	"ysiW\"": "lBi\"\e\eEa\"\e\e"
+	"ysiw'": "lbi'\e\eea'\e\e"
+	"ysiW'": "lBi'\e\eEa'\e\e"
+	"ysiwb": "lbi(\e\eea)\e\e"
+	"ysiWb": "lBi(\e\eEa)\e\e"
 	"cs\"'": "F\"r',."
 	"cs'\"": "F'r\",."
 	"ds\"": "F\"x,."
@@ -56,7 +56,7 @@ $if mode=vi
 	"\ep": yank
 	"\eu": copy-region-as-kill
 	"\ec": insert-comment
-	"\ew": unix-word-rubout
+	"\e\C-w": unix-word-rubout
 	"\e/": unix-filename-rubout
 	# HOME PAGEDOWN PAGEUP END
 	"\e[1~": beginning-of-line
@@ -76,8 +76,6 @@ $if mode=vi
 	"\C-e": end-of-line
 	"\C-f": forward-char
 	"\C-b": backward-char
-	"\ef": forward-word
-	"\eb": backward-word
 	"\C-l": clear-screen
 	"\C-o": redraw-current-line
 	"\C-r": reverse-search-history
@@ -86,12 +84,7 @@ $if mode=vi
 	"\C-i": menu-complete
 	# S-TAB
 	"\e[Z": menu-complete-backward
-	"\C-x\C-f": complete-filename
-	"\C-x\C-o": complete-command
-	"\C-x\C-h": complete-hostname
-	"\C-x\C-u": complete-username
-	"\C-x\C-v": complete-variable
-	"\ee": vi-movement-mode
+	"\e\e": vi-movement-mode
 	"\C-k": kill-line
 	"\C-y": ""
 	"\C-x": ""
@@ -99,8 +92,18 @@ $if mode=vi
 	"\ep": yank
 	"\eu": copy-region-as-kill
 	"\ec": insert-comment
-	"\ew": unix-word-rubout
+	"\e\C-w": unix-word-rubout
 	"\e/": unix-filename-rubout
+	"\eW": vi-forward-bigword
+	"\ew": vi-forward-word
+	"\eB": vi-backward-bigword
+	"\eb": vi-backward-word
+	"\eE": vi-end-bigword
+	"\ee": vi-end-word
+	"\ef": vi-char-search
+	"\eF": vi-char-search
+	"\e;": vi-char-search
+	"\e,": vi-char-search
 	# HOME PAGEDOWN PAGEUP END
 	"\e[1~": beginning-of-line
 	"\e[6~": history-search-forward
@@ -112,6 +115,16 @@ $if mode=vi
 	"\C-x\C-m": set-mark
 	"\C-x\C-x": exchange-point-and-mark
 	$if Bash
+		"\C-x\C-e": shell-expand-line
+		"\C-x\C-b": complete-into-braces
+		"\C-x\C-f": complete-filename
+		"\C-x\C-u": complete-username
+		"\C-x\C-h": complete-hostname
+		"\C-x\C-v": complete-variable
+		"\C-x\C-o": complete-command
+		"\C-x\C-g": glob-complete-word
+		"\C-x\C-w": glob-expand-word
+		"\C-x\C-l": glob-list-expansions
 		"\C-g": "\C-e\C-u fg || true\C-m"
 		"\eg": "\C-e\C-u fg || true\C-m\ep"
 		"\es": "\C-e --color=always | less\C-m"

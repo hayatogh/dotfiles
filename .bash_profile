@@ -8,6 +8,7 @@ PATH="$WASMTIME_HOME/bin:$PATH"
 export MANPATH INFOPATH
 export DISPLAY
 export CHKTEXRC="$HOME/dotfiles/chktexrc"
+export CRASHPAGER="/usr/bin/less -FX"
 export FZF_DEFAULT_COMMAND="fd -tf -HILE.git"
 export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --color='hl:9,hl+:9,spinner:16'"
 export LESS=-RiWM

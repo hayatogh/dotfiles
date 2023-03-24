@@ -74,10 +74,10 @@ _cw() {
 bind -m vi-insert  -x '"\C-w": _cw'
 bind -m vi-command -x '"\C-w": _cw'
 _msemicolon() {
-	_regex_rubout '[^;|<>]*(;|\||<|>)? *$'
+	_regex_rubout '([^ ;&|<>] *)*(;|&&|\|\||\||\|&|<|>|<<|>>|&>|>&)? *$'
 }
-bind -m vi-insert  -x '"\e;": _msemicolon'
-bind -m vi-command -x '"\e;": _msemicolon'
+bind -m vi-insert  -x '"\e\\": _msemicolon'
+bind -m vi-command -x '"\e\\": _msemicolon'
 stopwatch() {
 	local c t acc=0 start=${EPOCHREALTIME/./} int=${1:-.1}
 	[[ $int < 0.1 ]] && read -N 1 -t .1 c
@@ -229,7 +229,7 @@ type _completion_loader &>/dev/null && ! _completion_loader ssh
 complete -F _ssh tryssh
 complete -c realwhich
 
-if ! type __git_ps1 >&/dev/null; then
+if ! type __git_ps1 &>/dev/null; then
 	PROMPT_COMMAND=$_pc0
 	PS1=$_pc1$_pc2
 fi
