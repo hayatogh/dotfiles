@@ -268,10 +268,10 @@ endfunction
 vnoremap <expr> p <SID>Repl()
 
 function! s:Getfname()
-	let l:fname = fnamemodify(bufname(), ':t') . ':' . getcurpos()[1]
+	let l:fname = bufname() . ':' . getcurpos()[1]
 	silent! let @* = l:fname
 	silent! let @+ = l:fname
-	call <SID>CopyToScreenReg(l:fname)
+	call <SID>CopyToOther(l:fname)
 	return l:fname
 endfunction
 command! Getfname echo <SID>Getfname()
@@ -565,13 +565,13 @@ function! s:ConvertPunctuation()
 	call setpos('.', l:curpos)
 endfunction
 
-function! s:CopyToOther()
-	call <SID>CopyToScreenReg(join(v:event.regcontents, "\n"))
-	call <SID>CopyToClip_OSC52(join(v:event.regcontents, "\n"))
+function! s:CopyToOther(str)
+	call <SID>CopyToScreenReg(a:str)
+	call <SID>CopyToClip_OSC52(a:str)
 endfunction
 function! s:CopyToOtherUnnamed()
 	if v:event.regname == ''
-		call <SID>CopyToOther()
+		call <SID>CopyToOther(join(v:event.regcontents, "\n"))
 	endif
 endfunction
 
