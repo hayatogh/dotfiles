@@ -1,6 +1,6 @@
+export CRASHPAGER="/usr/bin/less -FX"
 export LESS=-RiWM
 export VISUAL=vim
-
 export PROMPT_COMMAND='history -a; history -c; history -r'
 export PS1='\[\e[0m\]\n\[\e[32m\]\u@\h \[\e[33m\]\w \[\e[38;5;166m\]$([[ \j -gt 0 ]] && echo \j)\[\e[0m\] \[\e[38;5;245m\]${PIPESTATUS[@]}\[\e[0m\]\n\[\ek\e\\\]\$ '
 export HISTCONTROL=ignoreboth:erasedups
@@ -18,6 +18,9 @@ alias ll="ls -lhF"
 alias al="ls -alhF"
 alias rm="rm -i"
 alias sr="screen -D -R"
+alias tm="tmux new -ADX"
+# older tmux
+# alias tm="tmux new -ADs0"
 alias vi="vim --clean"
 _regex_rubout() {
 	local right=${READLINE_LINE:$READLINE_POINT}

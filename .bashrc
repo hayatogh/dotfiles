@@ -9,14 +9,14 @@ elif [[ $SHLVL > 1 ]]; then
 	PSSHLVL=$SHLVL
 fi
 PSM=${PSM:-}
-alias bc="bc -l"
 alias chgrp="chgrp --preserve-root"
 alias chmod="chmod --preserve-root"
 alias chown="chown --preserve-root"
 alias cp="cp -p"
 alias dus="du -chs"
 alias diff="diff --color=auto"
-alias diffl="git diff --no-index --minimal -U2147483647"
+alias diffr="git -c core.autocrlf=false diff --no-index --histogram"
+alias diffl="gitdiff -U2147483647"
 alias diffc="diffl --word-diff-regex=."
 alias diffw='diffl --word-diff-regex='\''\S+|[^\S]'\'''
 alias ee=exit
@@ -37,11 +37,15 @@ alias rgall="rg -uug'!.git'"
 alias rm="rm -i"
 alias sc="script -qc sh"
 alias scheme="scheme ~/dotfiles/chezrc.ss"
-alias sr="screen -D -R"
 alias sudo_proxy="sudo --preserve-env=https_proxy,http_proxy,ftp_proxy,no_proxy"
 alias tm="tmux new -ADX"
 alias vi="vim --clean"
 alias wget="wget -N"
+sr() {
+	local tty=${SCREEN_TTY:-${SSH_TTY:-$(tty)}}
+	screen -X setenv SCREEN_TTY $tty >/dev/null
+	SCREEN_TTY=$tty screen -DR
+}
 alias l. &>/dev/null && unalias l.
 l.() {
 	([[ $# != 0 ]] && cd "$1"; ls -dF .*)
@@ -151,6 +155,24 @@ fixmod() {
 }
 vrg() {
 	vim $(rg -l "$@")
+}
+_i16() {
+	sed -E 's/\b(0[xX])?([0-9a-fA-F]+)/\U\2/g'
+}
+_o16() {
+	sed -E 's/\b([0-9A-F]+)/\L\1/'
+}
+to10() {
+	bc <<<"ibase=16; $(_i16 <<<"$1")"
+}
+to16() {
+	bc <<<"obase=16; $1" | _o16
+}
+bc16() {
+	bc <<<"obase=16; ibase=16; $(_i16 <<<"$1")" | _o16
+}
+bc10() {
+	bc <<<"$1"
 }
 
 if [[ $_uname == MSYS ]]; then

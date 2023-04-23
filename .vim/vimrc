@@ -74,7 +74,7 @@ function! g:Cuitabline()
 endfunction
 set tabline=%!g:Cuitabline()
 set noexpandtab shiftwidth=0 tabstop=8
-set tags=./tags;./../../,tags;../../
+set tagcase=match tags=./tags;./../../,tags;../../
 set ttimeoutlen=1
 let $MYVIM = fnamemodify($MYVIMRC, ':p:h')
 set viminfofile=$MYVIM/.viminfo directory=$MYVIM/swap
@@ -161,8 +161,14 @@ else
 		endif
 		let l:escaped = shellescape(a:str)
 		let l:enc = systemlist('echo -n ' . l:escaped . ' | base64 -w0')[0]
-		call echoraw("\eP\e]52;c;" . l:enc . "\x7\e\\")
+		if !filewritable($SCREEN_TTY)
+			let $SCREEN_TTY = systemlist('screen -QX echo \$HOST_TTY')[0]
+		endif
+		call writefile(["\e]52;c;" . l:enc . "\x7"], $SCREEN_TTY, 'b')
 	endfunction
+		" if len(l:enc) <= 504
+		" 	call echoraw("\eP\e]52;c;" . l:enc . "\x7\e\\")
+		" endif
 endif
 unlet s:cursor_bg
 if !executable('base64')
@@ -239,7 +245,7 @@ function! s:Search(zero, word)
 	endif
 	call histadd('/', l:pat)
 	let @/=l:pat
-	call <SID>CopyToScreenReg(a:word)
+	call <SID>CopyToOther(a:word)
 endfunction
 nnoremap <silent> <Plug>Star0 :call <SID>Search(0, expand('<cword>'))<CR>"_yiw<BS>
 nnoremap <silent> <Plug>Star1 :call <SID>Search(1, expand('<cword>'))<CR>"_yiw<BS>
