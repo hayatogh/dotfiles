@@ -97,10 +97,9 @@ if &term == 'xterm' || has('win32')
 	set t_Co=256
 endif
 
-let s:cursor_bg = '#ff0000'
+let &t_TI = ""
+let &t_TE = ""
 if !s:in_screen
-	let &t_VS .= "\e]12;" . s:cursor_bg . "\x7"
-	let &t_EI .= "\e]12;" . s:cursor_bg . "\x7"
 	call echoraw("\e[<0t\e[<s")
 	let &t_SI .= "\e[<r"
 	let &t_EI .= "\e[<s\e[<0t"
@@ -127,8 +126,6 @@ if !s:in_screen
 		call echoraw("\e]52;c;" . l:enc . "\x7")
 	endfunction
 else
-	let &t_VS .= "\eP\e]12;" . s:cursor_bg . "\x7\e\\"
-	let &t_EI .= "\eP\e]12;" . s:cursor_bg . "\x7\e\\"
 	call echoraw("\eP\e[<0t\e[<s\e\\")
 	let &t_SI .= "\eP\e[<r\e\\"
 	let &t_EI .= "\eP\e[<s\e[<0t\e\\"
@@ -170,7 +167,6 @@ else
 		" 	call echoraw("\eP\e]52;c;" . l:enc . "\x7\e\\")
 		" endif
 endif
-unlet s:cursor_bg
 if !executable('base64')
 	function! s:CopyToClip_OSC52(str)
 	endfunction
@@ -292,7 +288,7 @@ cnoremap <Down> <C-N>
 cnoremap <C-A> <Home>
 " cnoremap <C-O>
 " cnoremap <C-B>
-function s:RegexRubout(re)
+function! s:RegexRubout(re)
 	let l:right = strpart(getcmdline(), getcmdpos() - 1)
 	let l:left = strpart(getcmdline(), 0, getcmdpos() - 1)
 	let l:left = substitute(l:left, a:re, '', '')
@@ -302,6 +298,7 @@ endfunction
 cnoremap <Esc>/ <C-\>e<SID>RegexRubout('\v[^/ ]*/? *$')<CR>
 cnoremap <C-W>  <C-\>e<SID>RegexRubout('\v([a-zA-z]+\|[0-9]+\|.) *$')<CR>
 cnoremap <Esc>w <C-\>e<SID>RegexRubout('\v[^ ]* *$')<CR>
+cnoremap <Esc>W <C-\>e<SID>RegexRubout('\v[^ ]* *$')<CR>
 
 nmap ysa' ys2i'
 nmap ysa" ys2i"
@@ -633,7 +630,6 @@ function! s:Minpac()
 	call minpac#add('guns/xterm-color-table.vim')
 	" external commands
 	call minpac#add('dense-analysis/ale')
-	call minpac#add('junegunn/fzf.vim')
 	call minpac#add('HiPhish/info.vim')
 	call minpac#add('thinca/vim-quickrun')
 	" libraries
@@ -756,6 +752,8 @@ let g:ale_rust_cargo_use_clippy = executable('cargo-clippy')
 let g:ale_completion_enabled = 1
 let g:ale_fix_on_save = 1
 let g:ale_hover_cursor = 0
+let g:ale_lint_on_text_changed = 0
+let g:ale_lint_on_insert_leave = 0
 let g:ale_virtualtext_cursor = 0
 if has('win32unix')
 	let g:ale_enabled = 0
@@ -771,12 +769,6 @@ let g:surround_dict = {
 	\ 'ms': '【\r】',
 	\ 'ma': '［\r］',
 	\ }
-" fzf
-if filereadable('/usr/share/doc/fzf/examples/fzf.vim')
-	source /usr/share/doc/fzf/examples/fzf.vim
-elseif has('osxdarwin') && filereadable('/usr/local/opt/fzf/plugin/fzf.vim')
-	source /usr/local/opt/fzf/plugin/fzf.vim
-endif
 " NERDTree
 let g:NERDTreeMapActivateNode = 'e'
 let g:NERDTreeMapOpenSplit = 's'
@@ -813,42 +805,33 @@ silent! packadd termdebug
 silent! packadd minpac
 runtime ftplugin/man.vim
 " lexima
-function! s:Lexima_endwise(at, end, filetype)
+function! s:LeximaEndwise(at, end, filetype)
 	return {'char': '<CR>', 'input': '<CR>', 'input_after': '<CR>' . a:end, 'at': a:at, 'except': '\C\v^(\s*)\S.*%#\n%(%(\s*|\1\s.+)\n)*\1' . a:end, 'filetype': a:filetype}
 endfunction
 let s:rulelist = [
-	"\ {'char': '(', 'input_after': ')'},
-	"\ {'char': ')', 'at': '\%#)', 'leave': 1},
-	"\ {'char': '<C-H>', 'at': '(\%#)', 'delete': 1},
-	"\ {'char': '{', 'input_after': '}'},
-	"\ {'char': '}', 'at': '\%#}', 'leave': 1},
-	"\ {'char': '<C-H>', 'at': '{\%#}', 'delete': 1},
-	"\ {'char': '[', 'input_after': ']'},
-	"\ {'char': ']', 'at': '\%#]', 'leave': 1},
-	"\ {'char': '<C-H>', 'at': '\[\%#\]', 'delete': 1},
 	\ {'char': '<CR>', 'at': '(\%#)',   'input_after': '<CR>'},
 	\ {'char': '<CR>', 'at': '{\%#}',   'input_after': '<CR>'},
 	\ {'char': '<CR>', 'at': '\[\%#\]', 'input_after': '<CR>'},
-	\ <SID>Lexima_endwise('^\s*if\>.*\%#$',         'endif',       'vim'),
-	\ <SID>Lexima_endwise('^\s*while\>.*\%#$',      'endwhile',    'vim'),
-	\ <SID>Lexima_endwise('^\s*for\>.*\%#$',        'endfor',      'vim'),
-	\ <SID>Lexima_endwise('^\s*try\>.*\%#$',        'endtry',      'vim'),
-	\ <SID>Lexima_endwise('^\s*function!.*\%#$',    'endfunction', 'vim'),
-	\ <SID>Lexima_endwise('^\s*augroup\s\+.\+\%#$', 'augroup END', 'vim'),
-	\ <SID>Lexima_endwise('^\s*\%(module\|def\|class\|if\|unless\|for\|while\|until\|case\)\>\%(.*[^.:@$]\<end\>\)\@!.*\%#$', 'end', 'ruby'),
-	\ <SID>Lexima_endwise('^\s*\%(begin\)\s*\%#$',                                                                            'end', 'ruby'),
-	\ <SID>Lexima_endwise('\%(^\s*#.*\)\@<!do\%(\s*|.*|\)\?\s*\%#$',                                                          'end', 'ruby'),
-	\ <SID>Lexima_endwise('\<\%(if\|unless\)\>.*\%#$',                                                                        'end', 'ruby'),
-	\ <SID>Lexima_endwise('\%(^\s*#.*\)\@<!do\s*\%#$', 'end', 'elixir'),
-	\ <SID>Lexima_endwise('^\s*if\>.*\%#$',             'fi',   ['sh', 'zsh']),
-	\ <SID>Lexima_endwise('^\s*case\>.*\%#$',           'esac', ['sh', 'zsh']),
-	\ <SID>Lexima_endwise('\%(^\s*#.*\)\@<!do\>.*\%#$', 'done', ['sh', 'zsh']),
-	\ <SID>Lexima_endwise('\%(^\s*#.*\)\@<!\<\%(module\|struct\|function\|if\|for\|while\|do\|let\|macro\)\>\%(.*\<end\>\)\@!.*\%#$', 'end', 'julia'),
-	\ <SID>Lexima_endwise('\%(^\s*#.*\)\@<!\s*\<\%(begin\|try\|quote\)\s*\%#$',                                                       'end', 'julia'),
+	\ <SID>LeximaEndwise('^\s*if\>.*\%#$',         'endif',       'vim'),
+	\ <SID>LeximaEndwise('^\s*while\>.*\%#$',      'endwhile',    'vim'),
+	\ <SID>LeximaEndwise('^\s*for\>.*\%#$',        'endfor',      'vim'),
+	\ <SID>LeximaEndwise('^\s*try\>.*\%#$',        'endtry',      'vim'),
+	\ <SID>LeximaEndwise('^\s*function!.*\%#$',    'endfunction', 'vim'),
+	\ <SID>LeximaEndwise('^\s*augroup\s\+.\+\%#$', 'augroup END', 'vim'),
+	\ <SID>LeximaEndwise('^\s*\%(module\|def\|class\|if\|unless\|for\|while\|until\|case\)\>\%(.*[^.:@$]\<end\>\)\@!.*\%#$', 'end', 'ruby'),
+	\ <SID>LeximaEndwise('^\s*\%(begin\)\s*\%#$',                                                                            'end', 'ruby'),
+	\ <SID>LeximaEndwise('\%(^\s*#.*\)\@<!do\%(\s*|.*|\)\?\s*\%#$',                                                          'end', 'ruby'),
+	\ <SID>LeximaEndwise('\<\%(if\|unless\)\>.*\%#$',                                                                        'end', 'ruby'),
+	\ <SID>LeximaEndwise('\%(^\s*#.*\)\@<!do\s*\%#$', 'end', 'elixir'),
+	\ <SID>LeximaEndwise('^\s*if\>.*\%#$',             'fi',   ['sh', 'zsh']),
+	\ <SID>LeximaEndwise('^\s*case\>.*\%#$',           'esac', ['sh', 'zsh']),
+	\ <SID>LeximaEndwise('\%(^\s*#.*\)\@<!do\>.*\%#$', 'done', ['sh', 'zsh']),
+	\ <SID>LeximaEndwise('\%(^\s*#.*\)\@<!\<\%(module\|struct\|function\|if\|for\|while\|do\|let\|macro\)\>\%(.*\<end\>\)\@!.*\%#$', 'end', 'julia'),
+	\ <SID>LeximaEndwise('\%(^\s*#.*\)\@<!\s*\<\%(begin\|try\|quote\)\s*\%#$',                                                       'end', 'julia'),
 	\ {'char': '<CR>', 'input': '<CR>'},
 	"\ inoremap <CR> <C-G>u<CR>
 	\ ]
-delfunction s:Lexima_endwise
+delfunction s:LeximaEndwise
 for s:rule in s:rulelist
 	silent! call lexima#add_rule(s:rule)
 endfor
@@ -869,12 +852,12 @@ if has("gui_running") && has('win32')
 	set guifont=Consolas:h11
 	set lines=30 columns=86
 	let s:gvim_winpos_file = expand('~/.gvimwinpos')
-	function! s:Save_gvim_win_pos()
+	function! s:SaveGVimPos()
 		let l:pos = [getwinposx(), getwinposy()]
 		call writefile(l:pos, s:gvim_winpos_file)
 	endfunction
 	augroup vimrc
-		autocmd VimLeavePre * call <SID>Save_gvim_win_pos()
+		autocmd VimLeavePre * call <SID>SaveGVimPos()
 	augroup END
 	if filereadable(s:gvim_winpos_file)
 		let s:pos = readfile(s:gvim_winpos_file)

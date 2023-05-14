@@ -16,11 +16,12 @@ alias cp="cp -p"
 alias dus="du -chs"
 alias diff="diff --color=auto"
 alias diffr="git -c core.autocrlf=false diff --no-index --histogram"
-alias diffl="gitdiff -U2147483647"
+alias diffl="diffr -U2147483647"
 alias diffc="diffl --word-diff-regex=."
 alias diffw='diffl --word-diff-regex='\''\S+|[^\S]'\'''
 alias ee=exit
-alias fd="fd -HIE.git"
+alias fd="fd -HE.git/"
+alias fdall="fd -I"
 alias git_dotfiles_pull="git -C ~/dotfiles pull"
 alias git_empty_commit="git add -A && git commit -m 'No commit message' && git push"
 alias grep="grep --color=auto"
@@ -32,8 +33,6 @@ alias al="ls -alhF"
 alias ltime="ls -alhrtF"
 alias lsize="ls -alhrFS"
 alias manless="man -P less"
-alias rg="rg --hidden -g'!.git'"
-alias rgall="rg -uug'!.git'"
 alias rm="rm -i"
 alias sc="script -qc sh"
 alias scheme="scheme ~/dotfiles/chezrc.ss"
@@ -153,8 +152,26 @@ fixmod() {
 		fi
 	done
 }
-vrg() {
-	vim $(rg -l "$@")
+rg() {
+	command rg --hidden -g'!.git/' "$@"
+}
+rgi() {
+	rg --no-messages "$@"
+}
+rgall() {
+	rg --no-ignore "$@"
+}
+_rg_arch() {
+	rg $(echo arch/*/ | sed -E 's:arch/('"$1"')/ ?::g; s:arch/::g; s:[^ ]+:-g!&:g') "${@:2}"
+}
+rgx() {
+	_rg_arch x86 "$@"
+}
+rgarm() {
+	_rg_arch 'arm|arm64' "$@"
+}
+vil() {
+	vim $($1 -l "${@:2}")
 }
 _i16() {
 	sed -E 's/\b(0[xX])?([0-9a-fA-F]+)/\U\2/g'
@@ -174,13 +191,26 @@ bc16() {
 bc10() {
 	bc <<<"$1"
 }
+dl() {
+	if (( $# )); then
+		local IFS=$'\n'
+		dl <<<"$*"
+		return
+	fi
+	local url fname
+	while read -ep 'URL: ' url && [[ -n $url ]] ; do
+		fname=$(sed -E ' s:(\?|#).*::; s:.*/::' <<<"$url") || return 1
+		curl -fsSLo "$fname" "$url" || return 1
+		echo "$fname"
+	done
+}
 
 if [[ $_uname == MSYS ]]; then
 	shopt -s completion_strip_exe
-	alias e=explorer.exe
-	alias open=start
-	alias rg="rg --hidden -g'!.git' --path-separator '//'"
-	alias rgall="rg -uug'!.git' --path-separator '//'"
+	alias rg="rg --path-separator '//'"
+	e() {
+		start "${@:-.}"
+	}
 	upgrade() {
 		pacman -Qtdq | pacman -Rns --noconfirm - 2>/dev/null
 		pacman -Syu --noconfirm
@@ -189,19 +219,15 @@ if [[ $_uname == MSYS ]]; then
 elif [[ $_uname == Darwin ]]; then
 	alias batt="pmset -g batt"
 	alias scheme="chez ~/dotfiles/chezrc.ss"
+	alias e=open
 	upgrade() {
 		brew upgrade
 	}
 	[[ -r /usr/local/etc/profile.d/bash_completion.sh ]] && . /usr/local/etc/profile.d/bash_completion.sh
 else
-	open() {
-		if [[ $# == 0 ]]; then
-			xdg-open &>/dev/null .
-		else
-			xdg-open &>/dev/null "$@"
-		fi
+	e() {
+		xdg-open &>/dev/null "${@:-.}"
 	}
-	alias e=open
 	pdfx() {
 		wine start 'C:\Program Files\Tracker Software\PDF Editor\PDFXEdit.exe' "$@" &>/dev/null &
 	}
@@ -243,8 +269,8 @@ else
 	fi
 fi
 
-printf "\e]12;#ff0000\a"
-printf "\e[2 q"
+# printf "\e]12;#ff0000\a"
+# printf "\e[2 q"
 
 [[ -r /etc/profile.d/bash_completion.sh ]] && . /etc/profile.d/bash_completion.sh
 type _completion_loader &>/dev/null && ! _completion_loader ssh

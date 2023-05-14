@@ -23,15 +23,13 @@ startup_message off
 term 'screen-256color'
 termcapinfo xterm 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'
 vbell on
-# copymode Y = yy
-#          W = yiw
-#          x = o
-#          y = ^ mark
-#          c C set rectangle left and right region
-#          J toggles join mode. LF,  join, joined with spaces, commas
-#          v V toggle region not to include line number
-#          vim like hjkl0+-HML|g%^$wbBEfFtT;,/?nNo C-e C-y C-u C-d C-b C-f C-g
-#          less like g Home=gg End=G
+# copy mode
+# Y = yy
+# W = yiw
+# y = V
+# c C rectangle
+# a append
+# J join
 bind e screen
 bind ^e screen
 bind f windowlist -b
@@ -50,6 +48,9 @@ bind b focus bottom
 bind o only
 bind c remove
 bind ^c remove
+bind R collapse
+bind H bumpleft
+bind L bumpright
 bind ' ' copy
 bind ^@ copy
 bind \033
@@ -60,3 +61,6 @@ bind > resize -h +2
 bind < resize -h -2
 bind I login on
 bind O login off
+bind N eval 'register - "^J:number "' 'process -'
+bind T title
+bind C exec .!. bash --noprofile -norc -ic 'echo -e \\x03 export LINES=$LINES COLUMNS=$COLUMNS'
