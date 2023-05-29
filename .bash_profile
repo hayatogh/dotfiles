@@ -61,8 +61,14 @@ elif [[ $_uname == Darwin ]]; then
 	INFOPATH="/usr/local/opt/coreutils/share/info:$INFOPATH"
 	export BASH_COMPLETION_COMPAT_DIR=/usr/local/etc/bash_completion.d
 	export BASH_COMPLETION_DIR=/usr/local/share/bash-completion
-elif [[ $_uname == WSL ]]; then
-	LC_CTYPE=en_US.UTF-8
+else
+	if [[ $_uname == WSL ]]; then
+		LC_CTYPE=en_US.UTF-8
+	fi
+	if [[ $_distro == debian ]]; then
+		export LESSOPEN="| /usr/bin/lesspipe %s"
+		export LESSCLOSE="/usr/bin/lesspipe %s %s"
+	fi
 fi
 
 export _home=$(cd $(dirname ${BASH_SOURCE[0]}); pwd -P)

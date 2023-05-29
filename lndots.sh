@@ -9,7 +9,7 @@ case $(uname -sr) in
 	*_NT*) _uname=MSYS;;
 esac
 
-files=".inputrc .bash_profile .bashrc .gdbinit .vim .themes"
+files=".inputrc .bash_profile .bashrc .gdbinit .vim .themes .lessfilter"
 dirsinconfig="git yapf latexmk cheat"
 
 mkdir -p ~/.screen ~/.ssh ~/.config $dotfiles/.vim/swap

@@ -63,4 +63,4 @@ bind I login on
 bind O login off
 bind N eval 'register - "^J:number "' 'process -'
 bind T title
-bind C exec .!. bash --noprofile -norc -ic 'echo -e \\x03 export LINES=$LINES COLUMNS=$COLUMNS'
+bind C exec .!. bash --noprofile -norc -ic 'echo -e \\x03history -a\; LINES=$LINES COLUMNS=$COLUMNS exec bash -l'

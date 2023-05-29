@@ -204,10 +204,12 @@ dl() {
 		echo "$fname"
 	done
 }
+alias which &>/dev/null && unalias which
 
 if [[ $_uname == MSYS ]]; then
 	shopt -s completion_strip_exe
 	alias rg="rg --path-separator '//'"
+	alias open=start
 	e() {
 		start "${@:-.}"
 	}
@@ -232,6 +234,7 @@ else
 		wine start 'C:\Program Files\Tracker Software\PDF Editor\PDFXEdit.exe' "$@" &>/dev/null &
 	}
 	if [[ $_uname == WSL ]]; then
+		alias open=xdg-open
 		xdg-open() {
 			[[ $# == 0 ]] && return 1
 			local arg

@@ -13,6 +13,7 @@ mkdir -p "$winhome"/.config
 
 rsync -a --delete $dotfiles/latexmk/ "$winhome/.config/latexmk"
 rsync -a --delete $dotfiles/.vimfx/ "$winhome/.vimfx"
+rsync -a --delete $dotfiles/.vsvimrc "$winhome/.vsvimrc"
 rsync -a --delete $dotfiles/mintty/ "$appdata/mintty"
 rsync -a --delete $dotfiles/alacritty/ "$appdata/alacritty"
 rsync -a --delete $dotfiles/PowerShell/ "$windoc/PowerShell"

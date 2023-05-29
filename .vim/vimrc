@@ -159,7 +159,7 @@ else
 		let l:escaped = shellescape(a:str)
 		let l:enc = systemlist('echo -n ' . l:escaped . ' | base64 -w0')[0]
 		if !filewritable($SCREEN_TTY)
-			let $SCREEN_TTY = systemlist('screen -QX echo \$HOST_TTY')[0]
+			let $SCREEN_TTY = systemlist('screen -QX echo \$SCREEN_TTY')[0]
 		endif
 		call writefile(["\e]52;c;" . l:enc . "\x7"], $SCREEN_TTY, 'b')
 	endfunction

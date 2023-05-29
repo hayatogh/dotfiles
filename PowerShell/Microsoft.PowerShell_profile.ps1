@@ -74,10 +74,12 @@ function choco_install {
   Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
   choco feature enable -n allowGlobalConfirmation
-  $pin = "aquasnap", "discord.install", "drawio", "slack", "steam-client", "zotero"
-  $ins = "7zip.install", "autohotkey.install", "fd", "flac", "fontforge", "foobar2000",
-    "inkscape", "lavfilters", "lockhunter", "mpc-be", "pdfxchangeeditor", "ripgrep",
-    "strawberryperl", "sumatrapdf.install", "vim", "winscp.install", "wsltty"
+  $pin = "aquasnap", "discord.install", "drawio", "steam-client"
+  # "slack", "zotero"
+  $ins = "7zip.install", "autohotkey.install", "flac", "foobar2000", "lavfilters", "mpc-be", "pdfxchangeeditor", "vim", "wsltty"
+  # "fd", "ripgrep"
+  # "fontforge", "inkscape", "winscp.install"
+  # "strawberryperl", "sumatrapdf.install"
   choco install $ins $pin
   $pin | % { choco pin add --name $_ }
   choco_remove_links
