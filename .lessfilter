@@ -3,7 +3,7 @@ if [ -x /usr/bin/file ] && [ -x /usr/bin/iconv ] && [ -x /usr/bin/cut ]; then
 	case `file -b "$1"` in
 	*UTF-16*) conv=UTF-16 ;;
 	*UTF-32*) conv=UTF-32 ;;
-	"Non-ISO extended-ASCII text") conv=CP932 ;;
+	Non-ISO\ extended-ASCII\ text*) conv=CP932 ;;
 	esac
 	if [ -n "$conv" ]; then
 		env=`echo $LANG | cut -d. -f2`
