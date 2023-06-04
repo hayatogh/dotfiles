@@ -716,17 +716,60 @@ command! -bar ALEEnableAllBuffer  ALEEnableBuffer | ALEFixOnSaveEnableBuffer
 command! -bar ALEDisableAll       ALEDisable | ALEFixOnSaveDisable
 command! -bar ALEDisableAllBuffer ALEDisableBuffer | ALEFixOnSaveDisableBuffer
 
-function! s:Tjump(sp)
+function! s:TGuess(pattern, flags, info)
+	if !has_key(a:info, 'buf_ffname')
+		return v:null
+	endif
+	if a:flags == 'c'
+		let l:pat = '^' . a:pattern . '$'
+	elseif a:flags == 'i'
+		let l:pat = '^' . a:pattern . '.*'
+	else
+		let l:pat = a:pattern
+	endif
+	let l:tags = filter(taglist(l:pat), 'get(v:val, ''kind'', '''') != ''p''')
+	let l:file = fnamemodify(a:info['buf_ffname'], ':.')
+	let l:current = filter(copy(l:tags), 'v:val[''filename''] == l:file')
+	if len(l:current) == 1
+		echom 'Jump to the only current'
+		return [l:current[0]]
+	elseif len(l:current) > 1
+		return v:null
+	endif
+	let l:dir = fnamemodify(l:file, ':h')
+	let l:siblings = filter(copy(l:tags), 'fnamemodify(v:val[''filename''], '':h'') == l:dir')
+	if len(l:siblings) == 1
+		echom 'Jump to the only sibling'
+		return [l:siblings[0]]
+	endif
+	return v:null
+endfunction
+function! s:Tjump(sp, guess)
 	if tagfiles() == []
 		return ":ALEGoToDefinition" . (a:sp ? ' -split' : '') . "\<CR>"
 	else
+		if a:guess
+			setl tagfunc=<SID>TGuess
+		else
+			setl tagfunc=
+		endif
 		return (a:sp ? "\<C-W>" : '') . "g\<C-]>"
 	endif
 endfunction
-nnoremap <expr> <C-]>      <SID>Tjump(0)
-vnoremap <expr> <C-]>      <SID>Tjump(0)
-nnoremap <expr> <C-W><C-]> <SID>Tjump(1)
-vnoremap <expr> <C-W><C-]> <SID>Tjump(1)
+nnoremap <expr> g<C-]>      <SID>Tjump(0, 0)
+vnoremap <expr> g<C-]>      <SID>Tjump(0, 0)
+nnoremap <expr> g]          <SID>Tjump(0, 0)
+vnoremap <expr> g]          <SID>Tjump(0, 0)
+nnoremap <expr> <C-]>       <SID>Tjump(0, 1)
+vnoremap <expr> <C-]>       <SID>Tjump(0, 1)
+nnoremap <expr> <C-W>g<C-]> <SID>Tjump(1, 0)
+vnoremap <expr> <C-W>g<C-]> <SID>Tjump(1, 0)
+nnoremap <expr> <C-W>g]     <SID>Tjump(1, 0)
+vnoremap <expr> <C-W>g]     <SID>Tjump(1, 0)
+nnoremap <expr> <C-W><C-]>  <SID>Tjump(1, 1)
+vnoremap <expr> <C-W><C-]>  <SID>Tjump(1, 1)
+nnoremap <expr> <C-W>]      <SID>Tjump(1, 1)
+vnoremap <expr> <C-W>]      <SID>Tjump(1, 1)
 
 let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
 let g:ale_linters = {
