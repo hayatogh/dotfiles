@@ -728,6 +728,10 @@ function! s:TGuess(pattern, flags, info)
 		let l:pat = a:pattern
 	endif
 	let l:tags = filter(taglist(l:pat), 'get(v:val, ''kind'', '''') != ''p''')
+	if len(l:tags) == 1
+		echom 'Jump to the only'
+		return [l:tags[0]]
+	endif
 	let l:file = fnamemodify(a:info['buf_ffname'], ':.')
 	let l:current = filter(copy(l:tags), 'v:val[''filename''] == l:file')
 	if len(l:current) == 1

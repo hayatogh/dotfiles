@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
-if [[ $EUID != 0 ]]; then
+
+prefix=/usr/local
+# prefix=$HOME/.local
+
+if [[ $EUID != 0 && $prefix == /usr/local ]]; then
 	exec sudo "$0" "$@"
 fi
 
@@ -15,12 +19,12 @@ if [[ ${1:-} == -n ]]; then
 	exit
 fi
 
-mkdir -p /usr/local/src
-cd /usr/local/src
+mkdir -p $prefix/src
+cd $prefix/src
 curl -fsSo $dir.tar.gz $url
 rm -rf $dir
 tar -xf $dir.tar.gz
 cd $dir
-./configure --prefix=/usr/local &>/dev/null
+./configure --prefix=$prefix &>/dev/null
 make -j4 &>/dev/null
 make install &>/dev/null

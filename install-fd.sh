@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
-if [[ $EUID != 0 ]]; then
+
+prefix=/usr/local
+# prefix=$HOME/.local
+
+if [[ $EUID != 0 && $prefix == /usr/local ]]; then
 	exec sudo "$0" "$@"
 fi
 
@@ -10,7 +14,7 @@ if grep -Pq '^ID=(debian|ubuntu)$' /etc/os-release 2>/dev/null; then
 fi
 ver=$(curl -fsSL https://api.github.com/repos/sharkdp/fd/releases/latest | grep -Po '(?<=/sharkdp/fd/releases/download/v)([0-9.]+)(?=/fd_\1_amd64\.deb)' | head -n1)
 binname=fd
-if [[ $use_deb ]]; then
+if (( $use_deb )); then
 	if type fdfind &>/dev/null; then
 		binname=fdfind
 	fi
@@ -32,15 +36,24 @@ if [[ $binname == fdfind ]]; then
 	exit 1
 fi
 
-mkdir -p /usr/local/src
-cd /usr/local/src
+mkdir -p $prefix/src
+cd $prefix/src
 curl -fsSLo $fname $url
-if [[ $use_deb ]]; then
+if (( $use_deb )); then
 	dpkg -i $fname || apt -f install fd
 else
+	rm -rf $dir
 	tar -xf $fname
 	cd $dir
+	mkdir -p ../../bin
 	cp fd ../../bin/fd
+	mkdir -p ../../share/man/man1
 	cp fd.1 ../../share/man/man1/fd.1
-	cp autocomplete/fd.bash /etc/bash_completion.d/fd.bash
+	if [[ $EUID == 0 ]]; then
+		mkdir -p /etc/bash_completion.d
+		cp autocomplete/fd.bash /etc/bash_completion.d/fd.bash
+	else
+		mkdir -p ../../share/bash-completion/completions
+		cp autocomplete/fd.bash ../../share/bash-completion/completions/fd.bash
+	fi
 fi

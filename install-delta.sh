@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
-if [[ $EUID != 0 ]]; then
+
+prefix=/usr/local
+# prefix=$HOME/.local
+
+if [[ $EUID != 0 && $prefix == /usr/local ]]; then
 	exec sudo "$0" "$@"
 fi
 
@@ -10,7 +14,7 @@ if grep -Pq '^ID=ubuntu$' /etc/os-release 2>/dev/null; then
 	use_deb=1
 fi
 ver=$(curl -fsSL https://api.github.com/repos/dandavison/delta/releases/latest | grep -Po '(?<=/dandavison/delta/releases/download/)([0-9.]+)(?=/git-delta_\1_amd64\.deb)' | head -n1)
-if [[ $use_deb ]]; then
+if (( $use_deb )); then
 	fname=git-delta_${ver}_amd64.deb
 else
 	dir=delta-$ver-x86_64-unknown-linux-musl
@@ -25,13 +29,15 @@ if [[ ${1:-} == -n ]]; then
 	exit
 fi
 
-mkdir -p /usr/local/src
-cd /usr/local/src
+mkdir -p $prefix/src
+cd $prefix/src
 curl -fsSLo $fname $url
-if [[ $use_deb ]]; then
+if (( $use_deb )); then
 	dpkg -i $fname || apt -f install git-delta
 else
+	rm -rf $dir
 	tar -xf $fname
 	cd $dir
+	mkdir -p ../../bin
 	cp delta ../../bin/delta
 fi

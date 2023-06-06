@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
-if [[ $EUID != 0 ]]; then
+
+prefix=/usr/local
+# prefix=$HOME/.local
+
+if [[ $EUID != 0 && $prefix == /usr/local ]]; then
 	exec sudo "$0" "$@"
 fi
 
@@ -15,15 +19,20 @@ if [[ ${1:-} == -n ]]; then
 	exit
 fi
 
-mkdir -p /usr/local/src
-cd /usr/local/src
+mkdir -p $prefix/src
+cd $prefix/src
 curl -fsSo $dir.tar.gz $url
 rm -rf $dir
 tar -xf $dir.tar.gz
 cd $dir
 ./autogen.sh &>/dev/null
-./configure --prefix=/usr/local --enable-colors256 &>/dev/null
+./configure --prefix=$prefix --enable-colors256 &>/dev/null
 make -j4 &>/dev/null
 make install &>/dev/null
-cp /usr/local/src/$dir/etc/etcscreenrc /usr/local/etc/screenrc
-cat /usr/local/src/$dir/terminfo/screencap >>/etc/termcap
+mkdir -p ../../etc
+cp etc/etcscreenrc ../../etc/screenrc
+if [[ $EUID == 0 ]]; then
+	cat terminfo/screencap >>/etc/termcap
+else
+	cat terminfo/screencap >>../../etc/termcap
+fi

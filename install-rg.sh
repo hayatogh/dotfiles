@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
-if [[ $EUID != 0 ]]; then
+
+prefix=/usr/local
+# prefix=$HOME/.local
+
+if [[ $EUID != 0 && $prefix == /usr/local ]]; then
 	exec sudo "$0" "$@"
 fi
 
@@ -10,7 +14,7 @@ if grep -Pq '^ID=(debian|ubuntu)$' /etc/os-release 2>/dev/null; then
 fi
 arch=$(uname -m)
 ver=$(curl -fsSL https://api.github.com/repos/BurntSushi/ripgrep/releases/latest | grep -Po '(?<=/BurntSushi/ripgrep/releases/download/)([0-9.]+)(?=/ripgrep_\1_amd64\.deb)' | head -n1)
-if [[ $use_deb ]]; then
+if (( $use_deb )); then
 	fname=ripgrep_${ver}_amd64.deb
 else
 	dir=ripgrep-$ver-x86_64-unknown-linux-musl
@@ -25,15 +29,24 @@ if [[ ${1:-} == -n ]]; then
 	exit
 fi
 
-mkdir -p /usr/local/src
-cd /usr/local/src
+mkdir -p $prefix/src
+cd $prefix/src
 curl -fsSLo $fname $url
-if [[ $use_deb ]]; then
+if (( $use_deb )); then
 	dpkg -i $fname || apt -f install ripgrep
 else
+	rm -rf $dir
 	tar -xf $fname
 	cd $dir
+	mkdir -p ../../bin
 	cp rg ../../bin/rg
+	mkdir -p ../../share/man/man1
 	cp doc/rg.1 ../../share/man/man1/rg.1
-	cp complete/rg.bash /etc/bash_completion.d/rg.bash
+	if [[ $EUID == 0 ]]; then
+		mkdir -p /etc/bash_completion.d
+		cp complete/rg.bash /etc/bash_completion.d/rg.bash
+	else
+		mkdir -p ../../share/bash-completion/completions
+		cp complete/rg.bash ../../share/bash-completion/completions/rg.bash
+	fi
 fi
