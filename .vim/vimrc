@@ -267,7 +267,7 @@ function! s:Repl()
 	let s:restore_reg = @"
 	return "p@=g:RestoreRegister()\<CR>"
 endfunction
-vnoremap <expr> p <SID>Repl()
+vnoremap <silent> <expr> p <SID>Repl()
 
 function! s:Getfname()
 	let l:fname = bufname() . ':' . getcurpos()[1]
@@ -325,14 +325,32 @@ function! s:StayColumn(cmd)
 	let l:save_cursor = getcurpos()
 	let l:save_cursor[4] = virtcol('.')
 	call setpos('.', l:save_cursor)
-	execute "normal! " . a:cmd
+	return a:cmd
 endfunction
-nnoremap <silent> gj :<C-U>call <SID>StayColumn(v:count1 . 'gj')<CR>
-nnoremap <silent> gk :<C-U>call <SID>StayColumn(v:count1 . 'gk')<CR>
+nnoremap <silent> <expr> gj <SID>StayColumn(v:count1 . 'gj')
+nnoremap <silent> <expr> gk <SID>StayColumn(v:count1 . 'gk')
 
 nnoremap <silent> <Esc>= :<C-U>call <SID>FontSizeSet("")<CR>
 nnoremap <silent> <Esc>+ :<C-U>call <SID>FontSizeSet("+1")<CR>
 nnoremap <silent> <Esc>- :<C-U>call <SID>FontSizeSet("-1")<CR>
+
+function! s:Spacing(line1, line2)
+	silent! execute 'keeppatterns ' . a:line1 . ',' . a:line2 . 's/\v([[:graph:]])([^ [:graph:][:cntrl:]、。])/\1 \2/g'
+	silent! execute 'keeppatterns ' . a:line1 . ',' . a:line2 . 's/\v([^ [:graph:][:cntrl:]、。])([[:graph:]])/\1 \2/g'
+	silent! execute 'keeppatterns ' . a:line1 . ',' . a:line2 . 's/\v([[:graph:]]) ([、。])/\1\2/g'
+	silent! execute 'keeppatterns ' . a:line1 . ',' . a:line2 . 's/\v([、。]) ([[:graph:]])/\1\2/g'
+endfunction
+command! -range=% Spacing call <SID>Spacing(<line1>, <line2>)
+nnoremap <silent> <Leader>s :call <SID>Spacing('.', '.')<CR>
+vnoremap <silent> <Leader>s :call <SID>Spacing('''<', '''>')<CR>
+
+function! s:UnSpacing(line1, line2)
+	silent! execute 'keeppatterns ' . a:line1 . ',' . a:line2 . 's/\v([[:graph:]]) ([^ [:graph:][:cntrl:]])/\1\2/g'
+	silent! execute 'keeppatterns ' . a:line1 . ',' . a:line2 . 's/\v([^ [:graph:][:cntrl:]]) ([[:graph:]])/\1\2/g'
+endfunction
+command! -range=% Unspacing call <SID>UnSpacing(<line1>, <line2>)
+nnoremap <silent> <Leader>S :call <SID>UnSpacing('.', '.')<CR>
+vnoremap <silent> <Leader>S :call <SID>UnSpacing('''<', '''>')<CR>
 
 " excommand
 command! DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis | wincmd p | diffthis
@@ -351,9 +369,9 @@ command! Colortest runtime syntax/colortest.vim
 
 command! -nargs=0 Cdhere cd %:p:h
 
-function! s:FixWhitespace(line1,line2)
+function! s:FixWhitespace(line1, line2)
 	let l:save_cursor = getcurpos()
-	silent! execute a:line1 . ',' . a:line2 . 's/\\\@<!\s\+$//'
+	silent! execute 'keeppatterns ' . a:line1 . ',' . a:line2 . 's/\\\@<!\s\+$//'
 	call setpos('.', l:save_cursor)
 endfunction
 command! -range=% FixWhitespace call <SID>FixWhitespace(<line1>, <line2>)
@@ -610,11 +628,11 @@ augroup END
 " pack
 function! s:Minpac()
 	if !exists('*minpac#init')
-		call system('git clone --depth 1 -- https://github.com/matsuhav/minpac.git ~/.vim/pack/minpac/opt/minpac')
+		call system('git clone --depth 1 -- https://github.com/hayatogh/minpac.git ~/.vim/pack/minpac/opt/minpac')
 		packadd minpac
 	endif
 	call minpac#init({'jobs': 4, 'autoyes': 1})
-	call minpac#add('matsuhav/minpac', {'type': 'opt'})
+	call minpac#add('hayatogh/minpac', {'type': 'opt'})
 
 	call minpac#add('tpope/vim-commentary')
 	call minpac#add('vim-jp/vimdoc-ja')
@@ -625,7 +643,7 @@ function! s:Minpac()
 	call minpac#add('tommcdo/vim-lion')
 	call minpac#add('scrooloose/nerdtree')
 	call minpac#add('luochen1990/rainbow')
-	call minpac#add('matsuhav/vim-surround')
+	call minpac#add('hayatogh/vim-surround')
 	call minpac#add('kana/vim-tabpagecd')
 	call minpac#add('guns/xterm-color-table.vim')
 	" external commands
@@ -636,7 +654,7 @@ function! s:Minpac()
 	call minpac#add('kana/vim-operator-user')
 	call minpac#add('kana/vim-textobj-indent')
 	call minpac#add('kana/vim-textobj-user')
-	call minpac#add('matsuhav/vim-bash-completion')
+	call minpac#add('hayatogh/vim-bash-completion')
 	call minpac#add('tpope/vim-repeat')
 	call minpac#add('tyru/open-browser.vim')
 	" colorscheme
@@ -777,13 +795,17 @@ vnoremap <expr> <C-W>]      <SID>Tjump(1, 1)
 
 let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
 let g:ale_linters = {
-	\ 'c'     : ['clangd'],
-	\ 'cpp'   : ['clangd'],
-	\ 'go'    : ['govet', 'gopls'],
-	\ 'ocaml' : ['ocamllsp'],
-	\ 'python': ['pylsp'],
-	\ 'rust'  : ['rls', 'cargo'],
-	\ 'tex'   : ['chktex'],
+	\ 'asciidoc' : ['vale'],
+	\ 'c'        : ['clangd'],
+	\ 'cpp'      : ['clangd'],
+	\ 'go'       : ['govet', 'gopls'],
+	\ 'mail'     : ['vale'],
+	\ 'markdown' : ['vale'],
+	\ 'ocaml'    : ['ocamllsp'],
+	\ 'python'   : ['pylsp'],
+	\ 'rst'      : ['vale'],
+	\ 'rust'     : ['rls', 'cargo'],
+	\ 'tex'      : ['chktex'],
 	\ }
 let g:ale_fixers = {
 	\ 'c'     : ['clang-format'],

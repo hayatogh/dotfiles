@@ -53,8 +53,8 @@ tryssh() {
 	local sleeptime=5
 	[[ $# == 0 ]] && return 1
 	[[ $# == 2 ]] && sleeptime=$2
-	while printf "."; do
-		ssh $1 true &>/dev/null && printf "\n" && break
+	while printf .; do
+		ssh $1 true &>/dev/null && printf '\n' && break
 		sleep $sleeptime
 	done
 	ssh $1
