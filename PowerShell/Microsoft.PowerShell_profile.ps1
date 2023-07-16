@@ -69,24 +69,15 @@ function prompt {
     $(if ($NestedPromptLevel -ge 1) { '>>' }) + '> '
 }
 
-function choco_install {
-  [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-  Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-
-  choco feature enable -n allowGlobalConfirmation
-  $pin = "aquasnap", "discord.install", "drawio", "steam-client"
-  # "slack", "zotero"
-  $ins = "7zip.install", "autohotkey.install", "flac", "foobar2000", "lavfilters", "mpc-be", "pdfxchangeeditor", "vim", "wsltty"
-  # "fd", "ripgrep"
-  # "fontforge", "inkscape", "winscp.install"
-  # "strawberryperl", "sumatrapdf.install"
-  choco install $ins $pin
-  $pin | % { choco pin add --name $_ }
-  choco_remove_links
+function winget_install {
+  winget install --no-upgrade Discord.Discord NurgoSoftware.AquaSnap Valve.Steam
+  winget install 7zip.7zip AutoHotkey.AutoHotkey MPC-BE.MPC-BE Mintty.WSLtty PeterPawlowski.foobar2000 PeterPawlowski.foobar2000.EncoderPack TrackerSoftware.PDF-XChangeEditor vim.vim
+  # BurntSushi.ripgrep.MSVC JGraph.Draw sharkdp.fd
+  winget_remove_links
 }
-function choco_remove_links {
+function winget_remove_links {
   $desktop = [Environment]::GetFolderPath("Desktop")
-  $lnk = "Discord.lnk", "Inkscape.lnk", "Kindle.lnk", "MPC-BE x64.lnk", "SumatraPDF.lnk"
+  $lnk = "Discord.lnk", "Inkscape.lnk", "Kindle.lnk", "MPC-BE x64.lnk", "SumatraPDF.lnk", "WSL Terminal.lnk"
   $lnk | % {
     $path = Join-Path $desktop $_
     if (Test-Path $path) {
@@ -94,10 +85,6 @@ function choco_remove_links {
     }
   }
   Get-Item "$env:PUBLIC\Desktop\*.lnk" | Remove-Item
-}
-function choco_upgrade {
-  choco upgrade all
-  choco_remove_links
 }
 
 Invoke-Command -ScriptBlock {
