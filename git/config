@@ -15,8 +15,8 @@
 	sc = !sh -c 'git clone --depth 1 -- $0 && cd $(basename $0 .git) && git status'
 	scg = !sh -c 'git clone --depth 1 -- https://github.com/$0 && cd $(basename $0 .git) && git status'
 [core]
-	autocrlf = input
-	safecrlf = true
+	autocrlf = false
+	safecrlf = false
 [fetch]
 	prune = true
 	pruneTags = true

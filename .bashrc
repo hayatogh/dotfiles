@@ -15,7 +15,7 @@ alias chown="chown --preserve-root"
 alias cp="cp -p"
 alias dus="du -chs"
 alias diff="diff --color=auto"
-alias diffr="git -c core.autocrlf=false diff --no-index --histogram"
+alias diffr="git diff --no-index --histogram"
 alias diffl="diffr -U2147483647"
 alias diffc="diffl --word-diff-regex=."
 alias diffw='diffl --word-diff-regex='\''\S+|[^\S]'\'''
@@ -162,7 +162,7 @@ rgall() {
 	rg --no-ignore "$@"
 }
 _rg_arch() {
-	rg $(echo arch/*/ | sed -E 's:arch/('"$1"')/ ?::g; s:arch/::g; s:[^ ]+:-g!&:g') "${@:2}"
+	rg $(find arch/ -mindepth 1 -maxdepth 1 -type d -printf '-g!%f/ ' | sed -E 's:-g!('"$1"')/ ::') "${@:2}"
 }
 rgx() {
 	_rg_arch x86 "$@"
@@ -170,26 +170,33 @@ rgx() {
 rgarm() {
 	_rg_arch 'arm|arm64' "$@"
 }
-vil() {
+vl() {
 	vim $($1 -l "${@:2}")
 }
-_i16() {
-	sed -E 's/\b(0[xX])?([0-9a-fA-F]+)/\U\2/g'
-}
-_o16() {
-	sed -E 's/\b([0-9A-F]+)/\L\1/'
-}
-to10() {
-	bc <<<"ibase=16; $(_i16 <<<"$1")"
-}
-to16() {
-	bc <<<"obase=16; $1" | _o16
-}
-bc16() {
-	bc <<<"obase=16; ibase=16; $(_i16 <<<"$1")" | _o16
+_bc() {
+	local in=$1 out=$2 opt exp=${@:3} ifilter=cat ofilter=cat
+	if [[ $in == 10 && $out == 10 ]] && grep -Fq . <<<$exp; then
+		opt=-l
+	fi
+	if [[ $in == 16 ]]; then
+		ifilter='sed -E '\''s/\b(0[xX])?([0-9a-fA-F]+)/\U\2/g'\'
+	fi
+	if [[ $out == 16 ]]; then
+		ofilter='sed -E '\''s/\b([0-9A-F]+)/\L\1/'\'
+	fi
+	bc $opt <<<"obase=$out; ibase=$in; $(eval $ifilter <<<$exp)" | eval $ofilter
 }
 bc10() {
-	bc <<<"$1"
+	_bc 10 10 "$@"
+}
+bc16() {
+	_bc 16 16 "$@"
+}
+to10() {
+	_bc 16 10 "$@"
+}
+to16() {
+	_bc 10 16 "$@"
 }
 dl() {
 	if (( $# )); then
