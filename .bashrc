@@ -25,7 +25,7 @@ alias fdall="fd -I"
 alias git_dotfiles_pull="git -C ~/dotfiles pull"
 alias git_empty_commit="git add -A && git commit -m 'No commit message' && git push"
 alias grep="grep --color=auto"
-alias info="info --init-file ~/dotfiles/infokey"
+alias info="info --init-file $_home/dotfiles/infokey"
 alias ls="ls --color=auto"
 alias la="ls -AF"
 alias ll="ls -lhF"
@@ -35,7 +35,7 @@ alias lsize="ls -alhrFS"
 alias manless="man -P less"
 alias rm="rm -i"
 alias sc="script -qc sh"
-alias scheme="scheme ~/dotfiles/chezrc.ss"
+alias scheme="scheme $_home/dotfiles/chezrc.ss"
 alias sudo_proxy="sudo --preserve-env=https_proxy,http_proxy,ftp_proxy,no_proxy"
 alias tm="tmux new -ADX"
 alias vi="vim --clean"
@@ -153,13 +153,16 @@ fixmod() {
 	done
 }
 rg() {
-	command rg --hidden -g'!.git/' "$@"
+	command rg --hidden -g!tags "$@"
 }
 rgi() {
 	rg --no-messages "$@"
 }
-rgall() {
+rgall2() {
 	rg --no-ignore "$@"
+}
+rgall() {
+	rgall2 -g!.git/ "$@"
 }
 _rg_arch() {
 	rg $(find arch/ -mindepth 1 -maxdepth 1 -type d -printf '-g!%f/ ' | sed -E 's:-g!('"$1"')/ ::') "${@:2}"
@@ -212,10 +215,15 @@ dl() {
 	done
 }
 alias which &>/dev/null && unalias which
+sush() {
+	sudo INPUTRC="$INPUTRC" PATH="$PATH" VIMINIT="source $HOME/.vim/vimrc" XDG_CONFIG_HOME=~/.config $BASH --rcfile ~/.bash_profile
+}
 
 if [[ $_uname == MSYS ]]; then
 	shopt -s completion_strip_exe
-	alias rg="rg --path-separator '//'"
+	rg() {
+		command rg --hidden --path-separator // "$@"
+	}
 	alias open=start
 	e() {
 		start "${@:-.}"
@@ -227,7 +235,7 @@ if [[ $_uname == MSYS ]]; then
 	[[ -r /usr/share/git/git-prompt.sh ]] && . /usr/share/git/git-prompt.sh
 elif [[ $_uname == Darwin ]]; then
 	alias batt="pmset -g batt"
-	alias scheme="chez ~/dotfiles/chezrc.ss"
+	alias scheme="chez $_home/dotfiles/chezrc.ss"
 	alias e=open
 	upgrade() {
 		brew upgrade
@@ -292,7 +300,5 @@ if ! type __git_ps1 &>/dev/null; then
 	PS1=$_pc1$_pc2
 fi
 
-if [[ $_home == $HOME ]]; then
-	[[ -r ~/.localbashrc.bash ]] && . ~/.localbashrc.bash
-fi
+[[ -r $_home/.localbashrc.bash ]] && . $_home/.localbashrc.bash
 true

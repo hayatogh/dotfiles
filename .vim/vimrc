@@ -1,5 +1,12 @@
 set encoding=utf-8
 scriptencoding utf-8
+if !exists('$MYVIMRC')
+	set nocompatible
+	let $MYVIMRC = expand('<script>')
+	let $MYVIM = fnamemodify($MYVIMRC, ':h')
+	let &runtimepath = $MYVIM .. ',' .. &runtimepath .. ',' .. $MYVIM .. '/after'
+	let &packpath = $MYVIM .. ',' .. &packpath .. ',' .. $MYVIM .. '/after'
+endif
 
 set autoread
 set background=dark
@@ -76,7 +83,7 @@ set tabline=%!g:Cuitabline()
 set noexpandtab shiftwidth=0 tabstop=8
 set tagcase=match tags=./tags;./../../,tags;../../
 set ttimeoutlen=1
-let $MYVIM = fnamemodify($MYVIMRC, ':p:h')
+let $MYVIM = fnamemodify($MYVIMRC, ':h')
 set viminfofile=$MYVIM/.viminfo directory=$MYVIM/swap
 set virtualedit=block
 set wildmenu wildignorecase wildmode=list:longest,full

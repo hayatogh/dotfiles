@@ -9,8 +9,8 @@ case $(uname -sr) in
 	*_NT*) _uname=MSYS;;
 esac
 
-files=".inputrc .bash_profile .bashrc .gdbinit .vim .themes .lessfilter"
-dirsinconfig="git yapf latexmk cheat"
+tohome=".bash_profile .bashrc .gdbinit .vim .themes"
+toconfig="git yapf latexmk cheat lessfilter"
 
 mkdir -p ~/.screen ~/.ssh ~/.config $dotfiles/.vim/swap
 chmod 700 ~/.screen ~/.ssh $dotfiles/.vim/swap
@@ -33,7 +33,7 @@ elif [[ $_uname == WSL ]]; then
 		wslpath "$(powershell.exe -NoProfile "$1" | tr -d '\r')"
 	}
 elif [[ $_uname == Darwin ]]; then
-	dirsinconfig="$dirsinconfig karabiner"
+	toconfig="$toconfig karabiner"
 fi
 
 if [[ $_uname == MSYS ]] || [[ $_uname == WSL ]]; then
@@ -44,9 +44,9 @@ if [[ $_uname == MSYS ]] || [[ $_uname == WSL ]]; then
 	rm_ln "$windesk" ~/Desktop
 	rm_ln "$winbox" ~/Box
 fi
-for fname in $files; do
+for fname in $tohome; do
 	rm_ln $dotfiles/$fname ~/$fname
 done
-for dname in $dirsinconfig; do
-	rm_ln $dotfiles/$dname ~/.config/$dname
+for fname in $toconfig; do
+	rm_ln $dotfiles/$fname ~/.config/$fname
 done
