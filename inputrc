@@ -1,5 +1,5 @@
 # $include /etc/inputrc
-# bind -f ~/.inputrc  to re-read this file
+# bind -f $INPUTRC to re-read this file
 # bind -p | grep -v '\|#self-insert\|^$'
 set bell-style none
 set bind-tty-special-chars off

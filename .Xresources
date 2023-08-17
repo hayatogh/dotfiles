@@ -1,4 +1,0 @@
-XTerm*metaSendsEscape: true
-XTerm*saveLines: 4096
-XTerm*reverseVideo: on
-XTerm*cursorColor: green

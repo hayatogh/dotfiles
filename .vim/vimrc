@@ -44,8 +44,8 @@ set number relativenumber
 set pastetoggle=<F10>
 set path+=include,./include,arch/x86/include,./arch/x86/include
 if has('linux')
-	let s:moddir = '/lib/modules/' . substitute(system('uname -r'), '\n', '', '') . '/source'
-	let &path .= ',' . s:moddir . '/include,' . s:moddir . '/arch/x86/include'
+	let s:moddir = '/lib/modules/' .. substitute(system('uname -r'), '\n', '', '') .. '/source'
+	let &path .= ',' .. s:moddir .. '/include,' .. s:moddir .. '/arch/x86/include'
 	unlet s:moddir
 endif
 set pumheight=10
@@ -69,15 +69,15 @@ function! s:Tablabel(tabpagenr)
 	let l:hi = a:tabpagenr == tabpagenr() ? '%#TabLineSel#' : '%#TabLine#'
 	let l:no = len(l:buflist) == 1 ? '' : len(l:buflist)
 	let l:mod = len(filter(copy(l:buflist), 'getbufvar(v:val, "&modified")')) ? '+' : ''
-	let l:sp = (l:no . l:mod) == '' ? '' : ' '
+	let l:sp = (l:no .. l:mod) == '' ? '' : ' '
 	let l:fname = fnamemodify(bufname(l:curbufnr), ':t')
 	let l:fname = l:fname == '' ? '_' : l:fname
-	return '%' . a:tabpagenr . 'T%#Title#' . l:no . l:hi . l:mod . l:sp . l:fname . '%#TabLineFill#'
+	return '%' .. a:tabpagenr .. 'T%#Title#' .. l:no .. l:hi .. l:mod .. l:sp .. l:fname .. '%#TabLineFill#'
 endfunction
 function! g:Cuitabline()
 	let l:tablabels = join(map(range(1, tabpagenr('$')), '<SID>Tablabel(v:val)'), ' ')
-	let l:info = strftime('%m/%d%a %H:%M') . ' %#TabLine#' . fnamemodify(getcwd(), ':~') . ' '
-	return l:tablabels . ' %T%=' . l:info
+	let l:info = strftime('%m/%d%a %H:%M') .. ' %#TabLine#' .. fnamemodify(getcwd(), ':~') .. ' '
+	return l:tablabels .. ' %T%=' .. l:info
 endfunction
 set tabline=%!g:Cuitabline()
 set noexpandtab shiftwidth=0 tabstop=8
@@ -92,6 +92,8 @@ let g:c_comment_strings = 1
 let g:vim_json_conceal = 0
 let g:mapleader = ' '
 let g:maplocalleader = ' '
+let g:markdown_fenced_languages = ['html', 'python', 'bash=sh', 'c', 'cpp']
+let g:python_highlight_all = 1
 let g:readline_has_bash = 1
 let g:rust_bang_comment_leader = 1
 let g:tex_conceal = ''
@@ -118,7 +120,7 @@ if !s:in_screen
 		return ''
 	endfunction
 	function! s:FontSizeSet(amount)
-		call echoraw("\e]7770;" . a:amount . "\x7")
+		call echoraw("\e]7770;" .. a:amount .. "\x7")
 	endfunction
 	function! s:SetScreenTitle()
 	endfunction
@@ -129,8 +131,8 @@ if !s:in_screen
 			return
 		endif
 		let l:escaped = shellescape(a:str)
-		let l:enc = systemlist('echo -n ' . l:escaped . ' | base64 -w0')[0]
-		call echoraw("\e]52;c;" . l:enc . "\x7")
+		let l:enc = systemlist('echo -n ' .. l:escaped .. ' | base64 -w0')[0]
+		call echoraw("\e]52;c;" .. l:enc .. "\x7")
 	endfunction
 else
 	call echoraw("\eP\e[<0t\e[<s\e\\")
@@ -148,7 +150,7 @@ else
 		return ''
 	endfunction
 	function! s:FontSizeSet(amount)
-		call echoraw("\eP\e]7770;" . a:amount . "\x7\e\\")
+		call echoraw("\eP\e]7770;" .. a:amount .. "\x7\e\\")
 	endfunction
 	function! s:SetScreenTitle()
 		call job_start(['screen', '-X', 'title', 'vim'])
@@ -164,14 +166,14 @@ else
 			return
 		endif
 		let l:escaped = shellescape(a:str)
-		let l:enc = systemlist('echo -n ' . l:escaped . ' | base64 -w0')[0]
+		let l:enc = systemlist('echo -n ' .. l:escaped .. ' | base64 -w0')[0]
 		if !filewritable($SCREEN_TTY)
 			let $SCREEN_TTY = systemlist('screen -QX echo \$SCREEN_TTY')[0]
 		endif
-		call writefile(["\e]52;c;" . l:enc . "\x7"], $SCREEN_TTY, 'b')
+		call writefile(["\e]52;c;" .. l:enc .. "\x7"], $SCREEN_TTY, 'b')
 	endfunction
 		" if len(l:enc) <= 504
-		" 	call echoraw("\eP\e]52;c;" . l:enc . "\x7\e\\")
+		" 	call echoraw("\eP\e]52;c;" .. l:enc .. "\x7\e\\")
 		" endif
 endif
 if !executable('base64')
@@ -181,7 +183,7 @@ endif
 " if executable('clip.exe')
 " 	function! s:CopyToClip_clipexe(str)
 " 		let l:escaped = shellescape(escape(a:str, '\'))
-" 		call job_start(['/bin/sh', '-c', 'echo -n ' . l:escaped . ' | clip.exe'])
+" 		call job_start(['/bin/sh', '-c', 'echo -n ' .. l:escaped .. ' | clip.exe'])
 " 	endfunction
 " endif
 function! s:FontSizeGet()
@@ -242,7 +244,7 @@ nnoremap <expr> # <SID>ConsistentSearch('#')
 nnoremap <expr> g# <SID>ConsistentSearch('g#')
 function! s:Search(zero, word)
 	if a:zero == 0
-		let l:pat = '\<' . a:word . '\>'
+		let l:pat = '\<' .. a:word .. '\>'
 	else
 		let l:pat = a:word
 	endif
@@ -277,7 +279,7 @@ endfunction
 vnoremap <silent> <expr> p <SID>Repl()
 
 function! s:Getfname()
-	let l:fname = bufname() . ':' . getcurpos()[1]
+	let l:fname = bufname() .. ':' .. getcurpos()[1]
 	silent! let @* = l:fname
 	silent! let @+ = l:fname
 	call <SID>CopyToOther(l:fname)
@@ -300,7 +302,7 @@ function! s:RegexRubout(re)
 	let l:left = strpart(getcmdline(), 0, getcmdpos() - 1)
 	let l:left = substitute(l:left, a:re, '', '')
 	call setcmdpos(strlen(l:left) + 1)
-	return l:left . l:right
+	return l:left .. l:right
 endfunction
 cnoremap <Esc>/ <C-\>e<SID>RegexRubout('\v[^/ ]*/? *$')<CR>
 cnoremap <C-W>  <C-\>e<SID>RegexRubout('\v([a-zA-z]+\|[0-9]+\|.) *$')<CR>
@@ -322,8 +324,8 @@ nmap <Leader>6 :<C-U>Hi6 <C-R><C-W><CR>
 nnoremap <Leader>t :call <SID>Command({}, 1, 0, 0, ['cargo', 'test'])<CR>
 nnoremap <Leader>u :call <SID>Command({}, 1, 0, 0, ['cargo', 'run'])<CR>
 
-nnoremap <Esc>m <C-W>-
-nnoremap <Esc>p <C-W>+
+nnoremap <Esc>M <C-W>-
+nnoremap <Esc>P <C-W>+
 
 cnoremap <C-G> <C-\><C-N>
 inoremap <C-G> <C-\><C-N>
@@ -334,26 +336,26 @@ function! s:StayColumn(cmd)
 	call setpos('.', l:save_cursor)
 	return a:cmd
 endfunction
-nnoremap <silent> <expr> gj <SID>StayColumn(v:count1 . 'gj')
-nnoremap <silent> <expr> gk <SID>StayColumn(v:count1 . 'gk')
+nnoremap <silent> <expr> gj <SID>StayColumn(v:count1 .. 'gj')
+nnoremap <silent> <expr> gk <SID>StayColumn(v:count1 .. 'gk')
 
 nnoremap <silent> <Esc>= :<C-U>call <SID>FontSizeSet("")<CR>
 nnoremap <silent> <Esc>+ :<C-U>call <SID>FontSizeSet("+1")<CR>
 nnoremap <silent> <Esc>- :<C-U>call <SID>FontSizeSet("-1")<CR>
 
 function! s:Spacing(line1, line2)
-	silent! execute 'keeppatterns ' . a:line1 . ',' . a:line2 . 's/\v([[:graph:]])([^ [:graph:][:cntrl:]、。])/\1 \2/g'
-	silent! execute 'keeppatterns ' . a:line1 . ',' . a:line2 . 's/\v([^ [:graph:][:cntrl:]、。])([[:graph:]])/\1 \2/g'
-	silent! execute 'keeppatterns ' . a:line1 . ',' . a:line2 . 's/\v([[:graph:]]) ([、。])/\1\2/g'
-	silent! execute 'keeppatterns ' . a:line1 . ',' . a:line2 . 's/\v([、。]) ([[:graph:]])/\1\2/g'
+	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v([[:graph:]])([^ [:graph:][:cntrl:]、。])/\1 \2/g'
+	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v([^ [:graph:][:cntrl:]、。])([[:graph:]])/\1 \2/g'
+	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v([[:graph:]]) ([、。])/\1\2/g'
+	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v([、。]) ([[:graph:]])/\1\2/g'
 endfunction
 command! -range=% Spacing call <SID>Spacing(<line1>, <line2>)
 nnoremap <silent> <Leader>s :call <SID>Spacing('.', '.')<CR>
 vnoremap <silent> <Leader>s :call <SID>Spacing('''<', '''>')<CR>
 
 function! s:UnSpacing(line1, line2)
-	silent! execute 'keeppatterns ' . a:line1 . ',' . a:line2 . 's/\v([[:graph:]]) ([^ [:graph:][:cntrl:]])/\1\2/g'
-	silent! execute 'keeppatterns ' . a:line1 . ',' . a:line2 . 's/\v([^ [:graph:][:cntrl:]]) ([[:graph:]])/\1\2/g'
+	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v([[:graph:]]) ([^ [:graph:][:cntrl:]])/\1\2/g'
+	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v([^ [:graph:][:cntrl:]]) ([[:graph:]])/\1\2/g'
 endfunction
 command! -range=% Unspacing call <SID>UnSpacing(<line1>, <line2>)
 nnoremap <silent> <Leader>S :call <SID>UnSpacing('.', '.')<CR>
@@ -378,7 +380,7 @@ command! -nargs=0 Cdhere cd %:p:h
 
 function! s:FixWhitespace(line1, line2)
 	let l:save_cursor = getcurpos()
-	silent! execute 'keeppatterns ' . a:line1 . ',' . a:line2 . 's/\\\@<!\s\+$//'
+	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\\\@<!\s\+$//'
 	call setpos('.', l:save_cursor)
 endfunction
 command! -range=% FixWhitespace call <SID>FixWhitespace(<line1>, <line2>)
@@ -415,12 +417,12 @@ function! s:Hi(num, ...)
 	else
 		silent! call matchdelete(a:num + 5)
 		if a:0 != 0
-			call matchadd('Multihl' . a:num, a:1, 10, a:num + 5)
-			call histadd(':', 'Hi' . a:num . ' ' . a:1)
+			call matchadd('Multihl' .. a:num, a:1, 10, a:num + 5)
+			call histadd(':', 'Hi' .. a:num .. ' ' .. a:1)
 			return
 		endif
 	endif
-	call histadd(':', 'Hi' . a:num)
+	call histadd(':', 'Hi' .. a:num)
 endfunction
 command! -nargs=0 Hi0 call <SID>Hi(0)
 command! -nargs=? Hi1 call <SID>Hi(1, <f-args>)
@@ -437,7 +439,7 @@ function! s:Align(cmd, line1, line2, ...)
 	else
 		let l:char = a:1
 	endif
-	execute 'normal ' . a:line1 . 'GV' . a:line2 . 'G' . a:cmd . l:char
+	execute 'normal ' .. a:line1 .. 'GV' .. a:line2 .. 'G' .. a:cmd .. l:char
 	call setpos('.', l:save_cursor)
 endfunction
 command! -range -nargs=? AlignRight call <SID>Align('gL', <line1>, <line2>, <f-args>)
@@ -448,28 +450,28 @@ command! -nargs=0 Reload let s:undoreload = &undoreload | set undoreload=0 | edi
 function! s:Nkf()
 	let l:fname = fnamemodify(expand('%'), ':p')
 	if executable('uchardet')
-		let l:enc = system('uchardet ' . l:fname)
+		let l:enc = system('uchardet ' .. l:fname)
 	elseif executable('nkf')
-		let l:enc = system('nkf --guess=1 ' . l:fname)
+		let l:enc = system('nkf --guess=1 ' .. l:fname)
 	else
 		echoerr 'uchardet or nkf must be installed!'
 		return
 	endif
-	execute 'e ++enc=' . l:enc
+	execute 'e ++enc=' .. l:enc
 endfunction
 command! -nargs=0 Nkf call <SID>Nkf()
 
 function! s:Command(env, reuse, focus, close, arg)
 	let l:shiflag = has('win32') ? &shellcmdflag : '-ic'
-	let l:cmd = &shell . ' ' . l:shiflag . ' "' . join(a:arg) . '"'
+	let l:cmd = &shell .. ' ' .. l:shiflag .. ' "' .. join(a:arg) .. '"'
 	let l:opt = {'term_rows': &lines / 4, 'term_cols': &columns - 7, 'term_kill': 'term', 'env': a:env}
 	if a:close
 		let l:opt['term_finish'] = 'close'
 	endif
 	if a:reuse
-		let l:n = bufnr('!' . l:cmd)
+		let l:n = bufnr('!' .. l:cmd)
 		if l:n != -1
-			execute 'bdelete ' . l:n
+			execute 'bdelete ' .. l:n
 		endif
 	endif
 	call term_start(l:cmd, l:opt)
@@ -496,7 +498,7 @@ let s:template = {
 	\ 'c'     : ['#include <stdio.h>', '', 'int main(void) {', '	printf("Hello\n");', '	return 0;', '}'],
 	\ 'go'    : ['package main', '', 'import "fmt"', '', 'func main() {', '	fmt.Println("Hello")', '}'],
 	\ 'perl'  : ['#!/usr/bin/env perl', 'use strict;', 'use warnings;'],
-	\ 'python': '#!/usr/bin/env ' . s:pythonexe,
+	\ 'python': '#!/usr/bin/env ' .. s:pythonexe,
 	\ 'sh'    : ['#!/usr/bin/env bash', 'set -euxo pipefail'],
 	\ }
 let s:template_after = {
@@ -576,8 +578,8 @@ function! s:HalfCommas()
 	silent! keeppatterns %s/．\+$/\=repeat('.', strchars(submatch(0)))/g
 	silent! keeppatterns %s/，\+\ze /\=repeat(',', strchars(submatch(0)))/g
 	silent! keeppatterns %s/．\+\ze /\=repeat('.', strchars(submatch(0)))/g
-	silent! keeppatterns %s/，\+/\=repeat(',', strchars(submatch(0))) . ' '/g
-	silent! keeppatterns %s/．\+/\=repeat('.', strchars(submatch(0))) . ' '/g
+	silent! keeppatterns %s/，\+/\=repeat(',', strchars(submatch(0))) .. ' '/g
+	silent! keeppatterns %s/．\+/\=repeat('.', strchars(submatch(0))) .. ' '/g
 	call setpos('.', l:curpos)
 endfunction
 
@@ -603,32 +605,56 @@ function! s:CopyToOtherUnnamed()
 	endif
 endfunction
 
+function! s:DisableALEOnLinux()
+	if fnamemodify(bufname(), ':p') =~# '/linux/'
+		ALEDisableAllBuffer
+	endif
+endfunction
+
+let s:ignore_lastline = {'gitcommit': '', 'hgcommit': '', 'cvs': '', 'svn': ''}
+function! s:GoToLastLine()
+	if line('''"') <= line('$') && !has_key(s:ignore_lastline, &ft)
+		normal! g`"
+	endif
+endfunction
+
 augroup vimrc
 	autocmd!
-	autocmd BufRead,BufNewFile * if &ft == 'asm' | set ft=gas | endif
-	autocmd BufRead,BufNewFile *.lalrpop set ft=rust
-	autocmd BufRead,BufNewFile */git/config set ft=gitconfig
-	autocmd BufRead,BufNewFile */yapf/style set ft=cfg
-	autocmd BufRead,BufNewFile .latexmkrc,latexmkrc set ft=perl
-	autocmd BufRead,BufNewFile .clang-format set ft=yaml
-	autocmd BufReadPost * if line('''"') >= 1 && line('''"') <= line('$') && &ft !~# 'commit' | execute 'normal! g`"' | endif
+	autocmd BufNewFile *.go,*.pl,*.py,*.sh call <SID>Template()
+	autocmd BufNewFile,BufRead * if &ft == 'asm' | set ft=gas | endif
+	autocmd BufNewFile,BufRead * if &ft == 'diff' | set ft=git | endif
+	autocmd BufNewFile,BufRead *.lalrpop set ft=rust
+	autocmd BufNewFile,BufRead */git/config set ft=gitconfig
+	autocmd BufNewFile,BufRead */yapf/style set ft=cfg
+	autocmd BufNewFile,BufRead .latexmkrc,latexmkrc set ft=perl
+	autocmd BufNewFile,BufRead .clang-format set ft=yaml
+	autocmd BufNewFile,BufRead dir_colors set ft=dircolors
+	autocmd BufNewFile,BufRead * call <SID>DisableALEOnLinux()
+	autocmd BufReadPost * call <SID>GoToLastLine()
 	autocmd StdinReadPost * set nomodified
-	autocmd CmdwinEnter * nnoremap <buffer> <F5> :let g:CmdwinLastLineNum=line('.')<CR><CR>q::execute g:CmdwinLastLineNum<CR>
+	autocmd FileType autohotkey set commentstring=;%s
+	autocmd FileType c set textwidth=80 cindent cinoptions=:0(s
+	autocmd FileType git set vartabstop=9,8 | let b:autoHlTrailingWhiteSpaces = 0
+	autocmd FileType help nnoremap <buffer> <CR> <C-]>
+	autocmd FileType java set cindent cinoptions=(sJ1j1
+	autocmd FileType markdown set tabstop=8
+	autocmd FileType php set matchpairs-=<:>
+	autocmd FileType ps1 set expandtab shiftwidth=2
+	autocmd FileType rust set softtabstop=0 textwidth=100
+	" autocmd FileType tex nmap <silent><buffer><nowait> <LocalLeader>ls <plug>(vimtex-compile-ss)
+	autocmd CmdwinEnter * nnoremap <buffer> g<CR> :let g:CmdwinLastLine=line('.')<CR><CR>q::execute g:CmdwinLastLine<CR>
 	autocmd Colorscheme * highlight Cursor guifg=fg guibg=Red
 	autocmd Colorscheme * highlight CursorIM guifg=Black guibg=Blue
 	autocmd Colorscheme * highlight TabLineFill guibg=#808080
 	autocmd ColorScheme * highlight TrailingWhiteSpace ctermbg=darkred guibg=darkred
 	autocmd Colorscheme * highlight IdeographicSpace term=underline ctermbg=DarkGreen guibg=DarkGreen
-
-	autocmd BufEnter,BufRead,BufNew * call <SID>HlTrailingWhiteSpace(1)
-	autocmd InsertLeave * call <SID>HlTrailingWhiteSpace(1)
-	autocmd InsertEnter * call <SID>HlTrailingWhiteSpace(0)
-	autocmd BufEnter,BufRead,BufNew * call <SID>HlIdeographicSpace()
 	autocmd Colorscheme * call <SID>MultiHlSetup()
-	autocmd BufNewFile *.go,*.pl,*.py,*.sh call <SID>Template()
+	autocmd BufRead,InsertLeave * call <SID>HlTrailingWhiteSpace(1)
+	autocmd InsertEnter * call <SID>HlTrailingWhiteSpace(0)
+	autocmd BufRead * call <SID>HlIdeographicSpace()
+	autocmd TextYankPost * call <SID>CopyToOtherUnnamed()
 	autocmd BufWritePre *.tex call <SID>HalfCommas()
 	autocmd BufWritePre *.txt call <SID>ConvertPunctuation()
-	autocmd TextYankPost * call <SID>CopyToOtherUnnamed()
 	autocmd VimResume * call <SID>SetScreenTitle()
 augroup END
 
@@ -646,13 +672,12 @@ function! s:Minpac()
 	call minpac#add('editorconfig/editorconfig-vim', {'submodule': 0})
 	call minpac#add('mattn/emmet-vim', {'submodule': 0})
 	call minpac#add('tpope/vim-eunuch')
-	call minpac#add('cohama/lexima.vim')
 	call minpac#add('tommcdo/vim-lion')
 	call minpac#add('scrooloose/nerdtree')
 	call minpac#add('luochen1990/rainbow')
 	call minpac#add('hayatogh/vim-surround')
 	call minpac#add('kana/vim-tabpagecd')
-	call minpac#add('guns/xterm-color-table.vim')
+	" call minpac#add('guns/xterm-color-table.vim')
 	" external commands
 	call minpac#add('dense-analysis/ale')
 	call minpac#add('HiPhish/info.vim')
@@ -667,15 +692,15 @@ function! s:Minpac()
 	" colorscheme
 	call minpac#add('tomasr/molokai')
 	" syntax and filetype plugins
-	call minpac#add('kchmck/vim-coffee-script')
 	call minpac#add('chrisbra/csv.vim')
 	call minpac#add('Shirk/vim-gas')
-	call minpac#add('tpope/vim-markdown')
 	call minpac#add('previm/previm')
-	call minpac#add('vim-python/python-syntax')
 	call minpac#add('wlangstroth/vim-racket')
-	call minpac#add('lervag/vimtex')
 	call minpac#add('cespare/vim-toml')
+	" call minpac#add('kchmck/vim-coffee-script')
+	" call minpac#add('tpope/vim-markdown')
+	" call minpac#add('vim-python/python-syntax')
+	" call minpac#add('lervag/vimtex')
 	call minpac#clean()
 	call minpac#update()
 endfunction
@@ -685,14 +710,11 @@ let g:previm_enable_realtime = 1
 let g:loaded_previm = 1
 command! -nargs=0 PrevimOpen unlet g:loaded_previm | runtime plugin/previm.vim | doautocmd Previm FileType | PrevimOpen
 " vimtex
-if has('win32')
-	let g:vimtex_view_general_viewer = 'SumatraPDF'
-	let g:vimtex_view_general_options_latexmk = '-reuse-instance'
-	let g:vimtex_view_general_options = '-reuse-instance -forward-search @tex @line @pdf'
-endif
-" lexima
-let g:lexima_no_default_rules = 1
-let g:lexima_map_escape=''
+" if has('win32')
+" 	let g:vimtex_view_general_viewer = 'SumatraPDF'
+" 	let g:vimtex_view_general_options_latexmk = '-reuse-instance'
+" 	let g:vimtex_view_general_options = '-reuse-instance -forward-search @tex @line @pdf'
+" endif
 " quickrun
 nmap <Leader>r <Plug>(quickrun)
 let g:quickrun_config = {
@@ -727,8 +749,8 @@ nmap <Leader>k <Plug>(ale_previous)
 nmap <Leader>h <Plug>(ale_detail)
 
 function! s:ALEFixOnSaveToggle(vartype, value)
-	let l:new = a:value == -1 ? '!' . get(eval(a:vartype . ':'), 'ale_fix_on_save', 0) : a:value
-	execute 'let ' . a:vartype . ':ale_fix_on_save = ' . l:new
+	let l:new = a:value == -1 ? '!' .. get(eval(a:vartype .. ':'), 'ale_fix_on_save', 0) : a:value
+	execute 'let ' .. a:vartype .. ':ale_fix_on_save = ' .. l:new
 endfunction
 command! -bar ALEFixOnSaveToggle        call <SID>ALEFixOnSaveToggle('g', -1)
 command! -bar ALEFixOnSaveToggleBuffer  call <SID>ALEFixOnSaveToggle('b', -1)
@@ -742,47 +764,62 @@ command! -bar ALEDisableAll       ALEDisable | ALEFixOnSaveDisable
 command! -bar ALEDisableAllBuffer ALEDisableBuffer | ALEFixOnSaveDisableBuffer
 
 function! s:TGuess(pattern, flags, info)
-	if !has_key(a:info, 'buf_ffname')
-		return v:null
-	endif
-	if a:flags == 'c'
-		let l:pat = '^' . a:pattern . '$'
-	elseif a:flags == 'i'
-		let l:pat = '^' . a:pattern . '.*'
-	else
-		let l:pat = a:pattern
-	endif
+	" Quit when called by ex command
+	if a:flags == '' || a:flags == 'r' | return v:null | endif
+
+	let l:pat = '^' .. a:pattern .. (a:flags == 'c' ? '$' : '')
+	let l:path = a:info['buf_ffname'][len(fnamemodify(tagfiles()[0], ':p:h')) + 1:]
+	echom 'tag: ' .. l:pat .. ' from ' .. l:path
+
+	" Exclude prototypes
 	let l:tags = filter(taglist(l:pat), 'get(v:val, ''kind'', '''') != ''p''')
-	if len(l:tags) == 1
-		echom 'Jump to the only'
-		return [l:tags[0]]
+	if len(l:tags) == 1 | echom '  Jump to the only' | return l:tags | endif
+
+	" Limit to members or non-members
+	let l:before = expand('<cexpr>')[:-1 - len(expand('<cword>'))]
+	if l:before[-1:] == '.' || l:before[-2:] == '->'
+		echom '  Only members'
+		call filter(l:tags, 'get(v:val, ''kind'', '''') == ''m''')
+	else
+		echom '  Exclude members'
+		call filter(l:tags, 'get(v:val, ''kind'', '''') != ''m''')
 	endif
-	let l:file = fnamemodify(a:info['buf_ffname'], ':.')
-	let l:current = filter(copy(l:tags), 'v:val[''filename''] == l:file')
-	if len(l:current) == 1
-		echom 'Jump to the only current'
-		return [l:current[0]]
-	elseif len(l:current) > 1
-		return v:null
+	if len(l:tags) == 1 | echom '  Jump to the only' | return l:tags | endif
+
+	" Exclude unlikelies
+	let l:exclude_path_list = []
+	if l:path[:5] != 'tools/'   | let l:exclude_path_list += ['tools']   | endif
+	if l:path[:7] != 'drivers/' | let l:exclude_path_list += ['drivers'] | endif
+	if l:path[:7] != 'samples/' | let l:exclude_path_list += ['samples'] | endif
+	if l:path[:7] != 'scripts/' | let l:exclude_path_list += ['scripts'] | endif
+	if l:exclude_path_list != []
+		let l:exclude_pat = join(l:exclude_path_list, '|')
+		echom '  Exclude ' .. l:exclude_pat .. ' dir'
+		call filter(l:tags, 'v:val[''filename''] !~# ''\v^(' .. l:exclude_pat.. ')/''')
 	endif
-	let l:dir = fnamemodify(l:file, ':h')
-	let l:siblings = filter(copy(l:tags), 'fnamemodify(v:val[''filename''], '':h'') == l:dir')
-	if len(l:siblings) == 1
-		echom 'Jump to the only sibling'
-		return [l:siblings[0]]
-	endif
-	return v:null
+	if len(l:tags) == 1 | echom '  Jump to the only' | return l:tags | endif
+
+	" Guessing
+	let l:current = filter(copy(l:tags), 'l:path == v:val[''filename'']')
+	if len(l:current) == 1 | echom '  Jump to the only current' | return l:current | endif
+
+	let l:dir = fnamemodify(l:path, ':h')
+	let l:siblings = filter(copy(l:tags), 'l:dir == fnamemodify(v:val[''filename''], '':h'')')
+	if len(l:siblings) == 1 | echom '  Jump to the only sibling' | return l:siblings | endif
+
+	" Failed guessing, return likelies
+	return l:tags
 endfunction
 function! s:Tjump(sp, guess)
-	if tagfiles() == []
-		return ":ALEGoToDefinition" . (a:sp ? ' -split' : '') . "\<CR>"
-	else
+	if len(tagfiles())
 		if a:guess
-			setl tagfunc=<SID>TGuess
+			set tagfunc=<SID>TGuess
 		else
-			setl tagfunc=
+			set tagfunc=
 		endif
-		return (a:sp ? "\<C-W>" : '') . "g\<C-]>"
+		return (a:sp ? "\<C-W>" : '') .. "g\<C-]>"
+	else
+		return ":ALEGoToDefinition" .. (a:sp ? ' -split' : '') .. "\<CR>"
 	endif
 endfunction
 nnoremap <expr> g<C-]>      <SID>Tjump(0, 0)
@@ -822,7 +859,7 @@ let g:ale_fixers = {
 	\ 'python': ['isort', 'yapf'],
 	\ 'rust'  : ['rustfmt'],
 	\ }
-let g:ale_c_clangformat_style_option = '{ BasedOnStyle: LLVM, IndentWidth: 4 }'
+let g:ale_c_clangformat_style_option = '-n'
 let g:ale_c_clangformat_use_local_file = 1
 let g:ale_rust_cargo_use_clippy = executable('cargo-clippy')
 let g:ale_completion_enabled = 1
@@ -834,16 +871,16 @@ let g:ale_virtualtext_cursor = 0
 if has('win32unix')
 	let g:ale_enabled = 0
 endif
-" vim-markdown
-let g:markdown_fenced_languages = ['html', 'python', 'bash=sh', 'c', 'cpp']
 " vim-surround
 let g:surround_dict = {
-	\ 'U' : 'https://\r/',
+	\ 'mb': '（\r）', 'm(': '（ \r ）', 'm)': '（\r）',
+	\ 'mB': '｛\r｝', 'm{': '｛ \r ｝', 'm}': '｛\r｝',
+	\ 'ma': '＜\r＞', 'm<': '＜ \r ＞', 'm>': '＜\r＞',
+	\ 'mA': '［\r］', 'm[': '［ \r ］', 'm]': '［\r］',
 	\ 'mk': '「\r」',
 	\ 'mn': '『\r』',
-	\ 'mb': '（\r）',
 	\ 'ms': '【\r】',
-	\ 'ma': '［\r］',
+	\ 'U' : 'https://\r/',
 	\ }
 " NERDTree
 let g:NERDTreeMapActivateNode = 'e'
@@ -867,12 +904,11 @@ elseif filereadable('/usr/share/vim/addons/plugin/gtags.vim')
 elseif filereadable('/usr/share/gtags/gtags.vim')
 	source /usr/share/gtags/gtags.vim
 endif
-" rainbow vim-gas vim-lion emmet python-syntax csv
+" rainbow vim-gas vim-lion emmet csv
 let g:rainbow_active = 1
 let g:gasCppComments = 1
 let g:lion_squeeze_spaces = 1
 let g:user_emmet_leader_key='<C-K>'
-let g:python_highlight_all = 1
 let g:csv_default_delim=','
 
 packloadall!
@@ -880,38 +916,6 @@ packadd matchit
 silent! packadd termdebug
 silent! packadd minpac
 runtime ftplugin/man.vim
-" lexima
-function! s:LeximaEndwise(at, end, filetype)
-	return {'char': '<CR>', 'input': '<CR>', 'input_after': '<CR>' . a:end, 'at': a:at, 'except': '\C\v^(\s*)\S.*%#\n%(%(\s*|\1\s.+)\n)*\1' . a:end, 'filetype': a:filetype}
-endfunction
-let s:rulelist = [
-	\ {'char': '<CR>', 'at': '(\%#)',   'input_after': '<CR>'},
-	\ {'char': '<CR>', 'at': '{\%#}',   'input_after': '<CR>'},
-	\ {'char': '<CR>', 'at': '\[\%#\]', 'input_after': '<CR>'},
-	\ <SID>LeximaEndwise('^\s*if\>.*\%#$',         'endif',       'vim'),
-	\ <SID>LeximaEndwise('^\s*while\>.*\%#$',      'endwhile',    'vim'),
-	\ <SID>LeximaEndwise('^\s*for\>.*\%#$',        'endfor',      'vim'),
-	\ <SID>LeximaEndwise('^\s*try\>.*\%#$',        'endtry',      'vim'),
-	\ <SID>LeximaEndwise('^\s*function!.*\%#$',    'endfunction', 'vim'),
-	\ <SID>LeximaEndwise('^\s*augroup\s\+.\+\%#$', 'augroup END', 'vim'),
-	\ <SID>LeximaEndwise('^\s*\%(module\|def\|class\|if\|unless\|for\|while\|until\|case\)\>\%(.*[^.:@$]\<end\>\)\@!.*\%#$', 'end', 'ruby'),
-	\ <SID>LeximaEndwise('^\s*\%(begin\)\s*\%#$',                                                                            'end', 'ruby'),
-	\ <SID>LeximaEndwise('\%(^\s*#.*\)\@<!do\%(\s*|.*|\)\?\s*\%#$',                                                          'end', 'ruby'),
-	\ <SID>LeximaEndwise('\<\%(if\|unless\)\>.*\%#$',                                                                        'end', 'ruby'),
-	\ <SID>LeximaEndwise('\%(^\s*#.*\)\@<!do\s*\%#$', 'end', 'elixir'),
-	\ <SID>LeximaEndwise('^\s*if\>.*\%#$',             'fi',   ['sh', 'zsh']),
-	\ <SID>LeximaEndwise('^\s*case\>.*\%#$',           'esac', ['sh', 'zsh']),
-	\ <SID>LeximaEndwise('\%(^\s*#.*\)\@<!do\>.*\%#$', 'done', ['sh', 'zsh']),
-	\ <SID>LeximaEndwise('\%(^\s*#.*\)\@<!\<\%(module\|struct\|function\|if\|for\|while\|do\|let\|macro\)\>\%(.*\<end\>\)\@!.*\%#$', 'end', 'julia'),
-	\ <SID>LeximaEndwise('\%(^\s*#.*\)\@<!\s*\<\%(begin\|try\|quote\)\s*\%#$',                                                       'end', 'julia'),
-	\ {'char': '<CR>', 'input': '<CR>'},
-	"\ inoremap <CR> <C-G>u<CR>
-	\ ]
-delfunction s:LeximaEndwise
-for s:rule in s:rulelist
-	silent! call lexima#add_rule(s:rule)
-endfor
-unlet s:rule s:rulelist
 " vim-surround
 let s:surround_textobj = {
 	\ 'surround-mk': {'pattern': ['「', '」'], 'select-a': 'amk', 'select-i': 'imk'},
@@ -938,7 +942,7 @@ if has("gui_running") && has('win32')
 	if filereadable(s:gvim_winpos_file)
 		let s:pos = readfile(s:gvim_winpos_file)
 		let s:n = str2nr(strpart(v:servername, 4))
-		execute 'winpos ' . (s:pos[0] + 32 * s:n) . ' ' . (s:pos[1] + 32 * s:n)
+		execute 'winpos ' .. (s:pos[0] + 32 * s:n) .. ' ' .. (s:pos[1] + 32 * s:n)
 		unlet s:pos s:n
 	endif
 	function! g:Imzero()
@@ -956,9 +960,9 @@ if has("gui_running") && has('win32')
 		if a:amount ==# ""
 			let l:size = s:guifont_default_size
 		else
-			let l:size = eval(l:size . a:amount)
+			let l:size = eval(l:size .. a:amount)
 		endif
-		let l:font[1] = l:font[1][0] . l:size
+		let l:font[1] = l:font[1][0] .. l:size
 		let &guifont = join(l:font, ':')
 	endfunction
 	function! s:CopyToClip_OSC52(str)

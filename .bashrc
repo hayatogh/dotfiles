@@ -216,7 +216,7 @@ dl() {
 }
 alias which &>/dev/null && unalias which
 sush() {
-	sudo INPUTRC="$INPUTRC" PATH="$PATH" VIMINIT="source $HOME/.vim/vimrc" XDG_CONFIG_HOME=~/.config $BASH --rcfile ~/.bash_profile
+	sudo PATH="$PATH" VIMINIT="source $_home/.vim/vimrc" XDG_CONFIG_HOME=~/.config HISTFILE=~/.root_history $BASH --rcfile ~/.bash_profile
 }
 
 if [[ $_uname == MSYS ]]; then
