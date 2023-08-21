@@ -78,7 +78,7 @@ function winget_install {
   _winget_install_if_outdated "Mintty.WSLtty" '[0-9]\.[0-9]\.[0-9]' "$env:LOCALAPPDATA\wsltty\winget_version"
   _winget_install_if_outdated "PeterPawlowski.foobar2000.EncoderPack" '20[0-9][0-9]-[0-9][0-9]-[0-9][0-9]' "$env:ProgramFiles\foobar2000\encoders\winget_version"
 
-  winget_remove_links
+  _winget_remove_links
 }
 
 function _winget_install_vim {
@@ -128,7 +128,7 @@ function _winget_install_if_outdated {
   }
 }
 
-function winget_remove_links {
+function _winget_remove_links {
   $desktop = [Environment]::GetFolderPath("Desktop")
   $lnk = "Discord.lnk", "Inkscape.lnk", "Kindle.lnk", "MPC-BE x64.lnk", "SumatraPDF.lnk", "WSL Terminal.lnk"
   $lnk | % {

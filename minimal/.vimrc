@@ -17,6 +17,7 @@ set list listchars=tab:»-,extends:»,precedes:«,nbsp:◦
 set showmatch matchtime=1 matchpairs+=「:」,（:）,『:』,【:】,［:］
 set number relativenumber
 set scrolloff=3 sidescroll=1 sidescrolloff=10
+set incsearch hlsearch nowrapscan
 set shortmess=aoOtT
 set splitbelow splitright
 set laststatus=2
