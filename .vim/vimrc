@@ -82,7 +82,7 @@ endfunction
 set tabline=%!g:Cuitabline()
 set noexpandtab shiftwidth=0 tabstop=8
 set tagcase=match tags=./tags;./../../,tags;../../
-set ttimeoutlen=1
+set ttimeoutlen=10
 let $MYVIM = fnamemodify($MYVIMRC, ':h')
 set viminfofile=$MYVIM/.viminfo directory=$MYVIM/swap
 set virtualedit=block
@@ -605,76 +605,6 @@ function! s:CopyToOtherUnnamed()
 	endif
 endfunction
 
-function! s:SetupTag()
-	if fnamemodify(bufname(), ':p') =~# '/linux/'
-		ALEDisableAllBuffer
-		let b:guesstag = 1
-		if len(tagfiles())
-			set tagfunc=<SID>TagfuncLinux
-		endif
-	endif
-endfunction
-function! s:TagfuncLinux(pattern, flags, info)
-	if ! b:guesstag | let b:guesstag = 1 | return v:null | endif
-
-	let l:cmdline = 0
-	if a:flags == 'c'
-		let l:pat = '^' .. a:pattern .. '$'
-		let l:path = a:info['buf_ffname'][len(fnamemodify(tagfiles()[0], ':p:h')) + 1:]
-	elseif a:flags == ''
-		let l:pat = '^' .. a:pattern .. '$'
-		let l:path = '<command line>'
-		let l:cmdline = 1
-	elseif a:flags == 'r'
-		let l:pat = a:pattern
-		let l:path = '<command line>'
-		let l:cmdline = 1
-	else " 'i'
-		let l:pat = '^' .. a:pattern
-		let l:path = a:info['buf_ffname'][len(fnamemodify(tagfiles()[0], ':p:h')) + 1:]
-	endif
-	echom 'tag: ' .. l:pat .. ' from ' .. l:path
-
-	" Exclude prototypes
-	let l:tags = filter(taglist(l:pat), 'get(v:val, ''kind'', '''') != ''p''')
-	if len(l:tags) == 1 | echom '  Jump to the only' | return l:tags | endif
-	if l:cmdline | return l:tags | endif
-
-	" Limit to members or non-members
-	let l:before = expand('<cexpr>')[:-1 - len(expand('<cword>'))]
-	if l:before[-1:] == '.' || l:before[-2:] == '->'
-		echom '  Only members'
-		call filter(l:tags, 'get(v:val, ''kind'', '''') == ''m''')
-	else
-		echom '  Exclude members'
-		call filter(l:tags, 'get(v:val, ''kind'', '''') != ''m''')
-	endif
-	if len(l:tags) == 1 | echom '  Jump to the only' | return l:tags | endif
-
-	" Exclude unlikelies
-	let l:exclude_path_list = ['tools', 'drivers', 'samples', 'scripts']
-	if l:path[:5] == 'tools/'
-		call remove(l:exclude_path_list, 0)
-	elseif l:path[:7] == 'drivers/'
-		call remove(l:exclude_path_list, 1)
-	elseif l:path[:7] == 'samples/'
-		call remove(l:exclude_path_list, 2)
-	elseif l:path[:7] == 'scripts/'
-		call remove(l:exclude_path_list, 3)
-	endif
-	let l:exclude_pat = join(l:exclude_path_list, '|')
-	echom '  Exclude ' .. l:exclude_pat .. ' dir'
-	call filter(l:tags, 'v:val[''filename''] !~# ''\v^(' .. l:exclude_pat .. ')/''')
-	if len(l:tags) == 1 | echom '  Jump to the only' | return l:tags | endif
-
-	" Guessing
-	let l:current = filter(copy(l:tags), 'l:path == v:val[''filename'']')
-	if len(l:current) == 1 | echom '  Jump to the only current' | return l:current | endif
-
-	" Failed guessing, return likelies
-	return l:tags
-endfunction
-
 let s:ignore_lastline = {'gitcommit': '', 'hgcommit': '', 'cvs': '', 'svn': ''}
 function! s:GoToLastLine()
 	if line('''"') <= line('$') && !has_key(s:ignore_lastline, &ft)
@@ -705,7 +635,7 @@ augroup vimrc
 	autocmd FileType ps1 set expandtab shiftwidth=2
 	autocmd FileType rust set softtabstop=0 textwidth=100
 	" autocmd FileType tex nmap <silent><buffer><nowait> <LocalLeader>ls <plug>(vimtex-compile-ss)
-	autocmd BufWinEnter * call <SID>SetupTag()
+	autocmd BufWinEnter * call <SID>DisableALE()
 	autocmd CmdwinEnter * nnoremap <buffer> g<CR> :let g:CmdwinLastLine=line('.')<CR><CR>q::execute g:CmdwinLastLine<CR>
 	autocmd Colorscheme * highlight Cursor guifg=fg guibg=Red
 	autocmd Colorscheme * highlight CursorIM guifg=Black guibg=Blue
@@ -827,8 +757,77 @@ command! -bar ALEEnableAllBuffer  ALEEnableBuffer | ALEFixOnSaveEnableBuffer
 command! -bar ALEDisableAll       ALEDisable | ALEFixOnSaveDisable
 command! -bar ALEDisableAllBuffer ALEDisableBuffer | ALEFixOnSaveDisableBuffer
 
+function! s:DisableALE()
+	if fnamemodify(bufname(), ':p') =~# '/linux/'
+		ALEDisableAllBuffer
+	endif
+endfunction
+function! s:TagfuncLinux(pattern, flags, info)
+	if ! b:guesstag | let b:guesstag = 1 | return v:null | endif
+
+	let l:cmdline = 0
+	if a:flags == 'c'
+		let l:pat = '^' .. a:pattern .. '$'
+		let l:path = a:info['buf_ffname'][len(fnamemodify(tagfiles()[0], ':p:h')) + 1:]
+	elseif a:flags == ''
+		let l:pat = '^' .. a:pattern .. '$'
+		let l:path = '<command line>'
+		let l:cmdline = 1
+	elseif a:flags == 'r'
+		let l:pat = a:pattern
+		let l:path = '<command line>'
+		let l:cmdline = 1
+	else " 'i'
+		let l:pat = '^' .. a:pattern
+		let l:path = a:info['buf_ffname'][len(fnamemodify(tagfiles()[0], ':p:h')) + 1:]
+	endif
+	echom 'tag: ' .. l:pat .. ' from ' .. l:path
+
+	" Exclude prototypes
+	let l:tags = filter(taglist(l:pat), 'get(v:val, ''kind'', '''') != ''p''')
+	if len(l:tags) == 1 | echom '  Jump to the only' | return l:tags | endif
+	if l:cmdline | return l:tags | endif
+
+	" Limit to members or non-members
+	let l:before = expand('<cexpr>')[:-1 - len(expand('<cword>'))]
+	if l:before[-1:] == '.' || l:before[-2:] == '->'
+		echom '  Only members'
+		call filter(l:tags, 'get(v:val, ''kind'', '''') == ''m''')
+	else
+		echom '  Exclude members'
+		call filter(l:tags, 'get(v:val, ''kind'', '''') != ''m''')
+	endif
+	if len(l:tags) == 1 | echom '  Jump to the only' | return l:tags | endif
+
+	" Exclude unlikelies
+	let l:exclude_path_list = ['tools', 'drivers', 'samples', 'scripts']
+	if l:path[:5] == 'tools/'
+		call remove(l:exclude_path_list, 0)
+	elseif l:path[:7] == 'drivers/'
+		call remove(l:exclude_path_list, 1)
+	elseif l:path[:7] == 'samples/'
+		call remove(l:exclude_path_list, 2)
+	elseif l:path[:7] == 'scripts/'
+		call remove(l:exclude_path_list, 3)
+	endif
+	let l:exclude_pat = join(l:exclude_path_list, '|')
+	echom '  Exclude ' .. l:exclude_pat .. ' dir'
+	call filter(l:tags, 'v:val[''filename''] !~# ''\v^(' .. l:exclude_pat .. ')/''')
+	if len(l:tags) == 1 | echom '  Jump to the only' | return l:tags | endif
+
+	" Guessing
+	let l:current = filter(copy(l:tags), 'l:path == v:val[''filename'']')
+	if len(l:current) == 1 | echom '  Jump to the only current' | return l:current | endif
+
+	" Failed guessing, return likelies
+	return l:tags
+endfunction
+
 function! s:Tjump(sp, guess)
-	if &tagfunc != ''
+	if len(tagfiles())
+		if fnamemodify(bufname(), ':p') =~# '/linux/'
+			set tagfunc=<SID>TagfuncLinux
+		endif
 		let b:guesstag = a:guess
 		return (a:sp ? "\<C-W>" : '') .. "g\<C-]>"
 	else
