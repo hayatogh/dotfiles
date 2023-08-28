@@ -33,7 +33,7 @@ set smartindent autoindent
 set keywordprg=:Man
 set lispwords-=if
 set list listchars=tab:»-,extends:»,precedes:«,nbsp:◦
-set showmatch matchtime=1 matchpairs+=「:」,（:）,『:』,【:】,［:］
+set showmatch matchtime=1 matchpairs+=（:）,｛:｝,＜:＞,［:］,「:」,『:』,【:】
 set modeline modelines=3
 set mouse=a mousemodel=extend nomousehide
 let s:in_screen = &term =~# 'screen'
@@ -45,7 +45,7 @@ set pastetoggle=<F10>
 set path+=include,./include,arch/x86/include,./arch/x86/include
 if has('linux')
 	let s:moddir = '/lib/modules/' .. substitute(system('uname -r'), '\n', '', '') .. '/source'
-	let &path .= ',' .. s:moddir .. '/include,' .. s:moddir .. '/arch/x86/include'
+	let &path ..= ',' .. s:moddir .. '/include,' .. s:moddir .. '/arch/x86/include'
 	unlet s:moddir
 endif
 set pumheight=10
@@ -66,12 +66,12 @@ set showtabline=2
 function! s:Tablabel(tabpagenr)
 	let l:buflist = tabpagebuflist(a:tabpagenr)
 	let l:curbufnr = l:buflist[tabpagewinnr(a:tabpagenr) - 1]
-	let l:hi = a:tabpagenr == tabpagenr() ? '%#TabLineSel#' : '%#TabLine#'
-	let l:no = len(l:buflist) == 1 ? '' : len(l:buflist)
+	let l:hi = a:tabpagenr ==# tabpagenr() ? '%#TabLineSel#' : '%#TabLine#'
+	let l:no = len(l:buflist) ==# 1 ? '' : len(l:buflist)
 	let l:mod = len(filter(copy(l:buflist), 'getbufvar(v:val, "&modified")')) ? '+' : ''
-	let l:sp = (l:no .. l:mod) == '' ? '' : ' '
+	let l:sp = (l:no .. l:mod) ==# '' ? '' : ' '
 	let l:fname = fnamemodify(bufname(l:curbufnr), ':t')
-	let l:fname = l:fname == '' ? '_' : l:fname
+	let l:fname = l:fname ==# '' ? '_' : l:fname
 	return '%' .. a:tabpagenr .. 'T%#Title#' .. l:no .. l:hi .. l:mod .. l:sp .. l:fname .. '%#TabLineFill#'
 endfunction
 function! g:Cuitabline()
@@ -102,7 +102,7 @@ let g:vim_indent_cont = &tabstop
 filetype plugin indent on
 syntax enable
 
-if &term == 'xterm' || has('win32')
+if &term ==# 'xterm' || has('win32')
 	set t_Co=256
 endif
 
@@ -110,9 +110,9 @@ let &t_TI = ""
 let &t_TE = ""
 if !s:in_screen
 	call echoraw("\e[<0t\e[<s")
-	let &t_SI .= "\e[<r"
-	let &t_EI .= "\e[<s\e[<0t"
-	let &t_te .= "\e[<0t\e[<s"
+	let &t_SI ..= "\e[<r"
+	let &t_EI ..= "\e[<s\e[<0t"
+	let &t_te ..= "\e[<0t\e[<s"
 	function! g:Imzero()
 		if s:autoIminsertZero
 			call echoraw("\e[<0t\e[<s")
@@ -127,7 +127,7 @@ if !s:in_screen
 	function! s:CopyToScreenReg(str)
 	endfunction
 	function! s:CopyToClip_OSC52(str)
-		if a:str == ''
+		if a:str ==# ''
 			return
 		endif
 		let l:escaped = shellescape(a:str)
@@ -136,9 +136,9 @@ if !s:in_screen
 	endfunction
 else
 	call echoraw("\eP\e[<0t\e[<s\e\\")
-	let &t_SI .= "\eP\e[<r\e\\"
-	let &t_EI .= "\eP\e[<s\e[<0t\e\\"
-	let &t_te .= "\eP\e[<0t\e[<s\e\\"
+	let &t_SI ..= "\eP\e[<r\e\\"
+	let &t_EI ..= "\eP\e[<s\e[<0t\e\\"
+	let &t_te ..= "\eP\e[<0t\e[<s\e\\"
 	let &t_BE = "\eP\e[?2004h\e\\"
 	let &t_BD = "\eP\e[?2004l\e\\"
 	let &t_PS = "\e[200~"
@@ -162,7 +162,7 @@ else
 		endif
 	endfunction
 	function! s:CopyToClip_OSC52(str)
-		if a:str == ''
+		if a:str ==# ''
 			return
 		endif
 		let l:escaped = shellescape(a:str)
@@ -197,7 +197,7 @@ function! s:FontSizeGet()
 		if l:char ==# "\x7"
 			break
 		else
-			let l:size .= l:char
+			let l:size ..= l:char
 		endif
 	endwhile
 	echo l:size
@@ -208,7 +208,6 @@ let s:pythonexe = executable('python3') ? 'python3' : 'python'
 map Y y$
 
 nnoremap <silent> mm :<C-U>nohlsearch<CR>
-nnoremap <silent> mn :<C-U>Hi0<CR>
 
 nnoremap <silent> <C-W><C-E> :tabedit<CR>
 nnoremap <silent> <C-W><C-L> :tabnext<CR>
@@ -228,6 +227,52 @@ nnoremap <Leader>n :n<CR>
 nnoremap <Leader>p :N<CR>
 nnoremap <Leader>c :clo<CR>
 
+nmap ysa' ys2i'
+nmap ysa" ys2i"
+nmap ysa` ys2i`
+
+nnoremap <Leader>t :call <SID>Command({}, 1, 0, 0, ['cargo', 'test'])<CR>
+nnoremap <Leader>u :call <SID>Command({}, 1, 0, 0, ['cargo', 'run'])<CR>
+
+nnoremap <Esc>M <C-W>-
+nnoremap <Esc>P <C-W>+
+
+cnoremap <C-G> <C-\><C-N>
+inoremap <C-G> <C-\><C-N>
+
+nnoremap <silent> <Esc>= :<C-U>call <SID>FontSizeSet("")<CR>
+nnoremap <silent> <Esc>+ :<C-U>call <SID>FontSizeSet("+1")<CR>
+nnoremap <silent> <Esc>- :<C-U>call <SID>FontSizeSet("-1")<CR>
+
+nnoremap g/ /\<\><Left><Left>
+
+if has('win32')
+	silent! vunmap <C-X>
+endif
+
+inoremap <C-U> <C-G>u<C-U>
+
+cnoremap <Left> <Space><BS><Left>
+cnoremap <Right> <Space><BS><Right>
+cnoremap <C-P> <Up>
+cnoremap <C-N> <Down>
+cnoremap <Up> <C-P>
+cnoremap <Down> <C-N>
+cnoremap <C-A> <Home>
+" cnoremap <C-O>
+" cnoremap <C-B>
+
+function! s:FixWhitespace(line1, line2)
+	let l:save_cursor = getcurpos()
+	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\\\@<!\s\+$//'
+	call setpos('.', l:save_cursor)
+endfunction
+command! -range=% FixWhitespace call <SID>FixWhitespace(<line1>, <line2>)
+nnoremap <silent> <Leader>f :<C-U>FixWhitespace<CR>
+
+command! -nargs=0 Cdhere cd %:p:h
+nnoremap <silent> <Leader>d :<C-U>Cdhere<CR>
+
 function! s:ResetSearchDirection(cmd)
 	let @/=@/
 	nunmap n
@@ -242,8 +287,9 @@ endfunction
 nnoremap <expr> ? <SID>ConsistentSearch('?')
 nnoremap <expr> # <SID>ConsistentSearch('#')
 nnoremap <expr> g# <SID>ConsistentSearch('g#')
+
 function! s:Search(zero, word)
-	if a:zero == 0
+	if a:zero ==# 0
 		let l:pat = '\<' .. a:word .. '\>'
 	else
 		let l:pat = a:word
@@ -256,13 +302,6 @@ nnoremap <silent> <Plug>Star0 :call <SID>Search(0, expand('<cword>'))<CR>"_yiw<B
 nnoremap <silent> <Plug>Star1 :call <SID>Search(1, expand('<cword>'))<CR>"_yiw<BS>
 nmap *  <Plug>Star0n
 nmap g* <Plug>Star1n
-nnoremap g/ /\<\><Left><Left>
-
-if has('win32')
-	silent! vunmap <C-X>
-endif
-
-inoremap <C-U> <C-G>u<C-U>
 
 function! g:RestoreRegister()
 	silent! let @* = s:restore_reg
@@ -288,15 +327,6 @@ endfunction
 command! Getfname echo <SID>Getfname()
 nnoremap <silent> yd :<C-U>echo <SID>Getfname()<CR>
 
-cnoremap <Left> <Space><BS><Left>
-cnoremap <Right> <Space><BS><Right>
-cnoremap <C-P> <Up>
-cnoremap <C-N> <Down>
-cnoremap <Up> <C-P>
-cnoremap <Down> <C-N>
-cnoremap <C-A> <Home>
-" cnoremap <C-O>
-" cnoremap <C-B>
 function! s:RegexRubout(re)
 	let l:right = strpart(getcmdline(), getcmdpos() - 1)
 	let l:left = strpart(getcmdline(), 0, getcmdpos() - 1)
@@ -309,27 +339,6 @@ cnoremap <C-W>  <C-\>e<SID>RegexRubout('\v([a-zA-z]+\|[0-9]+\|.) *$')<CR>
 cnoremap <Esc>w <C-\>e<SID>RegexRubout('\v[^ ]* *$')<CR>
 cnoremap <Esc>W <C-\>e<SID>RegexRubout('\v[^ ]* *$')<CR>
 
-nmap ysa' ys2i'
-nmap ysa" ys2i"
-nmap ysa` ys2i`
-
-nmap <Leader>0 :<C-U>Hi0<CR>
-nmap <Leader>1 :<C-U>Hi1 <C-R><C-W><CR>
-nmap <Leader>2 :<C-U>Hi2 <C-R><C-W><CR>
-nmap <Leader>3 :<C-U>Hi3 <C-R><C-W><CR>
-nmap <Leader>4 :<C-U>Hi4 <C-R><C-W><CR>
-nmap <Leader>5 :<C-U>Hi5 <C-R><C-W><CR>
-nmap <Leader>6 :<C-U>Hi6 <C-R><C-W><CR>
-
-nnoremap <Leader>t :call <SID>Command({}, 1, 0, 0, ['cargo', 'test'])<CR>
-nnoremap <Leader>u :call <SID>Command({}, 1, 0, 0, ['cargo', 'run'])<CR>
-
-nnoremap <Esc>M <C-W>-
-nnoremap <Esc>P <C-W>+
-
-cnoremap <C-G> <C-\><C-N>
-inoremap <C-G> <C-\><C-N>
-
 function! s:StayColumn(cmd)
 	let l:save_cursor = getcurpos()
 	let l:save_cursor[4] = virtcol('.')
@@ -339,23 +348,159 @@ endfunction
 nnoremap <silent> <expr> gj <SID>StayColumn(v:count1 .. 'gj')
 nnoremap <silent> <expr> gk <SID>StayColumn(v:count1 .. 'gk')
 
-nnoremap <silent> <Esc>= :<C-U>call <SID>FontSizeSet("")<CR>
-nnoremap <silent> <Esc>+ :<C-U>call <SID>FontSizeSet("+1")<CR>
-nnoremap <silent> <Esc>- :<C-U>call <SID>FontSizeSet("-1")<CR>
+function! s:MultiHlSetup()
+	highlight Multihl1 ctermbg=14 ctermfg=8 guibg=#00ffff guifg=#808080
+	highlight Multihl2 ctermbg=13 ctermfg=8 guibg=#ff00ff guifg=#808080
+	highlight Multihl3 ctermbg=11 ctermfg=8 guibg=#ffff00 guifg=#808080
+	highlight Multihl4 ctermbg=1  ctermfg=7 guibg=#800000 guifg=#c0c0c0
+	highlight Multihl5 ctermbg=4  ctermfg=7 guibg=#000080 guifg=#c0c0c0
+	highlight Multihl6 ctermbg=2  ctermfg=7 guibg=#008000 guifg=#c0c0c0
+endfunction
+function! s:Hi(num, ...)
+	if a:num ==# 0
+		call clearmatches()
+	else
+		silent! call matchdelete(a:num + 5)
+		if a:0 !=# 0
+			call matchadd('Multihl' .. a:num, a:1, 10, a:num + 5)
+			call histadd(':', 'Hi' .. a:num .. ' ' .. a:1)
+			return
+		endif
+	endif
+	call histadd(':', 'Hi' .. a:num)
+endfunction
+command! -nargs=0 Hi0 call <SID>Hi(0)
+command! -nargs=? Hi1 call <SID>Hi(1, <f-args>)
+command! -nargs=? Hi2 call <SID>Hi(2, <f-args>)
+command! -nargs=? Hi3 call <SID>Hi(3, <f-args>)
+command! -nargs=? Hi4 call <SID>Hi(4, <f-args>)
+command! -nargs=? Hi5 call <SID>Hi(5, <f-args>)
+command! -nargs=? Hi6 call <SID>Hi(6, <f-args>)
+nmap <Leader>0 :<C-U>Hi0<CR>
+nmap <Leader>1 :<C-U>Hi1 <C-R><C-W><CR>
+nmap <Leader>2 :<C-U>Hi2 <C-R><C-W><CR>
+nmap <Leader>3 :<C-U>Hi3 <C-R><C-W><CR>
+nmap <Leader>4 :<C-U>Hi4 <C-R><C-W><CR>
+nmap <Leader>5 :<C-U>Hi5 <C-R><C-W><CR>
+nmap <Leader>6 :<C-U>Hi6 <C-R><C-W><CR>
+
+function! s:TagfuncLinux(pattern, flags, info)
+	if ! b:guesstag | let b:guesstag = 1 | return v:null | endif
+
+	let l:cmdline = 0
+	if a:flags ==# 'c'
+		let l:pat = '^' .. a:pattern .. '$'
+		let l:path = a:info['buf_ffname'][len(fnamemodify(tagfiles()[0], ':p:h')) + 1:]
+	elseif a:flags ==# ''
+		let l:pat = '^' .. a:pattern .. '$'
+		let l:path = '<command line>'
+		let l:cmdline = 1
+	elseif a:flags ==# 'r'
+		let l:pat = a:pattern
+		let l:path = '<command line>'
+		let l:cmdline = 1
+	else " 'i'
+		let l:pat = '^' .. a:pattern
+		let l:path = a:info['buf_ffname'][len(fnamemodify(tagfiles()[0], ':p:h')) + 1:]
+	endif
+	echom 'tag: ' .. l:pat .. ' from ' .. l:path
+
+	" Exclude prototypes
+	let l:tags = filter(taglist(l:pat), 'get(v:val, ''kind'', '''') !=# ''p''')
+	if len(l:tags) ==# 1 | echom '  Jump to the only' | return l:tags | endif
+	if l:cmdline | return l:tags | endif
+
+	" Limit to members or non-members
+	let l:before = expand('<cexpr>')[:-1 - len(expand('<cword>'))]
+	if l:before[-1:] ==# '.' || l:before[-2:] ==# '->'
+		echom '  Only members'
+		call filter(l:tags, 'get(v:val, ''kind'', '''') ==# ''m''')
+	else
+		echom '  Exclude members'
+		call filter(l:tags, 'get(v:val, ''kind'', '''') !=# ''m''')
+	endif
+	if len(l:tags) ==# 1 | echom '  Jump to the only' | return l:tags | endif
+
+	" Exclude unlikelies
+	let l:exclude_path_list = ['tools', 'drivers', 'samples', 'scripts']
+	if l:path[:5] ==# 'tools/'
+		call remove(l:exclude_path_list, 0)
+	elseif l:path[:7] ==# 'drivers/'
+		call remove(l:exclude_path_list, 1)
+	elseif l:path[:7] ==# 'samples/'
+		call remove(l:exclude_path_list, 2)
+	elseif l:path[:7] ==# 'scripts/'
+		call remove(l:exclude_path_list, 3)
+	endif
+	let l:exclude_pat = join(l:exclude_path_list, '|')
+	echom '  Exclude ' .. l:exclude_pat .. ' dir'
+	call filter(l:tags, 'v:val[''filename''] !~# ''\v^(' .. l:exclude_pat .. ')/''')
+	if len(l:tags) ==# 1 | echom '  Jump to the only' | return l:tags | endif
+
+	" Guessing
+	let l:current = filter(copy(l:tags), 'l:path ==# v:val[''filename'']')
+	if len(l:current) ==# 1 | echom '  Jump to the only current' | return l:current | endif
+
+	" Failed guessing, return likelies
+	return l:tags
+endfunction
+function! s:SetTagfunc(guess)
+	let b:guesstag = a:guess
+	if fnamemodify(tagfiles()[0], ':p') =~# '/linux/'
+		setlocal tagfunc=<SID>TagfuncLinux
+	else
+		setlocal tagfunc=
+	endif
+endfunction
+function! s:Tjump(sp, guess)
+	if len(tagfiles())
+		call <SID>SetTagfunc(a:guess)
+		return (a:sp ? "\<C-W>" : '') .. "g\<C-]>"
+	else
+		return ":ALEGoToDefinition" .. (a:sp ? ' -split' : '') .. "\<CR>"
+	endif
+endfunction
+nnoremap <expr> g<C-]>      <SID>Tjump(0, 0)
+vnoremap <expr> g<C-]>      <SID>Tjump(0, 0)
+nnoremap <expr> g]          <SID>Tjump(0, 0)
+vnoremap <expr> g]          <SID>Tjump(0, 0)
+nnoremap <expr> <C-]>       <SID>Tjump(0, 1)
+vnoremap <expr> <C-]>       <SID>Tjump(0, 1)
+nnoremap <expr> <C-W>g<C-]> <SID>Tjump(1, 0)
+vnoremap <expr> <C-W>g<C-]> <SID>Tjump(1, 0)
+nnoremap <expr> <C-W>g]     <SID>Tjump(1, 0)
+vnoremap <expr> <C-W>g]     <SID>Tjump(1, 0)
+nnoremap <expr> <C-W><C-]>  <SID>Tjump(1, 1)
+vnoremap <expr> <C-W><C-]>  <SID>Tjump(1, 1)
+nnoremap <expr> <C-W>]      <SID>Tjump(1, 1)
+vnoremap <expr> <C-W>]      <SID>Tjump(1, 1)
+command! -nargs=1 -bar Tj   call <SID>SetTagfunc(1) | tj  <args>
+command! -nargs=1 -bar Stj  call <SID>SetTagfunc(1) | stj <args>
+command! -nargs=1 -bar STj  call <SID>SetTagfunc(1) | stj <args>
+command! -nargs=1 -bar Gtj  call <SID>SetTagfunc(0) | tj  <args>
+command! -nargs=1 -bar GTj  call <SID>SetTagfunc(0) | tj  <args>
+command! -nargs=1 -bar Gstj call <SID>SetTagfunc(0) | stj <args>
+command! -nargs=1 -bar GStj call <SID>SetTagfunc(0) | stj <args>
+command! -nargs=1 -bar GSTj call <SID>SetTagfunc(0) | stj <args>
 
 function! s:Spacing(line1, line2)
-	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v([[:graph:]])([^ [:graph:][:cntrl:]、。])/\1 \2/g'
-	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v([^ [:graph:][:cntrl:]、。])([[:graph:]])/\1 \2/g'
-	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v([[:graph:]]) ([、。])/\1\2/g'
-	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v([、。]) ([[:graph:]])/\1\2/g'
+	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v([^ [:graph:][:cntrl:]]+) +\ze[^ [:graph:][:cntrl:]]/\1/g'
+	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v([[:graph:]]+) +\ze[、。]/\1/g'
+	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v([、。]+) +\ze[[:graph:]]/\1/g'
+	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v([[:graph:]]+) *\ze[^ [:graph:][:cntrl:]、。]/\1 /g'
+	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v([^ [:graph:][:cntrl:]、。]+) *\ze[[:graph:]]/\1 /g'
+	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v([[:graph:]]+) +\ze[[:graph:]]/\1 /g'
+	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v +$//g'
 endfunction
 command! -range=% Spacing call <SID>Spacing(<line1>, <line2>)
 nnoremap <silent> <Leader>s :call <SID>Spacing('.', '.')<CR>
 vnoremap <silent> <Leader>s :call <SID>Spacing('''<', '''>')<CR>
 
 function! s:UnSpacing(line1, line2)
-	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v([[:graph:]]) ([^ [:graph:][:cntrl:]])/\1\2/g'
-	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v([^ [:graph:][:cntrl:]]) ([[:graph:]])/\1\2/g'
+	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v([[:graph:]]+) +\ze[^ [:graph:][:cntrl:]]/\1/g'
+	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v([^ [:graph:][:cntrl:]]+) +\ze/\1/g'
+	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v([[:graph:]]+) +\ze[[:graph:]]/\1 /g'
+	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v +$//g'
 endfunction
 command! -range=% Unspacing call <SID>UnSpacing(<line1>, <line2>)
 nnoremap <silent> <Leader>S :call <SID>UnSpacing('.', '.')<CR>
@@ -366,7 +511,7 @@ command! DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis | wincm
 
 function! s:ReadTypescript()
 	let l:ts = map(readfile('typescript')[1:-3], {_, val -> substitute(val, '\s\+$', '', '')})
-	if &ft == 'c'
+	if &ft ==# 'c'
 		let l:ts = ['/*'] + l:ts + ['*/']
 	endif
 	call append(getpos('.')[1], l:ts)
@@ -375,15 +520,6 @@ command! Typesc call <SID>ReadTypescript()
 
 command! Hitest runtime syntax/hitest.vim
 command! Colortest runtime syntax/colortest.vim
-
-command! -nargs=0 Cdhere cd %:p:h
-
-function! s:FixWhitespace(line1, line2)
-	let l:save_cursor = getcurpos()
-	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\\\@<!\s\+$//'
-	call setpos('.', l:save_cursor)
-endfunction
-command! -range=% FixWhitespace call <SID>FixWhitespace(<line1>, <line2>)
 
 function! s:XXD(do)
 	if a:do
@@ -403,38 +539,9 @@ endfunction
 command! XXD call <SID>XXD(1)
 command! XXDundo call <SID>XXD(0)
 
-function! s:MultiHlSetup()
-	highlight Multihl1 ctermbg=14 ctermfg=8 guibg=#00ffff guifg=#808080
-	highlight Multihl2 ctermbg=13 ctermfg=8 guibg=#ff00ff guifg=#808080
-	highlight Multihl3 ctermbg=11 ctermfg=8 guibg=#ffff00 guifg=#808080
-	highlight Multihl4 ctermbg=1  ctermfg=7 guibg=#800000 guifg=#c0c0c0
-	highlight Multihl5 ctermbg=4  ctermfg=7 guibg=#000080 guifg=#c0c0c0
-	highlight Multihl6 ctermbg=2  ctermfg=7 guibg=#008000 guifg=#c0c0c0
-endfunction
-function! s:Hi(num, ...)
-	if a:num == 0
-		call clearmatches()
-	else
-		silent! call matchdelete(a:num + 5)
-		if a:0 != 0
-			call matchadd('Multihl' .. a:num, a:1, 10, a:num + 5)
-			call histadd(':', 'Hi' .. a:num .. ' ' .. a:1)
-			return
-		endif
-	endif
-	call histadd(':', 'Hi' .. a:num)
-endfunction
-command! -nargs=0 Hi0 call <SID>Hi(0)
-command! -nargs=? Hi1 call <SID>Hi(1, <f-args>)
-command! -nargs=? Hi2 call <SID>Hi(2, <f-args>)
-command! -nargs=? Hi3 call <SID>Hi(3, <f-args>)
-command! -nargs=? Hi4 call <SID>Hi(4, <f-args>)
-command! -nargs=? Hi5 call <SID>Hi(5, <f-args>)
-command! -nargs=? Hi6 call <SID>Hi(6, <f-args>)
-
 function! s:Align(cmd, line1, line2, ...)
 	let l:save_cursor = getcurpos()
-	if a:0 == 0
+	if a:0 ==# 0
 		let l:char = input('')
 	else
 		let l:char = a:1
@@ -470,7 +577,7 @@ function! s:Command(env, reuse, focus, close, arg)
 	endif
 	if a:reuse
 		let l:n = bufnr('!' .. l:cmd)
-		if l:n != -1
+		if l:n !=# -1
 			execute 'bdelete ' .. l:n
 		endif
 	endif
@@ -504,12 +611,12 @@ let s:template = {
 let s:template_after = {
 	\ 'c' : 'call cursor(4, 2)',
 	\ 'go': 'call cursor(6, 2)',
-	\ '_':  'call cursor(line(''$''), 1)',
+	\ '_' : 'call cursor(line(''$''), 1)',
 	\ }
 function! s:Template()
 	if has_key(s:template, &filetype)
 		call append(0, s:template[&filetype])
-		if getline('$') == ''
+		if getline('$') ==# ''
 			$delete _
 		endif
 		if has_key(s:template_after, &filetype)
@@ -600,7 +707,7 @@ function! s:CopyToOther(str)
 	call <SID>CopyToClip_OSC52(a:str)
 endfunction
 function! s:CopyToOtherUnnamed()
-	if v:event.regname == ''
+	if v:event.regname ==# ''
 		call <SID>CopyToOther(join(v:event.regcontents, "\n"))
 	endif
 endfunction
@@ -615,8 +722,8 @@ endfunction
 augroup vimrc
 	autocmd!
 	autocmd BufNewFile *.go,*.pl,*.py,*.sh call <SID>Template()
-	autocmd BufNewFile,BufRead * if &ft == 'asm' | set ft=gas | endif
-	autocmd BufNewFile,BufRead * if &ft == 'diff' | set ft=git | endif
+	autocmd BufNewFile,BufRead * if &ft ==# 'asm' | set ft=gas | endif
+	autocmd BufNewFile,BufRead * if &ft ==# 'diff' | set ft=git | endif
 	autocmd BufNewFile,BufRead *.lalrpop set ft=rust
 	autocmd BufNewFile,BufRead */git/config set ft=gitconfig
 	autocmd BufNewFile,BufRead */yapf/style set ft=cfg
@@ -624,25 +731,25 @@ augroup vimrc
 	autocmd BufNewFile,BufRead .clang-format set ft=yaml
 	autocmd BufNewFile,BufRead dir_colors set ft=dircolors
 	autocmd BufReadPost * call <SID>GoToLastLine()
-	autocmd StdinReadPost * set nomodified
-	autocmd FileType autohotkey set commentstring=;%s
-	autocmd FileType c set textwidth=80 cindent cinoptions=:0(s
-	autocmd FileType git set vartabstop=9,8 | let b:autoHlTrailingWhiteSpaces = 0
+	autocmd StdinReadPost * setlocal nomodified
+	autocmd FileType autohotkey setlocal commentstring=;%s
+	autocmd FileType c setlocal textwidth=80 cindent cinoptions=:0(s
+	autocmd FileType git setlocal vartabstop=9,8 | let b:autoHlTrailingWhiteSpaces = 0
 	autocmd FileType help nnoremap <buffer> <CR> <C-]>
-	autocmd FileType java set cindent cinoptions=(sJ1j1
-	autocmd FileType markdown set tabstop=8
-	autocmd FileType php set matchpairs-=<:>
-	autocmd FileType ps1 set expandtab shiftwidth=2
-	autocmd FileType rust set softtabstop=0 textwidth=100
+	autocmd FileType java setlocal cindent cinoptions=(sJ1j1
+	autocmd FileType markdown setlocal tabstop=8
+	autocmd FileType php setlocal matchpairs-=<:>
+	autocmd FileType ps1 setlocal expandtab shiftwidth=2
+	autocmd FileType rust setlocal softtabstop=0 textwidth=100
 	" autocmd FileType tex nmap <silent><buffer><nowait> <LocalLeader>ls <plug>(vimtex-compile-ss)
 	autocmd BufWinEnter * call <SID>DisableALE()
 	autocmd CmdwinEnter * nnoremap <buffer> g<CR> :let g:CmdwinLastLine=line('.')<CR><CR>q::execute g:CmdwinLastLine<CR>
-	autocmd Colorscheme * highlight Cursor guifg=fg guibg=Red
-	autocmd Colorscheme * highlight CursorIM guifg=Black guibg=Blue
-	autocmd Colorscheme * highlight TabLineFill guibg=#808080
+	autocmd ColorScheme * highlight Cursor guifg=fg guibg=Red
+	autocmd ColorScheme * highlight CursorIM guifg=Black guibg=Blue
+	autocmd ColorScheme * highlight TabLineFill guibg=#808080
 	autocmd ColorScheme * highlight TrailingWhiteSpace ctermbg=darkred guibg=darkred
-	autocmd Colorscheme * highlight IdeographicSpace term=underline ctermbg=DarkGreen guibg=DarkGreen
-	autocmd Colorscheme * call <SID>MultiHlSetup()
+	autocmd ColorScheme * highlight IdeographicSpace term=underline ctermbg=DarkGreen guibg=DarkGreen
+	autocmd ColorScheme * call <SID>MultiHlSetup()
 	autocmd BufRead,InsertLeave * call <SID>HlTrailingWhiteSpace(1)
 	autocmd InsertEnter * call <SID>HlTrailingWhiteSpace(0)
 	autocmd BufRead * call <SID>HlIdeographicSpace()
@@ -743,7 +850,7 @@ nmap <Leader>k <Plug>(ale_previous)
 nmap <Leader>h <Plug>(ale_detail)
 
 function! s:ALEFixOnSaveToggle(vartype, value)
-	let l:new = a:value == -1 ? '!' .. get(eval(a:vartype .. ':'), 'ale_fix_on_save', 0) : a:value
+	let l:new = a:value ==# -1 ? '!' .. get(eval(a:vartype .. ':'), 'ale_fix_on_save', 0) : a:value
 	execute 'let ' .. a:vartype .. ':ale_fix_on_save = ' .. l:new
 endfunction
 command! -bar ALEFixOnSaveToggle        call <SID>ALEFixOnSaveToggle('g', -1)
@@ -762,106 +869,20 @@ function! s:DisableALE()
 		ALEDisableAllBuffer
 	endif
 endfunction
-function! s:TagfuncLinux(pattern, flags, info)
-	if ! b:guesstag | let b:guesstag = 1 | return v:null | endif
-
-	let l:cmdline = 0
-	if a:flags == 'c'
-		let l:pat = '^' .. a:pattern .. '$'
-		let l:path = a:info['buf_ffname'][len(fnamemodify(tagfiles()[0], ':p:h')) + 1:]
-	elseif a:flags == ''
-		let l:pat = '^' .. a:pattern .. '$'
-		let l:path = '<command line>'
-		let l:cmdline = 1
-	elseif a:flags == 'r'
-		let l:pat = a:pattern
-		let l:path = '<command line>'
-		let l:cmdline = 1
-	else " 'i'
-		let l:pat = '^' .. a:pattern
-		let l:path = a:info['buf_ffname'][len(fnamemodify(tagfiles()[0], ':p:h')) + 1:]
-	endif
-	echom 'tag: ' .. l:pat .. ' from ' .. l:path
-
-	" Exclude prototypes
-	let l:tags = filter(taglist(l:pat), 'get(v:val, ''kind'', '''') != ''p''')
-	if len(l:tags) == 1 | echom '  Jump to the only' | return l:tags | endif
-	if l:cmdline | return l:tags | endif
-
-	" Limit to members or non-members
-	let l:before = expand('<cexpr>')[:-1 - len(expand('<cword>'))]
-	if l:before[-1:] == '.' || l:before[-2:] == '->'
-		echom '  Only members'
-		call filter(l:tags, 'get(v:val, ''kind'', '''') == ''m''')
-	else
-		echom '  Exclude members'
-		call filter(l:tags, 'get(v:val, ''kind'', '''') != ''m''')
-	endif
-	if len(l:tags) == 1 | echom '  Jump to the only' | return l:tags | endif
-
-	" Exclude unlikelies
-	let l:exclude_path_list = ['tools', 'drivers', 'samples', 'scripts']
-	if l:path[:5] == 'tools/'
-		call remove(l:exclude_path_list, 0)
-	elseif l:path[:7] == 'drivers/'
-		call remove(l:exclude_path_list, 1)
-	elseif l:path[:7] == 'samples/'
-		call remove(l:exclude_path_list, 2)
-	elseif l:path[:7] == 'scripts/'
-		call remove(l:exclude_path_list, 3)
-	endif
-	let l:exclude_pat = join(l:exclude_path_list, '|')
-	echom '  Exclude ' .. l:exclude_pat .. ' dir'
-	call filter(l:tags, 'v:val[''filename''] !~# ''\v^(' .. l:exclude_pat .. ')/''')
-	if len(l:tags) == 1 | echom '  Jump to the only' | return l:tags | endif
-
-	" Guessing
-	let l:current = filter(copy(l:tags), 'l:path == v:val[''filename'']')
-	if len(l:current) == 1 | echom '  Jump to the only current' | return l:current | endif
-
-	" Failed guessing, return likelies
-	return l:tags
-endfunction
-
-function! s:Tjump(sp, guess)
-	if len(tagfiles())
-		if fnamemodify(bufname(), ':p') =~# '/linux/'
-			set tagfunc=<SID>TagfuncLinux
-		endif
-		let b:guesstag = a:guess
-		return (a:sp ? "\<C-W>" : '') .. "g\<C-]>"
-	else
-		return ":ALEGoToDefinition" .. (a:sp ? ' -split' : '') .. "\<CR>"
-	endif
-endfunction
-nnoremap <expr> g<C-]>      <SID>Tjump(0, 0)
-vnoremap <expr> g<C-]>      <SID>Tjump(0, 0)
-nnoremap <expr> g]          <SID>Tjump(0, 0)
-vnoremap <expr> g]          <SID>Tjump(0, 0)
-nnoremap <expr> <C-]>       <SID>Tjump(0, 1)
-vnoremap <expr> <C-]>       <SID>Tjump(0, 1)
-nnoremap <expr> <C-W>g<C-]> <SID>Tjump(1, 0)
-vnoremap <expr> <C-W>g<C-]> <SID>Tjump(1, 0)
-nnoremap <expr> <C-W>g]     <SID>Tjump(1, 0)
-vnoremap <expr> <C-W>g]     <SID>Tjump(1, 0)
-nnoremap <expr> <C-W><C-]>  <SID>Tjump(1, 1)
-vnoremap <expr> <C-W><C-]>  <SID>Tjump(1, 1)
-nnoremap <expr> <C-W>]      <SID>Tjump(1, 1)
-vnoremap <expr> <C-W>]      <SID>Tjump(1, 1)
 
 let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
 let g:ale_linters = {
-	\ 'asciidoc' : ['vale'],
-	\ 'c'        : ['clangd'],
-	\ 'cpp'      : ['clangd'],
-	\ 'go'       : ['govet', 'gopls'],
-	\ 'mail'     : ['vale'],
-	\ 'markdown' : ['vale'],
-	\ 'ocaml'    : ['ocamllsp'],
-	\ 'python'   : ['pylsp'],
-	\ 'rst'      : ['vale'],
-	\ 'rust'     : ['rls', 'cargo'],
-	\ 'tex'      : ['chktex'],
+	\ 'asciidoc': ['vale'],
+	\ 'c'       : ['clangd'],
+	\ 'cpp'     : ['clangd'],
+	\ 'go'      : ['govet', 'gopls'],
+	\ 'mail'    : ['vale'],
+	\ 'markdown': ['vale'],
+	\ 'ocaml'   : ['ocamllsp'],
+	\ 'python'  : ['pylsp'],
+	\ 'rst'     : ['vale'],
+	\ 'rust'    : ['rls', 'cargo'],
+	\ 'tex'     : ['chktex'],
 	\ }
 let g:ale_fixers = {
 	\ 'c'     : ['clang-format'],
@@ -906,7 +927,7 @@ vmap gX :<C-U>call openbrowser#search(expand('<cword>'), 'x')<CR>
 let g:openbrowser_default_search = 'bing'
 let g:openbrowser_search_engines = {
 	\ 'bing': 'https://www.bing.com/search?q={query}',
-	\ 'x':    'https://www.oxfordlearnersdictionaries.com/search/english/?q={query}',
+	\ 'x'   : 'https://www.oxfordlearnersdictionaries.com/search/english/?q={query}',
 	\ }
 " global
 if filereadable('/usr/local/share/gtags/gtags.vim')
@@ -930,11 +951,13 @@ silent! packadd minpac
 runtime ftplugin/man.vim
 " vim-surround
 let s:surround_textobj = {
+	\ 'surround-mb': {'pattern': ['（', '）'], 'select-a': 'amb', 'select-i': 'imb'},
+	\ 'surround-mB': {'pattern': ['｛', '｝'], 'select-a': 'amB', 'select-i': 'imB'},
+	\ 'surround-ma': {'pattern': ['＜', '＞'], 'select-a': 'ama', 'select-i': 'ima'},
+	\ 'surround-mA': {'pattern': ['［', '］'], 'select-a': 'amA', 'select-i': 'imA'},
 	\ 'surround-mk': {'pattern': ['「', '」'], 'select-a': 'amk', 'select-i': 'imk'},
 	\ 'surround-mn': {'pattern': ['『', '』'], 'select-a': 'amn', 'select-i': 'imn'},
-	\ 'surround-mb': {'pattern': ['（', '）'], 'select-a': 'amb', 'select-i': 'imb'},
 	\ 'surround-ms': {'pattern': ['【', '】'], 'select-a': 'ams', 'select-i': 'ims'},
-	\ 'surround-ma': {'pattern': ['［', '］'], 'select-a': 'ama', 'select-i': 'ima'},
 	\ }
 silent! call textobj#user#plugin('surround', s:surround_textobj)
 unlet s:surround_textobj
