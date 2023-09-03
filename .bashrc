@@ -1,5 +1,5 @@
 [[ ! $- =~ i ]] && return
-shopt -s autocd cdspell checkjobs checkwinsize dotglob globstar lithist no_empty_cmd_completion nocaseglob
+shopt -s autocd cdspell checkhash checkjobs checkwinsize dotglob execfail globstar lithist no_empty_cmd_completion nocaseglob
 PSSHLVL=
 if [[ $TERM =~ screen ]]; then
 	if [[ $SHLVL > 2 ]]; then
@@ -83,20 +83,20 @@ bind -m vi-insert  -x '"\e\\": _msemicolon'
 bind -m vi-command -x '"\e\\": _msemicolon'
 stopwatch() {
 	local c t acc=0 start=${EPOCHREALTIME/./} int=${1:-.1}
-	[[ $int < 0.1 ]] && read -N 1 -t .1 c
+	[[ $int < 0.1 ]] && read -N1 -t.1 c
 	while true; do
-		read -N 1 -t $int c
+		read -N1 -t$int c
 		t=$(($acc + ${EPOCHREALTIME/./} - $start))
 		printf "\r${t:: -6}.${t: -6}"
 
 		if [[ -z $c || $c == $'\n' ]]; then
 			continue
 		elif [[ $c == ' ' ]]; then
-			printf "\n"
+			printf '\n'
 			acc=$t
-			read -N 1 c
+			read -N1 c
 			start=${EPOCHREALTIME/./}
-			printf "\n"
+			printf '\n'
 		else
 			break
 		fi
@@ -107,7 +107,7 @@ cdd() {
 }
 ctags_exclude() {
 	local state=exclude arg
-	while (( $# )); do
+	while (($#)); do
 		case "$1" in
 			-h|--help)
 				echo "$0: $0 FILE ... [--include FILE ...]"
@@ -202,22 +202,50 @@ to16() {
 	_bc 10 16 "$@"
 }
 dl() {
-	if (( $# )); then
+	if (($#)); then
 		local IFS=$'\n'
 		dl <<<"$*"
 		return
 	fi
-	local url fname
-	while read -ep 'URL: ' url && [[ -n $url ]] ; do
-		fname=$(sed -E ' s:(\?|#).*::; s:.*/::' <<<"$url") || return 1
-		curl -fsSLo "$fname" "$url" || return 1
-		echo "$fname"
+	local url file pids files i=0
+	trap '
+	for ((i--; i >= 0; i--)); do
+		kill -9 ${pids[$i]} && rm -f "${files[$i]}"
 	done
+	trap - SIGINT
+	' SIGINT
+	while read -ep'URL: ' url && [[ -n $url ]] ; do
+		file=$(sed -E 's:(\?|#).*::; s:.*/::' <<<"$url") || continue
+		eval curl -fsSLo "$file" "$url" '&'
+		pids+=($!)
+		files+=("$file")
+		i=$((i + 1))
+	done
+	wait ${pids[@]}
+	trap - SIGINT
 }
 alias which &>/dev/null && unalias which
 sush() {
-	sudo PATH="$PATH" VIMINIT="source $_home/.vim/vimrc" XDG_CONFIG_HOME=~/.config HISTFILE=~/.root_history $BASH --rcfile ~/.bash_profile
+	sudo PATH="$PATH" $BASH --rcfile ~/.bash_profile
 }
+rpmt() {
+	[[ $# == 1 ]] || return 1
+	rpm2cpio $1 | cpio -t --quiet
+}
+rpmi() {
+	[[ $# -lt 3 ]] || return 1
+	local rpm=$1 pat tar
+	if [[ ${2:-} ]]; then
+		pat=$2
+	elif [[ $rpm =~ ^kernel ]]; then
+		pat=linux
+	else
+		pat=$(grep -Po '[a-z0-9]+(-[a-z]+)*' <<<$rpm | head -n1)
+	fi
+	tar=$(rpmt $rpm | grep -Po '^'$pat'([-0-9.]+(\.(el|fc)[0-9_]+)?.tar.(xz|bz2|gz))?$')
+	rpm2cpio $rpm | cpio -id --quiet $tar
+}
+alias rpmc="rpm -qp --changelog"
 
 if [[ $_uname == MSYS ]]; then
 	shopt -s completion_strip_exe
@@ -253,7 +281,7 @@ else
 		xdg-open() {
 			[[ $# == 0 ]] && return 1
 			local arg
-			while (( $# )); do
+			while (($#)); do
 				if [[ -r $1 ]]; then
 					arg=$arg'"'$(wslpath -w "$1")'", '
 				else

@@ -22,6 +22,7 @@ export RUST_BACKTRACE=1
 export SCREENDIR="$HOME/.screen"
 export SCREENRC="$_home/dotfiles/screenrc"
 export VISUAL=vim
+export XDG_CONFIG_HOME="$_home/.config"
 
 export _pc0='history -a; history -c; history -r'
 export _pc1='\[\e]0;\u@\h \w \d \A [\j] \a\]'
@@ -75,6 +76,9 @@ fi
 if [[ $_home == $HOME ]]; then
 	[[ -r $_home/.opam/opam-init/init.sh ]] && . $_home/.opam/opam-init/init.sh
 	[[ -r $_home/.ghcup/env ]] && . $_home/.ghcup/env
+elif [[ $EUID == 0 ]]; then
+	export VIMINIT="source $_home/.vim/vimrc"
+	export HISTFILE="$_home/.root_history"
 fi
 [[ -r $_home/.localbash_profile.sh ]] && . $_home/.localbash_profile.sh
 [[ -r $_home/.bashrc ]] && . $_home/.bashrc
