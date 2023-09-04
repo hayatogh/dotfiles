@@ -216,7 +216,7 @@ dl() {
 	' SIGINT
 	while read -ep'URL: ' url && [[ -n $url ]] ; do
 		file=$(sed -E 's:(\?|#).*::; s:.*/::' <<<"$url") || continue
-		eval curl -fsSLo "$file" "$url" '&'
+		eval curl -fsSLo \'$file\' \'$url\' '&'
 		pids+=($!)
 		files+=("$file")
 		i=$((i + 1))
@@ -243,7 +243,7 @@ rpmi() {
 		pat=$(grep -Po '[a-z0-9]+(-[a-z]+)*' <<<$rpm | head -n1)
 	fi
 	tar=$(rpmt $rpm | grep -Po '^'$pat'([-0-9.]+(\.(el|fc)[0-9_]+)?.tar.(xz|bz2|gz))?$')
-	rpm2cpio $rpm | cpio -id --quiet $tar
+	rpm2cpio $rpm | cpio -idu --quiet $tar
 }
 alias rpmc="rpm -qp --changelog"
 
