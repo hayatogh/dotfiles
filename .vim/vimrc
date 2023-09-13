@@ -231,9 +231,6 @@ nmap ysa' ys2i'
 nmap ysa" ys2i"
 nmap ysa` ys2i`
 
-nnoremap <Leader>t :call <SID>Command({}, 1, 0, 0, ['cargo', 'test'])<CR>
-nnoremap <Leader>u :call <SID>Command({}, 1, 0, 0, ['cargo', 'run'])<CR>
-
 nnoremap <Esc>M <C-W>-
 nnoremap <Esc>P <C-W>+
 
@@ -506,6 +503,17 @@ command! -range=% Unspacing call <SID>UnSpacing(<line1>, <line2>)
 nnoremap <silent> <Leader>S :call <SID>UnSpacing('.', '.')<CR>
 vnoremap <silent> <Leader>S :call <SID>UnSpacing('''<', '''>')<CR>
 
+function! s:CopyMode()
+	if !exists('b:copymode')
+		let b:copymode = 1
+		setl nolist nonumber norelativenumber nobreakindent
+	else
+		unlet b:copymode
+		setl list number relativenumber breakindent
+	endif
+endfunction
+nnoremap <silent> <Leader>v :call <SID>CopyMode()<CR>
+
 " excommand
 command! DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis | wincmd p | diffthis
 
@@ -741,6 +749,9 @@ augroup vimrc
 	autocmd FileType php setlocal matchpairs-=<:>
 	autocmd FileType ps1 setlocal expandtab shiftwidth=2
 	autocmd FileType rust setlocal softtabstop=0 textwidth=100
+	autocmd FileType rust nnoremap <buffer> <Leader>t :call <SID>Command({}, 1, 0, 0, ['cargo', 'test'])<CR>
+	autocmd FileType rust nnoremap <buffer> <Leader>u :call <SID>Command({}, 1, 0, 0, ['cargo', 'run'])<CR>
+
 	" autocmd FileType tex nmap <silent><buffer><nowait> <LocalLeader>ls <plug>(vimtex-compile-ss)
 	autocmd BufWinEnter * call <SID>DisableALE()
 	autocmd CmdwinEnter * nnoremap <buffer> g<CR> :let g:CmdwinLastLine=line('.')<CR><CR>q::execute g:CmdwinLastLine<CR>
