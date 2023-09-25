@@ -69,16 +69,30 @@ function prompt {
     $(if ($NestedPromptLevel -ge 1) { '>>' }) + '> '
 }
 
+Set-Alias upgrade winget_install
 function winget_install {
   winget install --no-upgrade Discord.Discord MSYS2.MSYS2 Microsoft.PowerToys NurgoSoftware.AquaSnap Valve.Steam
-  winget install 7zip.7zip AutoHotkey.AutoHotkey Debian.Debian ImageLine.FLStudio MPC-BE.MPC-BE MichaelTippach.ASIO4ALL Microsoft.MouseandKeyboardCenter Microsoft.PowerShell Microsoft.WindowsTerminal PeterPawlowski.foobar2000 SteelSeries.GG Streamlink.Streamlink TrackerSoftware.PDF-XChangeEditor Zoom.Zoom
+  winget install 7zip.7zip Debian.Debian ImageLine.FLStudio MPC-BE.MPC-BE MichaelTippach.ASIO4ALL Microsoft.MouseandKeyboardCenter Microsoft.WindowsTerminal PeterPawlowski.foobar2000 SteelSeries.GG Streamlink.Streamlink TrackerSoftware.PDF-XChangeEditor Zoom.Zoom
   # BurntSushi.ripgrep.MSVC Git.Git JGraph.Draw sharkdp.fd
 
+  _winget_install_ahk
   _winget_install_vim
   _winget_install_if_outdated "Mintty.WSLtty" '[0-9]\.[0-9]\.[0-9]' "$env:LOCALAPPDATA\wsltty\winget_version"
   _winget_install_if_outdated "PeterPawlowski.foobar2000.EncoderPack" '20[0-9][0-9]-[0-9][0-9]-[0-9][0-9]' "$env:ProgramFiles\foobar2000\encoders\winget_version"
 
   _winget_remove_links
+
+  winget install Microsoft.PowerShell
+}
+
+function _winget_install_ahk {
+  $scripts = (Get-Process -Name AutoHotkey64).CommandLine
+  winget install AutoHotkey.AutoHotkey
+  if ($?) {
+    $scripts | % {
+      pwsh -NoProfile -Command "& $_"
+    }
+  }
 }
 
 function _winget_install_vim {
