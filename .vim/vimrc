@@ -481,23 +481,39 @@ command! -nargs=1 -bar GStj call <SID>SetTagfunc(0) | stj <args>
 command! -nargs=1 -bar GSTj call <SID>SetTagfunc(0) | stj <args>
 
 function! s:Spacing(line1, line2)
-	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v([^ [:graph:][:cntrl:]]+) +\ze[^ [:graph:][:cntrl:]]/\1/g'
-	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v([[:graph:]]+) +\ze[、。]/\1/g'
-	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v([、。]+) +\ze[[:graph:]]/\1/g'
-	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v([[:graph:]]+) *\ze[^ [:graph:][:cntrl:]、。]/\1 /g'
-	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v([^ [:graph:][:cntrl:]、。]+) *\ze[[:graph:]]/\1 /g'
-	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v([[:graph:]]+) +\ze[[:graph:]]/\1 /g'
-	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v +$//g'
+	let l:a = '[[:graph:]]'
+	let l:m = '[^ [:graph:][:cntrl:]]'
+	let l:k = '[、。]'
+	let l:s = 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v'
+
+	silent! execute l:s..'('..l:a..'+) +\ze'..l:a..'/\1 /g'
+	silent! execute l:s..'('..l:a..'+) *\ze'..l:m..'/\1 /g'
+	silent! execute l:s..'('..l:m..'+) *\ze'..l:a..'/\1 /g'
+
+	silent! execute l:s..'('..l:m..'+) +\ze'..l:m..'/\1/g'
+	silent! execute l:s..'('..l:a..'+) +\ze'..l:k..'/\1/g'
+	silent! execute l:s..'('..l:k..'+) +\ze'..l:a..'/\1/g'
+
+	silent! execute l:s..'('..l:m..'+) +\ze[)]/\1/g'
+	silent! execute l:s..'([(]) +\ze('..l:m..'+)/\1/g'
+
+	silent! execute l:s..' +$//g'
 endfunction
 command! -range=% Spacing call <SID>Spacing(<line1>, <line2>)
 nnoremap <silent> <Leader>s :call <SID>Spacing('.', '.')<CR>
 vnoremap <silent> <Leader>s :call <SID>Spacing('''<', '''>')<CR>
 
 function! s:UnSpacing(line1, line2)
-	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v([[:graph:]]+) +\ze[^ [:graph:][:cntrl:]]/\1/g'
-	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v([^ [:graph:][:cntrl:]]+) +\ze/\1/g'
-	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v([[:graph:]]+) +\ze[[:graph:]]/\1 /g'
-	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v +$//g'
+	let l:a = '[[:graph:]]'
+	let l:m = '[^ [:graph:][:cntrl:]]'
+	let l:s = 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v'
+
+	silent! execute l:s..'('..l:a..'+) +\ze'..l:a..'/\1 /g'
+
+	silent! execute l:s..'('..l:a..'+) +\ze'..l:m..'/\1/g'
+	silent! execute l:s..'('..l:m..'+) +\ze/\1/g'
+
+	silent! execute l:s..' +$//g'
 endfunction
 command! -range=% Unspacing call <SID>UnSpacing(<line1>, <line2>)
 nnoremap <silent> <Leader>S :call <SID>UnSpacing('.', '.')<CR>
@@ -799,7 +815,6 @@ function! s:Minpac()
 	call minpac#add('kana/vim-textobj-indent')
 	call minpac#add('kana/vim-textobj-user')
 	call minpac#add('hayatogh/vim-bash-completion')
-	call minpac#add('tpope/vim-repeat')
 	call minpac#add('tyru/open-browser.vim')
 	" colorscheme
 	call minpac#add('tomasr/molokai')
@@ -807,11 +822,7 @@ function! s:Minpac()
 	call minpac#add('chrisbra/csv.vim')
 	call minpac#add('Shirk/vim-gas')
 	call minpac#add('previm/previm')
-	call minpac#add('wlangstroth/vim-racket')
-	call minpac#add('cespare/vim-toml')
 	" call minpac#add('kchmck/vim-coffee-script')
-	" call minpac#add('tpope/vim-markdown')
-	" call minpac#add('vim-python/python-syntax')
 	" call minpac#add('lervag/vimtex')
 	call minpac#clean()
 	call minpac#update()
