@@ -14,6 +14,8 @@
 	cl = !sh -c 'git clone $0 && cd $(basename $0 .git) && git status'
 	sc = !sh -c 'git clone --depth 1 -- $0 && cd $(basename $0 .git) && git status'
 	scg = !sh -c 'git clone --depth 1 -- https://github.com/$0 && cd $(basename $0 .git) && git status'
+[checkout]
+	workers = 0
 [core]
 	autocrlf = false
 	safecrlf = false

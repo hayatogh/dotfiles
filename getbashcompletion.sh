@@ -19,9 +19,9 @@ pip3_comp() {
 	pip3 completion --bash >$dir/pip3
 }
 
-arg=( rustup cargo pip3 )
+arg=(rustup cargo pip3)
 if [[ $# -ne 0 ]]; then
-	arg=( "$@" )
+	arg=("$@")
 fi
 for x in ${arg[@]}; do
 	${x}_comp

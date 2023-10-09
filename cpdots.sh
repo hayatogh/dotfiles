@@ -9,19 +9,38 @@ pspath() {
 winhome=$(pspath 'Get-Content Env:USERPROFILE')
 windoc=$(pspath '[Environment]::GetFolderPath("MyDocuments")')
 appdata=$(pspath 'Get-Content Env:APPDATA')
-mkdir -p "$winhome"/.config
+mkdir -p "$winhome/.config"
 
-if [[ ${1:-} =~ |all ]]; then
-	rsync -rt $dotfiles/.vimfx/ "$winhome/.vimfx"
-	rsync -t $dotfiles/.vsvimrc "$winhome/.vsvimrc"
-	rsync -rt $dotfiles/PowerShell/ "$windoc/PowerShell"
-	# rsync -rt $dotfiles/alacritty/ "$appdata/alacritty"
-	# rsync -rt $dotfiles/latexmk/ "$winhome/.config/latexmk"
-fi
-
-if [[ ${1:-} =~ mintty|all ]]; then
-	rsync -rt $dotfiles/mintty/ "$appdata/mintty"
-fi
-if [[ ${1:-} =~ vim|all ]]; then
+cp_mintty() {
+	rsync -rt $dotfiles/mintty/ "$appdata/mintty/"
+}
+cp_powershell() {
+	rsync -rt $dotfiles/PowerShell/ "$windoc/PowerShell/"
+}
+cp_vim() {
 	rsync -rtz --exclude=.git/ --exclude=/.netrwhist --exclude=/.viminfo --exclude=/swap --delete $dotfiles/.vim/ "$winhome/vimfiles"
+}
+cp_vimfx() {
+	rsync -rt $dotfiles/.vimfx/ "$winhome/.vimfx/"
+}
+cp_vsvimrc() {
+	rsync -rt $dotfiles/.vsvimrc "$winhome/"
+}
+cp_alacritty() {
+	rsync -rt $dotfiles/alacritty/ "$appdata/alacritty/"
+}
+cp_latexmk() {
+	rsync -rt $dotfiles/latexmk/ "$winhome/.config/latexmk/"
+}
+
+arg=(powershell vimfx vsvimrc)
+if [[ $# -ne 0 ]]; then
+	if [[ $1 == all ]]; then
+		arg=(mintty powershell vim vimfx vsvimrc)
+	else
+		arg=("$@")
+	fi
 fi
+for x in ${arg[@]}; do
+	cp_${x}
+done

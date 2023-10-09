@@ -214,7 +214,7 @@ dl() {
 	done
 	trap - SIGINT
 	' SIGINT
-	while read -ep'URL: ' url && [[ -n $url ]] ; do
+	while read -ep'URL: ' url && [[ -n $url ]]; do
 		file=$(sed -E 's:(\?|#).*::; s:.*/::' <<<"$url") || continue
 		eval curl -fsSLo \'$file\' \'$url\' '&'
 		pids+=($!)
