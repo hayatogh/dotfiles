@@ -2,5 +2,5 @@
 set -euo pipefail
 
 pip3 install --upgrade --user python-lsp-server yapf isort
-# pyflakes
+# flake8
 # matplotlib

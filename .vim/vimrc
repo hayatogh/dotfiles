@@ -885,6 +885,7 @@ command! -bar ALEEnableAll        ALEEnable | ALEFixOnSaveEnable
 command! -bar ALEEnableAllBuffer  ALEEnableBuffer | ALEFixOnSaveEnableBuffer
 command! -bar ALEDisableAll       ALEDisable | ALEFixOnSaveDisable
 command! -bar ALEDisableAllBuffer ALEDisableBuffer | ALEFixOnSaveDisableBuffer
+command! -bar WriteNoFix          ALEFixOnSaveDisableBuffer | w
 
 function! s:DisableALE()
 	if fnamemodify(bufname(), ':p') =~# '/linux/'
@@ -963,7 +964,7 @@ endif
 let g:rainbow_active = 1
 let g:gasCppComments = 1
 let g:lion_squeeze_spaces = 1
-let g:user_emmet_leader_key='<C-K>'
+let g:user_emmet_leader_key='<Esc>k'
 let g:csv_default_delim=','
 
 packloadall!
