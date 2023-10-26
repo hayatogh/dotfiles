@@ -964,7 +964,7 @@ endif
 let g:rainbow_active = 1
 let g:gasCppComments = 1
 let g:lion_squeeze_spaces = 1
-let g:user_emmet_leader_key='<Esc>k'
+let g:user_emmet_leader_key='<F7>'
 let g:csv_default_delim=','
 
 packloadall!
