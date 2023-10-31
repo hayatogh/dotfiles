@@ -207,25 +207,24 @@ let s:pythonexe = executable('python3') ? 'python3' : 'python'
 " mapping
 map Y y$
 
-nnoremap <silent> mm :<C-U>nohlsearch<CR>
+nnoremap <silent> mm <Cmd>noh<CR>
 
-nnoremap <silent> <C-W><C-E> :tabedit<CR>
-nnoremap <silent> <C-W><C-L> :tabnext<CR>
-nnoremap <silent> <C-W><C-H> :tabprevious<CR>
-nnoremap <silent> <C-W><C-O> :tabonly<CR>
-tnoremap <silent> <C-W><C-E> <C-W>:tabedit<CR>
-tnoremap <silent> <C-W><C-L> <C-W>:tabnext<CR>
-tnoremap <silent> <C-W><C-H> <C-W>:tabprevious<CR>
-tnoremap <silent> <C-W><C-O> <C-W>:tabonly<CR>
+nnoremap <silent> <C-W><C-E> <Cmd>tabe<CR>
+nnoremap <silent> <C-W><C-L> <Cmd>tabn<CR>
+nnoremap <silent> <C-W><C-H> <Cmd>tabp<CR>
+nnoremap <silent> <C-W><C-O> <Cmd>tabo<CR>
+tnoremap <silent> <C-W><C-E> <Cmd>tabe<CR>
+tnoremap <silent> <C-W><C-L> <Cmd>tabn<CR>
+tnoremap <silent> <C-W><C-H> <Cmd>tabp<CR>
+tnoremap <silent> <C-W><C-O> <Cmd>tabo<CR>
 
-nnoremap <silent> <Plug>Blankline :call append(line('.'), '')<CR>j:call repeat#set("\<Plug>Blankline")<CR>
-nmap <Leader>o <Plug>Blankline
+nnoremap <silent> <Leader>o o<Esc>
 
 nnoremap Q gq
-nnoremap <Leader>w :w<CR>
-nnoremap <Leader>n :n<CR>
-nnoremap <Leader>p :N<CR>
-nnoremap <Leader>c :clo<CR>
+nnoremap <Leader>w <Cmd>w<CR>
+nnoremap <Leader>n <Cmd>n<CR>
+nnoremap <Leader>p <Cmd>N<CR>
+nnoremap <Leader>c <Cmd>clo<CR>
 
 nmap ysa' ys2i'
 nmap ysa" ys2i"
@@ -237,9 +236,9 @@ nnoremap <Esc>P <C-W>+
 cnoremap <C-G> <C-\><C-N>
 inoremap <C-G> <C-\><C-N>
 
-nnoremap <silent> <Esc>= :<C-U>call <SID>FontSizeSet("")<CR>
-nnoremap <silent> <Esc>+ :<C-U>call <SID>FontSizeSet("+1")<CR>
-nnoremap <silent> <Esc>- :<C-U>call <SID>FontSizeSet("-1")<CR>
+nnoremap <silent> <Esc>= <Cmd>call <SID>FontSizeSet("")<CR>
+nnoremap <silent> <Esc>+ <Cmd>call <SID>FontSizeSet("+1")<CR>
+nnoremap <silent> <Esc>- <Cmd>call <SID>FontSizeSet("-1")<CR>
 
 nnoremap g/ /\<\><Left><Left>
 
@@ -265,10 +264,10 @@ function! s:FixWhitespace(line1, line2)
 	call setpos('.', l:save_cursor)
 endfunction
 command! -range=% FixWhitespace call <SID>FixWhitespace(<line1>, <line2>)
-nnoremap <silent> <Leader>f :<C-U>FixWhitespace<CR>
+nnoremap <silent> <Leader>f <Cmd>FixWhitespace<CR>
 
 command! -nargs=0 Cdhere cd %:p:h
-nnoremap <silent> <Leader>d :<C-U>Cdhere<CR>
+nnoremap <silent> <Leader>d <Cmd>Cdhere<CR>
 
 function! s:ResetSearchDirection(cmd)
 	let @/=@/
@@ -295,8 +294,8 @@ function! s:Search(zero, word)
 	let @/=l:pat
 	call <SID>CopyToOther(a:word)
 endfunction
-nnoremap <silent> <Plug>Star0 :call <SID>Search(0, expand('<cword>'))<CR>"_yiw<BS>
-nnoremap <silent> <Plug>Star1 :call <SID>Search(1, expand('<cword>'))<CR>"_yiw<BS>
+nnoremap <silent> <Plug>Star0 <Cmd>call <SID>Search(0, expand('<cword>'))<CR>"_yiw<BS>
+nnoremap <silent> <Plug>Star1 <Cmd>call <SID>Search(1, expand('<cword>'))<CR>"_yiw<BS>
 nmap *  <Plug>Star0n
 nmap g* <Plug>Star1n
 
@@ -322,7 +321,7 @@ function! s:Getfname()
 	return l:fname
 endfunction
 command! Getfname echo <SID>Getfname()
-nnoremap <silent> yd :<C-U>echo <SID>Getfname()<CR>
+nnoremap <silent> yd <Cmd>Getfname<CR>
 
 function! s:RegexRubout(re)
 	let l:right = strpart(getcmdline(), getcmdpos() - 1)
@@ -373,13 +372,13 @@ command! -nargs=? Hi3 call <SID>Hi(3, <f-args>)
 command! -nargs=? Hi4 call <SID>Hi(4, <f-args>)
 command! -nargs=? Hi5 call <SID>Hi(5, <f-args>)
 command! -nargs=? Hi6 call <SID>Hi(6, <f-args>)
-nmap <Leader>0 :<C-U>Hi0<CR>
-nmap <Leader>1 :<C-U>Hi1 <C-R><C-W><CR>
-nmap <Leader>2 :<C-U>Hi2 <C-R><C-W><CR>
-nmap <Leader>3 :<C-U>Hi3 <C-R><C-W><CR>
-nmap <Leader>4 :<C-U>Hi4 <C-R><C-W><CR>
-nmap <Leader>5 :<C-U>Hi5 <C-R><C-W><CR>
-nmap <Leader>6 :<C-U>Hi6 <C-R><C-W><CR>
+nnoremap <Leader>0 :<C-U>Hi0<CR>
+nnoremap <Leader>1 :<C-U>Hi1 <C-R><C-W><CR>
+nnoremap <Leader>2 :<C-U>Hi2 <C-R><C-W><CR>
+nnoremap <Leader>3 :<C-U>Hi3 <C-R><C-W><CR>
+nnoremap <Leader>4 :<C-U>Hi4 <C-R><C-W><CR>
+nnoremap <Leader>5 :<C-U>Hi5 <C-R><C-W><CR>
+nnoremap <Leader>6 :<C-U>Hi6 <C-R><C-W><CR>
 
 function! s:TagfuncLinux(pattern, flags, info)
 	if ! b:guesstag | let b:guesstag = 1 | return v:null | endif
@@ -528,7 +527,7 @@ function! s:CopyMode()
 		setl list number relativenumber breakindent
 	endif
 endfunction
-nnoremap <silent> <Leader>v :call <SID>CopyMode()<CR>
+nnoremap <silent> <Leader>v <Cmd>call <SID>CopyMode()<CR>
 
 " excommand
 command! DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis | wincmd p | diffthis
@@ -765,8 +764,8 @@ augroup vimrc
 	autocmd FileType php setlocal matchpairs-=<:>
 	autocmd FileType ps1 setlocal expandtab shiftwidth=2
 	autocmd FileType rust setlocal softtabstop=0 textwidth=100
-	autocmd FileType rust nnoremap <buffer> <Leader>t :call <SID>Command({}, 1, 0, 0, ['cargo', 'test'])<CR>
-	autocmd FileType rust nnoremap <buffer> <Leader>u :call <SID>Command({}, 1, 0, 0, ['cargo', 'run'])<CR>
+	autocmd FileType rust nnoremap <buffer> <Leader>t <Cmd>call <SID>Command({}, 1, 0, 0, ['cargo', 'test'])<CR>
+	autocmd FileType rust nnoremap <buffer> <Leader>u <Cmd>call <SID>Command({}, 1, 0, 0, ['cargo', 'run'])<CR>
 
 	" autocmd FileType tex nmap <silent><buffer><nowait> <LocalLeader>ls <plug>(vimtex-compile-ss)
 	autocmd BufWinEnter * call <SID>DisableALE()
@@ -945,8 +944,8 @@ let g:NERDTreeMapOpenVSplit = 'v'
 " openbrowser
 nmap gx <Plug>(openbrowser-smart-search)
 vmap gx <Plug>(openbrowser-smart-search)
-nmap gX :<C-U>call openbrowser#search(expand('<cword>'), 'x')<CR>
-vmap gX :<C-U>call openbrowser#search(expand('<cword>'), 'x')<CR>
+nmap gX <Cmd>call openbrowser#search(expand('<cword>'), 'x')<CR>
+vmap gX <Cmd>call openbrowser#search(expand('<cword>'), 'x')<CR>
 let g:openbrowser_default_search = 'bing'
 let g:openbrowser_search_engines = {
 	\ 'bing': 'https://www.bing.com/search?q={query}',
@@ -1026,17 +1025,17 @@ if has("gui_running") && has('win32')
 	function! s:CopyToClip_OSC52(str)
 	endfunction
 
-	nnoremap <silent> <M-Space> :simalt ~<CR>
+	nnoremap <silent> <M-Space> <Cmd>simalt ~<CR>
 	cnoremap <M-/> <C-\>e<SID>RegexRubout('\v[^/\\]*(/\|\\)? *$')<CR>
 	cnoremap <M-w> <C-\>e<SID>RegexRubout('\v[^ ]* *$')<CR>
 	nnoremap <M-m> <C-W>-
 	nnoremap <M-p> <C-W>+
-	nnoremap <silent> <M-=>               :<C-U>call <SID>FontSizeSet("")<CR>
-	nnoremap <silent> <M-+>               :<C-U>call <SID>FontSizeSet("+1")<CR>
-	nnoremap <silent> <M-->               :<C-U>call <SID>FontSizeSet("-1")<CR>
-	nnoremap <silent> <C-=>               :<C-U>call <SID>FontSizeSet("")<CR>
-	nnoremap <silent> <C-ScrollWheelUp>   :<C-U>call <SID>FontSizeSet("+1")<CR>
-	nnoremap <silent> <C-ScrollWheelDown> :<C-U>call <SID>FontSizeSet("-1")<CR>
+	nnoremap <silent> <M-=>               <Cmd>call <SID>FontSizeSet("")<CR>
+	nnoremap <silent> <M-+>               <Cmd>call <SID>FontSizeSet("+1")<CR>
+	nnoremap <silent> <M-->               <Cmd>call <SID>FontSizeSet("-1")<CR>
+	nnoremap <silent> <C-=>               <Cmd>call <SID>FontSizeSet("")<CR>
+	nnoremap <silent> <C-ScrollWheelUp>   <Cmd>call <SID>FontSizeSet("+1")<CR>
+	nnoremap <silent> <C-ScrollWheelDown> <Cmd>call <SID>FontSizeSet("-1")<CR>
 endif
 
 if filereadable(expand('~/.localvimrc.vim'))
