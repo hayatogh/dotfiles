@@ -45,15 +45,15 @@ else
 	rm -rf $dir
 	tar -xf $fname
 	cd $dir
-	mkdir -p ../../bin
-	cp fd ../../bin/fd
-	mkdir -p ../../share/man/man1
-	cp fd.1 ../../share/man/man1/fd.1
+	mkdir -p $prefix/bin
+	cp fd $prefix/bin/fd
+	mkdir -p $prefix/share/man/man1
+	cp fd.1 $prefix/share/man/man1/fd.1
 	if [[ $EUID == 0 ]]; then
 		mkdir -p /etc/bash_completion.d
 		cp autocomplete/fd.bash /etc/bash_completion.d/fd.bash
 	else
-		mkdir -p ../../share/bash-completion/completions
-		cp autocomplete/fd.bash ../../share/bash-completion/completions/fd.bash
+		mkdir -p $prefix/share/bash-completion/completions
+		cp autocomplete/fd.bash $prefix/share/bash-completion/completions/fd.bash
 	fi
 fi

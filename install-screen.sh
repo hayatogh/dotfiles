@@ -29,10 +29,10 @@ cd $dir
 ./configure --prefix=$prefix --enable-colors256 &>/dev/null
 make -j4 &>/dev/null
 make install &>/dev/null
-mkdir -p ../../etc
-cp etc/etcscreenrc ../../etc/screenrc
+mkdir -p $prefix/etc
+cp etc/etcscreenrc $prefix/etc/screenrc
 if [[ $EUID == 0 ]]; then
 	cat terminfo/screencap >>/etc/termcap
 else
-	cat terminfo/screencap >>../../etc/termcap
+	cat terminfo/screencap >>$prefix/etc/termcap
 fi

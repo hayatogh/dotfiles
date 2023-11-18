@@ -38,15 +38,15 @@ else
 	rm -rf $dir
 	tar -xf $fname
 	cd $dir
-	mkdir -p ../../bin
-	cp rg ../../bin/rg
-	mkdir -p ../../share/man/man1
-	cp doc/rg.1 ../../share/man/man1/rg.1
+	mkdir -p $prefix/bin
+	cp rg $prefix/bin/rg
+	mkdir -p $prefix/share/man/man1
+	cp doc/rg.1 $prefix/share/man/man1/rg.1
 	if [[ $EUID == 0 ]]; then
 		mkdir -p /etc/bash_completion.d
 		cp complete/rg.bash /etc/bash_completion.d/rg.bash
 	else
-		mkdir -p ../../share/bash-completion/completions
-		cp complete/rg.bash ../../share/bash-completion/completions/rg.bash
+		mkdir -p $prefix/share/bash-completion/completions
+		cp complete/rg.bash $prefix/share/bash-completion/completions/rg.bash
 	fi
 fi
