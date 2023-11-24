@@ -21,7 +21,6 @@
 	safecrlf = false
 [fetch]
 	prune = true
-	pruneTags = true
 [init]
 	defaultBranch = main
 [log]
@@ -35,8 +34,6 @@
 	diff = less -x9,17
 [pull]
 	rebase = false
-[push]
-	followTags = true
 [user]
 	name = hayatogh
 	email = 28914976+hayatogh@users.noreply.github.com
