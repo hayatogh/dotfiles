@@ -234,7 +234,7 @@ rpmt() {
 }
 rpmi() {
 	[[ $# -lt 3 ]] || return 1
-	local rpm=$1 base=${rpm##*/} pat tar
+	local rpm=$1 base=${1##*/} pat tar
 	if [[ ${2:-} ]]; then
 		pat=$2
 	elif [[ $base =~ ^kernel ]]; then
