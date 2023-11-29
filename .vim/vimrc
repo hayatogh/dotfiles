@@ -36,7 +36,7 @@ set list listchars=tab:»-,extends:»,precedes:«,nbsp:◦
 set showmatch matchtime=1 matchpairs+=（:）,｛:｝,＜:＞,［:］,「:」,『:』,【:】
 set modeline modelines=3
 set mouse=a mousemodel=extend nomousehide
-let s:in_screen = &term =~# 'screen'
+let s:in_screen = exists('$STY')
 if s:in_screen
 	set mouse=
 endif

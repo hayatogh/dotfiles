@@ -130,6 +130,20 @@ ctags_exclude() {
 	echo "ctags -R $arg"
 	ctags -R $arg
 }
+maketags() {
+	if [[ ! -f Kbuild ]]; then
+		ctags -R
+	else
+		local arch=x86
+		if [[ ${1:-} =~ arm ]]; then
+			arch=arm64
+		fi
+		rm -f tags
+		make SRCARCH=$arch tags
+		mv tags tags.$arch
+		ln -s tags.$arch tags
+	fi
+}
 realwhich() {
 	realpath "$(which "$1")"
 }
