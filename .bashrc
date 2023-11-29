@@ -234,15 +234,17 @@ rpmt() {
 }
 rpmi() {
 	[[ $# -lt 3 ]] || return 1
-	local rpm=$1 pat tar
+	local rpm=$1 base=${rpm##*/} pat tar
 	if [[ ${2:-} ]]; then
 		pat=$2
-	elif [[ $rpm =~ ^kernel ]]; then
+	elif [[ $base =~ ^kernel ]]; then
 		pat=linux
 	else
-		pat=$(grep -Po '[a-z0-9]+(-[a-z]+)*' <<<$rpm | head -n1)
+		pat=$(grep -Po '[a-z0-9]+(-[a-z]+)*' <<<$base | head -n1)
+		[[ -n $pat ]] || return 1
 	fi
 	tar=$(rpmt $rpm | grep -Po '^'$pat'([-0-9.]+(\.(el|fc)[0-9_]+)?.tar.(xz|bz2|gz))?$')
+	[[ -n $tar ]] || return 1
 	rpm2cpio $rpm | cpio -idu --quiet $tar
 }
 alias rpmc="rpm -qp --changelog"
