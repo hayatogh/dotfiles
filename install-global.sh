@@ -2,7 +2,9 @@
 set -euo pipefail
 
 prefix=/usr/local
-# prefix=$HOME/.local
+if [[ ${1:-} == -l ]]; then
+	prefix=$HOME/.local
+fi
 
 if [[ $EUID != 0 && $prefix == /usr/local ]]; then
 	exec sudo "$0" "$@"
