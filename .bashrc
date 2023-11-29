@@ -289,9 +289,6 @@ else
 	e() {
 		xdg-open &>/dev/null "${@:-.}"
 	}
-	pdfx() {
-		wine start 'C:\Program Files\Tracker Software\PDF Editor\PDFXEdit.exe' "$@" &>/dev/null &
-	}
 	if [[ $_uname == WSL ]]; then
 		alias open=xdg-open
 		xdg-open() {
