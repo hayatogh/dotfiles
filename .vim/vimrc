@@ -330,10 +330,9 @@ function! s:RegexRubout(re)
 	call setcmdpos(strlen(l:left) + 1)
 	return l:left .. l:right
 endfunction
-cnoremap <Esc>/ <C-\>e<SID>RegexRubout('\v[^/ ]*/? *$')<CR>
-cnoremap <C-W>  <C-\>e<SID>RegexRubout('\v([a-zA-z]+\|[0-9]+\|.) *$')<CR>
-cnoremap <Esc>w <C-\>e<SID>RegexRubout('\v[^ ]* *$')<CR>
-cnoremap <Esc>W <C-\>e<SID>RegexRubout('\v[^ ]* *$')<CR>
+cnoremap <Esc>/     <C-\>e<SID>RegexRubout('\v[^/ ]*/? *$')<CR>
+cnoremap <C-W>      <C-\>e<SID>RegexRubout('\v([a-zA-Z0-9_]+\|[^ a-zA-Z0-9_]+) *$')<CR>
+cnoremap <Esc><C-W> <C-\>e<SID>RegexRubout('\v[^ ]* *$')<CR>
 
 function! s:StayColumn(cmd)
 	let l:save_cursor = getcurpos()

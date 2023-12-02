@@ -1,6 +1,5 @@
 # $include /etc/inputrc
-# bind -f $INPUTRC to re-read this file
-# bind -p | grep -v '\|#self-insert\|^$'
+# bind -p | grep -v self-insert
 set bell-style none
 set bind-tty-special-chars off
 set blink-matching-paren on
@@ -9,8 +8,7 @@ set colored-stats on
 set completion-ignore-case on
 set completion-map-case on
 set convert-meta off
-set editing-mode vi
-# set editing-mode emacs
+set editing-mode emacs
 set history-size 500
 set input-meta on
 set keyseq-timeout 500
@@ -20,144 +18,62 @@ set menu-complete-display-prefix on
 set output-meta on
 set show-all-if-ambiguous on
 set show-all-if-unmodified on
-set show-mode-in-prompt on
 set visible-stats on
 
-$if mode=vi
-	set keymap vi-command
-	"ciw": "lbcw"
-	"ciW": "lBcW"
-	"ci\"": "lT\"ct\""
-	"ci'": "lT'ct'"
-	"ci/": "lT/ct/"
-	"cib": "lT(ct)"
-	"diw": "lbdw"
-	"diW": "lBdW"
-	"ysiw\"": "lbi\"\e\eea\"\e\e"
-	"ysiW\"": "lBi\"\e\eEa\"\e\e"
-	"ysiw'": "lbi'\e\eea'\e\e"
-	"ysiW'": "lBi'\e\eEa'\e\e"
-	"ysiwb": "lbi(\e\eea)\e\e"
-	"ysiWb": "lBi(\e\eEa)\e\e"
-	"cs\"'": "F\"r',."
-	"cs'\"": "F'r\",."
-	"ds\"": "F\"x,."
-	"ds'": "F'x,."
-	"v": "iv"
-	"\C-l": clear-screen
-	"\C-o": redraw-current-line
-	"\C-y": previous-history
-	"\C-e": next-history
-	"\C-n": history-search-forward
-	j:history-search-forward
-	"\C-p": history-search-backward
-	k:history-search-backward
-	"\C-x\C-r": re-read-init-file
-	"\ep": yank
-	"\eu": copy-region-as-kill
-	"\ec": insert-comment
-	"\e\C-w": unix-word-rubout
-	"\e/": unix-filename-rubout
-	# HOME PAGEDOWN PAGEUP END
-	"\e[1~": beginning-of-line
-	"\e[6~": history-search-forward
-	"\e[5~": history-search-backward
-	"\e[4~": end-of-line
-	"\eOH": beginning-of-line
-	"\eOF": end-of-line
-	$if Bash
-		"gcc": insert-comment
-		"\C-g": "i\C-e\C-u fg || true\C-m"
-		"\eg": "i\C-e\C-u fg || true\C-m\ep"
-		"\es": "i\C-e --color=always | less\C-m"
-	$endif
-	set keymap vi-insert
-	"\C-a": beginning-of-line
-	"\C-e": end-of-line
-	"\C-f": forward-char
-	"\C-b": backward-char
-	"\C-l": clear-screen
-	"\C-o": redraw-current-line
-	"\C-r": reverse-search-history
-	"\C-n": history-search-forward
-	"\C-p": history-search-backward
-	"\C-i": menu-complete
-	# S-TAB
-	"\e[Z": menu-complete-backward
-	"\e\e": vi-movement-mode
-	"\C-k": kill-line
-	"\C-y": ""
-	"\C-x": ""
-	"\C-x\C-r": re-read-init-file
-	"\ep": yank
-	"\eu": copy-region-as-kill
-	"\ec": insert-comment
-	"\e\C-w": unix-word-rubout
-	"\e/": unix-filename-rubout
-	"\eW": vi-forward-bigword
-	"\ew": vi-forward-word
-	"\eB": vi-backward-bigword
-	"\eb": vi-backward-word
-	"\eE": vi-end-bigword
-	"\ee": vi-end-word
-	"\ef": vi-char-search
-	"\eF": vi-char-search
-	"\e;": vi-char-search
-	"\e,": vi-char-search
-	# HOME PAGEDOWN PAGEUP END
-	"\e[1~": beginning-of-line
-	"\e[6~": history-search-forward
-	"\e[5~": history-search-backward
-	"\e[4~": end-of-line
-	"\eOH": beginning-of-line
-	"\eOF": end-of-line
-
-	"\C-x\C-m": set-mark
-	"\C-x\C-t": exchange-point-and-mark
-	$if Bash
-		"\C-x\C-n": shell-expand-line
-		"\C-x\C-b": complete-into-braces
-		"\C-x\C-f": complete-filename
-		"\C-x\C-u": complete-username
-		"\C-x\C-h": complete-hostname
-		"\C-x\C-v": complete-variable
-		"\C-x\C-o": complete-command
-		# "\C-x\C-g": glob-complete-word
-		"\C-x\C-p": glob-expand-word
-		"\C-x\C-l": glob-list-expansions
-		"\C-g": "\C-e\C-u fg || true\C-m"
-		"\eg": "\C-e\C-u fg || true\C-m\ep"
-		"\es": "\C-e --color=always | less\C-m"
-	$endif
-	$if Python
-		"\C-i": "    "
-		"\C-d": "\C-x\C-m\C-a\e[3~\e[3~\e[3~\e[3~\C-x\C-t\C-x\C-m"
-		"\C-t": "\C-x\C-m\C-a    \C-x\C-t\C-f\C-f\C-f\C-f\C-x\C-m"
-	$endif
+"\C-d": vi-eof-maybe
+"\C-n": history-search-forward
+"\C-p": history-search-backward
+"\C-i": menu-complete
+"\e[Z": menu-complete-backward
+"\C-x": ""
+"\ec": insert-comment
+"\e\C-w": unix-word-rubout
+"\e/": unix-filename-rubout
+"\eW": vi-forward-bigword
+"\ew": vi-forward-word
+"\eB": vi-backward-bigword
+"\eb": vi-backward-word
+"\eE": vi-end-bigword
+"\ee": vi-end-word
+"\ef": vi-char-search
+"\eF": vi-char-search
+"\e;": vi-char-search
+"\e,": vi-char-search
+$if Bash
+	"\C-x\C-n": shell-expand-line
+	"\C-x\C-b": complete-into-braces
+	"\C-x\C-f": complete-filename
+	"\C-x\C-u": complete-username
+	"\C-x\C-h": complete-hostname
+	"\C-x\C-v": complete-variable
+	"\C-x\C-o": complete-command
+	"\C-x\C-p": glob-expand-word
+	"\C-x\C-l": glob-list-expansions
+	"\C-g": "\C-e\C-u fg || true\C-m"
+	"\eg": "\C-e\C-u fg || true\C-m\C-y"
+	"\es": "\C-e --color=always | less\C-m"
 $endif
-$if mode=emacs
-	"\C-n": history-search-forward
-	"\C-p": history-search-backward
-	# for linux console and RH/Debian xterm
-	"\e[1~": beginning-of-line
-	"\e[6~": history-search-forward
-	"\e[5~": history-search-backward
-	"\e[4~": end-of-line
-
-	"\e[3~": delete-char
-	"\e[2~": quoted-insert
-	"\e[5C": forward-word
-	"\e[5D": backward-word
-	"\e[1;5C": forward-word
-	"\e[1;5D": backward-word
-	# for rxvt
-	"\e[8~": end-of-line
-	"\eOc": forward-word
-	"\eOd": backward-word
-	# for non RH/Debian xterm, can't hurt for RH/DEbian xterm
-	"\eOH": beginning-of-line
-	"\eOF": end-of-line
-	# for freebsd console
-	"\e[H": beginning-of-line
-	"\e[F": end-of-line
+$if Python
+	"\C-i": "    "
+	"\C-d": "\C-x \C-a\e[3~\e[3~\e[3~\e[3~\C-x\C-x\C-x "
+	"\C-t": "\C-x \C-a    \C-x\C-x\C-f\C-f\C-f\C-f\C-x "
 $endif
+
+"\e[A": previous-history
+"\e[B": next-history
+"\e[C": forward-char
+"\e[D": backward-char
+"\eOA": previous-history
+"\eOB": next-history
+"\eOC": forward-char
+"\eOD": backward-char
+"\e[H": beginning-of-line
+"\e[F": end-of-line
+"\eOH": beginning-of-line
+"\eOF": end-of-line
+"\e[2~": quoted-insert
+"\e[3~": delete-char
+"\e[1~": beginning-of-line
+"\e[4~": end-of-line
+"\e[5~": history-search-backward
+"\e[6~": history-search-forward

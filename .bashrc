@@ -72,15 +72,13 @@ _regex_rubout() {
 	READLINE_POINT=${#left}
 }
 _cw() {
-	_regex_rubout '([a-zA-Z]+|[0-9]+|.) *$'
+	_regex_rubout '([a-zA-Z0-9_]+|[^ a-zA-Z0-9_]+) *$'
 }
-bind -m vi-insert  -x '"\C-w": _cw'
-bind -m vi-command -x '"\C-w": _cw'
-_msemicolon() {
+bind -x '"\C-w": _cw'
+_mbackslash() {
 	_regex_rubout '([^ ;&|<>] *)*(;|&&|\|\||\||\|&|<|>|<<|>>|&>|>&)? *$'
 }
-bind -m vi-insert  -x '"\e\\": _msemicolon'
-bind -m vi-command -x '"\e\\": _msemicolon'
+bind -x '"\e\\": _mbackslash'
 stopwatch() {
 	local c t acc=0 start=${EPOCHREALTIME/./} int=${1:-.1}
 	[[ $int < 0.1 ]] && read -N1 -t.1 c
@@ -105,43 +103,20 @@ stopwatch() {
 cdd() {
 	cd "$(dirname "$1")"
 }
-ctags_exclude() {
-	local state=exclude arg
-	while (($#)); do
-		case "$1" in
-			-h|--help)
-				echo "$0: $0 FILE ... [--include FILE ...]"
-				return
-				;;
-			--include)
-				state=include
-				shift
-				;;
-			*)
-				if [[ $state == exclude ]]; then
-					arg="$arg--exclude=$1 "
-				else
-					arg=$(sed 's/--exclude='$1' //g' <<<"$arg")
-				fi
-				shift
-				;;
-		esac
-	done
-	echo "ctags -R $arg"
-	ctags -R $arg
-}
-maketags() {
-	if [[ ! -f Kbuild ]]; then
-		ctags -R
-	else
+mktags() {
+	if [[ -f Kbuild ]]; then
 		local arch=x86
 		if [[ ${1:-} =~ arm ]]; then
 			arch=arm64
 		fi
 		rm -f tags
-		make SRCARCH=$arch tags
+		make SRCARCH=$arch tags &>/dev/null
 		mv tags tags.$arch
 		ln -s tags.$arch tags
+	elif [[ ${#@} != 0 ]]; then
+		ctags "$@" &>/dev/null
+	else
+		ctags -R &>/dev/null
 	fi
 }
 realwhich() {
@@ -158,7 +133,7 @@ fixmod() {
 		return
 	fi
 	local x
-	for x in "$@"; do
+	for x; do
 		if [[ -d $x ]]; then
 			chmod 755 "$x"
 		else
@@ -214,6 +189,29 @@ to10() {
 }
 to16() {
 	_bc 10 16 "$@"
+}
+calc() {
+	perl -Mbignum -e '$x = ('"$*"');
+$u64 = $x & 0xffffffffffffffff;
+$i64 = $u64 >> 63 ? -1 * (($u64 ^ 0xffffffffffffffff) + 1) : $u64;
+$u32 = $x & 0xffffffff;
+$i32 = $u32 >> 31 ? -1 * (($u32 ^ 0xffffffff) + 1) : $u32;
+$set = "";
+for (my $b = 0; $x >> $b; $b++) {
+	if (($x >> $b) & 1) {
+		$set = $b . " " . $set;
+	}
+}
+printf "hex:      %s
+decimal:  %s
+octal:    %s
+string:   %s
+binary:   %s
+bits set: %s
+64:       %#x %u %d
+32:       %#x %u %d
+", $x->as_hex(), $x, $x->as_oct(), $x->to_bytes(), $x->as_bin(), $set,
+$u64, $u64, $i64, $u32, $u32, $i32;'
 }
 dl() {
 	if (($#)); then
