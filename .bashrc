@@ -141,17 +141,11 @@ fixmod() {
 		fi
 	done
 }
-rg() {
-	command rg --hidden -g!tags "$@"
-}
-rgi() {
-	rg --no-messages "$@"
-}
-rgall2() {
-	rg --no-ignore "$@"
-}
 rgall() {
-	rgall2 -g!.git/ "$@"
+	command rg --no-messages --hidden --no-ignore -g!tags -g!.git/ "$@"
+}
+rg() {
+	rgall --ignore -g!/po/*.po -g!/Documentation/translations "$@"
 }
 _rg_arch() {
 	rg $(find arch/ -mindepth 1 -maxdepth 1 -type d -printf '-g!%f/ ' | sed -E 's:-g!('"$1"')/ ::') "${@:2}"
