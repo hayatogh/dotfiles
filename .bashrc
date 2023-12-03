@@ -9,37 +9,37 @@ elif [[ $SHLVL > 1 ]]; then
 	PSSHLVL=$SHLVL
 fi
 PSM=${PSM:-}
-alias chgrp="chgrp --preserve-root"
-alias chmod="chmod --preserve-root"
-alias chown="chown --preserve-root"
-alias cp="cp -p"
-alias dus="du -chs"
-alias diff="diff --color=auto"
-alias diffr="git diff --no-index --histogram"
-alias diffl="diffr -U2147483647"
-alias diffc="diffl --word-diff-regex=."
+alias chgrp='chgrp --preserve-root'
+alias chmod='chmod --preserve-root'
+alias chown='chown --preserve-root'
+alias cp='cp -p'
+alias dus='du -chs'
+alias diff='diff --color=auto'
+alias diffr='git diff --no-index --histogram'
+alias diffl='diffr -U2147483647'
+alias diffc='diffl --word-diff-regex=.'
 alias diffw='diffl --word-diff-regex='\''\S+|[^\S]'\'''
 alias ee=exit
-alias fd="fd -HE.git/"
-alias fdall="fd -I"
-alias git_dotfiles_pull="git -C ~/dotfiles pull"
-alias git_empty_commit="git add -A && git commit -m 'No commit message' && git push"
-alias grep="grep --color=auto"
-alias info="info --init-file $_home/dotfiles/infokey"
-alias ls="ls --color=auto"
-alias la="ls -AF"
-alias ll="ls -lhF"
-alias al="ls -alhF"
-alias ltime="ls -alhrtF"
-alias lsize="ls -alhrFS"
-alias manless="man -P less"
-alias rm="rm -i"
-alias sc="script -qc sh"
-alias scheme="scheme $_home/dotfiles/chezrc.ss"
-alias sudo_proxy="sudo --preserve-env=https_proxy,http_proxy,ftp_proxy,no_proxy"
-alias tm="tmux new -ADX"
-alias vi="vim --clean"
-alias wget="wget -N"
+alias fd='fd -HE.git/'
+alias fdall='fd -I'
+alias git_dotfiles_pull='git -C ~/dotfiles pull'
+alias git_empty_commit='git add -A && git commit -m '\''No commit message'\'' && git push'
+alias grep='grep --color=auto'
+alias info='info --init-file '$_home'/dotfiles/infokey'
+alias ls='ls --color=auto'
+alias la='ls -AF'
+alias ll='ls -lhF'
+alias al='ls -alhF'
+alias ltime='ls -alhrtF'
+alias lsize='ls -alhrFS'
+alias manless='man -P less'
+alias rm='rm -i'
+alias sc='script -qc sh'
+alias scheme='scheme '$_home'/dotfiles/chezrc.ss'
+alias sudo_proxy='sudo --preserve-env=https_proxy,http_proxy,ftp_proxy,no_proxy'
+alias tm='tmux new -ADX'
+alias vi='vim --clean'
+alias wget='wget -N'
 sr() {
 	local tty=${SCREEN_TTY:-${SSH_TTY:-$(tty)}}
 	screen -X setenv SCREEN_TTY $tty >/dev/null
@@ -253,7 +253,7 @@ rpmi() {
 	[[ -n $tar ]] || return 1
 	rpm2cpio $rpm | cpio -idu --quiet $tar
 }
-alias rpmc="rpm -qp --changelog"
+alias rpmc='rpm -qp --changelog'
 
 if [[ $_uname == MSYS ]]; then
 	shopt -s completion_strip_exe
@@ -270,8 +270,8 @@ if [[ $_uname == MSYS ]]; then
 	}
 	[[ -r /usr/share/git/git-prompt.sh ]] && . /usr/share/git/git-prompt.sh
 elif [[ $_uname == Darwin ]]; then
-	alias batt="pmset -g batt"
-	alias scheme="chez $_home/dotfiles/chezrc.ss"
+	alias batt='pmset -g batt'
+	alias scheme='chez '$_home'/dotfiles/chezrc.ss'
 	alias e=open
 	upgrade() {
 		brew upgrade
