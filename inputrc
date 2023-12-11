@@ -25,10 +25,11 @@ set visible-stats on
 "\C-p": history-search-backward
 "\C-i": menu-complete
 "\e[Z": menu-complete-backward
-"\C-x": ""
 "\ec": insert-comment
+"\C-w": backward-kill-word
 "\e\C-w": unix-word-rubout
 "\e/": unix-filename-rubout
+"\eD": backward-kill-word
 "\eW": vi-forward-bigword
 "\ew": vi-forward-word
 "\eB": vi-backward-bigword
@@ -41,6 +42,8 @@ set visible-stats on
 "\e,": vi-char-search
 $if Bash
 	"\C-x\C-n": shell-expand-line
+	"\C-x\C-i": history-expand-line
+	"\C-x\C-a": alias-expand-line
 	"\C-x\C-b": complete-into-braces
 	"\C-x\C-f": complete-filename
 	"\C-x\C-u": complete-username
@@ -49,31 +52,9 @@ $if Bash
 	"\C-x\C-o": complete-command
 	"\C-x\C-p": glob-expand-word
 	"\C-x\C-l": glob-list-expansions
-	"\C-g": "\C-e\C-u fg || true\C-m"
-	"\eg": "\C-e\C-u fg || true\C-m\C-y"
-	"\es": "\C-e --color=always | less\C-m"
+	"\C-g": "\C-e\C-u fg || true\C-m\C-y"
+	"\es": "\C-e--color=always | less\C-m"
 $endif
 $if Python
-	"\C-i": "    "
-	"\C-d": "\C-x \C-a\e[3~\e[3~\e[3~\e[3~\C-x\C-x\C-x "
-	"\C-t": "\C-x \C-a    \C-x\C-x\C-f\C-f\C-f\C-f\C-x "
+	"\C-i": "\e4 "
 $endif
-
-"\e[A": previous-history
-"\e[B": next-history
-"\e[C": forward-char
-"\e[D": backward-char
-"\eOA": previous-history
-"\eOB": next-history
-"\eOC": forward-char
-"\eOD": backward-char
-"\e[H": beginning-of-line
-"\e[F": end-of-line
-"\eOH": beginning-of-line
-"\eOF": end-of-line
-"\e[2~": quoted-insert
-"\e[3~": delete-char
-"\e[1~": beginning-of-line
-"\e[4~": end-of-line
-"\e[5~": history-search-backward
-"\e[6~": history-search-forward

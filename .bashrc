@@ -142,7 +142,7 @@ fixmod() {
 	done
 }
 rgall() {
-	command rg --no-messages --hidden --no-ignore -g!tags -g!.git/ "$@"
+	command rg --no-messages --hidden --no-ignore -g!tags -g!tags.x86 -g!tags.arm64 -g!.git/ "$@"
 }
 rg() {
 	rgall --ignore -g!/po/*.po -g!/Documentation/translations "$@"
@@ -186,26 +186,29 @@ to16() {
 }
 calc() {
 	perl -Mbignum -e '$x = ('"$*"');
-$u64 = $x & 0xffffffffffffffff;
-$i64 = $u64 >> 63 ? -1 * (($u64 ^ 0xffffffffffffffff) + 1) : $u64;
-$u32 = $x & 0xffffffff;
-$i32 = $u32 >> 31 ? -1 * (($u32 ^ 0xffffffff) + 1) : $u32;
-$set = "";
-for (my $b = 0; $x >> $b; $b++) {
-	if (($x >> $b) & 1) {
-		$set = $b . " " . $set;
+if ($x->is_int()) {
+	$u64 = $x & 0xffffffffffffffff;
+	$i64 = $u64 >> 63 ? -1 * (($u64 ^ 0xffffffffffffffff) + 1) : $u64;
+	$u32 = $x & 0xffffffff;
+	$i32 = $u32 >> 31 ? -1 * (($u32 ^ 0xffffffff) + 1) : $u32;
+	$set = "";
+	for (my $b = 0; $x >> $b; $b++) {
+		if (($x >> $b) & 1) {
+			$set = $b . " " . $set;
+		}
 	}
-}
-printf "hex:      %s
-decimal:  %s
+	printf "hex:      %s
+decimal:  %s %s %s
 octal:    %s
 string:   %s
 binary:   %s
 bits set: %s
-64:       %#x %u %d
-32:       %#x %u %d
-", $x->as_hex(), $x, $x->as_oct(), $x->to_bytes(), $x->as_bin(), $set,
-$u64, $u64, $i64, $u32, $u32, $i32;'
+64 bit:   %#x %u %d
+32 bit:   %#x %u %d
+", $x->as_hex(), $x->bdstr(), $x->bnstr(), $x->bestr(), $x->as_oct(), $x->to_bytes(), $x->as_bin(), $set, $u64, $u64, $i64, $u32, $u32, $i32;
+} else {
+	printf "%s\n%s\n", $x->bdstr(), $x->bsstr()
+}'
 }
 dl() {
 	if (($#)); then
@@ -320,8 +323,8 @@ else
 	fi
 fi
 
-# printf "\e]12;#ff0000\a"
-# printf "\e[2 q"
+# printf '\e]12;#ff0000\a'
+# printf '\e[2 q'
 
 [[ -r /etc/profile.d/bash_completion.sh ]] && . /etc/profile.d/bash_completion.sh
 type _completion_loader &>/dev/null && ! _completion_loader ssh

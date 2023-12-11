@@ -6,8 +6,7 @@ set colored-stats on
 set completion-ignore-case on
 set completion-map-case on
 set convert-meta off
-set editing-mode vi
-# set editing-mode emacs
+set editing-mode emacs
 set history-size 500
 set input-meta on
 set keyseq-timeout 500
@@ -17,47 +16,40 @@ set menu-complete-display-prefix on
 set output-meta on
 set show-all-if-ambiguous on
 set show-all-if-unmodified on
-set show-mode-in-prompt on
 set visible-stats on
 
-$if mode=vi
-	set keymap vi-command
-	"v": "iv"
-	set keymap vi-insert
-	"\C-a": beginning-of-line
-	"\C-e": end-of-line
-	"\C-f": forward-char
-	"\C-b": backward-char
-	"\ef": forward-word
-	"\eb": backward-word
-	"\C-l": clear-screen
-	"\C-o": redraw-current-line
-	"\C-r": reverse-search-history
-	"\C-n": history-search-forward
-	"\C-p": history-search-backward
-	"\C-i": menu-complete
-	"\e[Z": menu-complete-backward
+"\C-d": vi-eof-maybe
+"\C-n": history-search-forward
+"\C-p": history-search-backward
+"\C-i": menu-complete
+"\e[Z": menu-complete-backward
+"\ec": insert-comment
+"\C-w": backward-kill-word
+"\e\C-w": unix-word-rubout
+"\e/": unix-filename-rubout
+"\eD": backward-kill-word
+"\eW": vi-forward-bigword
+"\ew": vi-forward-word
+"\eB": vi-backward-bigword
+"\eb": vi-backward-word
+"\eE": vi-end-bigword
+"\ee": vi-end-word
+"\ef": vi-char-search
+"\eF": vi-char-search
+"\e;": vi-char-search
+"\e,": vi-char-search
+$if Bash
+	"\C-x\C-n": shell-expand-line
+	"\C-x\C-i": history-expand-line
+	"\C-x\C-a": alias-expand-line
+	"\C-x\C-b": complete-into-braces
 	"\C-x\C-f": complete-filename
-	"\C-x\C-o": complete-command
-	"\C-x\C-h": complete-hostname
 	"\C-x\C-u": complete-username
+	"\C-x\C-h": complete-hostname
 	"\C-x\C-v": complete-variable
-	"\C-k": kill-line
-	"\C-y": ""
-	"\C-x": ""
-	"\C-x\C-r": re-read-init-file
-	"\ew": unix-word-rubout
-	"\e/": unix-filename-rubout
-
-	"\e[1~": beginning-of-line
-	"\e[6~": history-search-forward
-	"\e[5~": history-search-backward
-	"\e[4~": end-of-line
-	"\eOH": beginning-of-line
-	"\eOF": end-of-line
-
-	$if Bash
-		"\C-g": "\C-e\C-u fg || true\C-m"
-		"\es": "\C-e --color=always | less\C-m"
-	$endif
+	"\C-x\C-o": complete-command
+	"\C-x\C-p": glob-expand-word
+	"\C-x\C-l": glob-list-expansions
+	"\eg": "\C-e\C-u fg || true\C-m\C-y"
+	"\es": "\C-e --color=always | less\C-m"
 $endif
