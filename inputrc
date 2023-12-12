@@ -52,7 +52,8 @@ $if Bash
 	"\C-x\C-o": complete-command
 	"\C-x\C-p": glob-expand-word
 	"\C-x\C-l": glob-list-expansions
-	"\C-g": "\C-e\C-u fg || true\C-m\C-y"
+	"\C-g": "\C-e\C-u fg || true\C-m"
+	"\eg": "\C-e\C-u fg || true\C-m\C-y"
 	"\es": "\C-e--color=always | less\C-m"
 $endif
 $if Python
