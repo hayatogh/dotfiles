@@ -6,7 +6,6 @@ compacthist on
 defencoding utf-8
 defflow off
 defscrollback 1000
-defshell -bash
 defutf8 on
 escape ^j^v
 hardstatus alwayslastline '%{=}%m/%d%D %0c %{= .g}%H%{-} %L=%-w%45L>%{= gk}%n* %t%{-}%+w %-20<%=%{= .y}(%l)'
@@ -48,7 +47,7 @@ bind b focus bottom
 bind o only
 bind c remove
 bind ^c remove
-bind R collapse
+bind C collapse
 bind H bumpleft
 bind L bumpright
 bind ' ' copy
@@ -63,4 +62,4 @@ bind I login on
 bind O login off
 bind N eval 'register - "^J:number "' 'process -'
 bind T title
-bind C exec .!. bash --noprofile -norc -ic 'echo -e \\x03 history -a\; LINES=$LINES COLUMNS=$COLUMNS exec bash -l'
+bind R exec .!. bash --noprofile -norc -ic 'echo -e \\x03 history -a\; LINES=$LINES COLUMNS=$COLUMNS exec bash -l'

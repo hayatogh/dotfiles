@@ -50,8 +50,10 @@ $if Bash
 	"\C-x\C-h": complete-hostname
 	"\C-x\C-v": complete-variable
 	"\C-x\C-o": complete-command
+	"\C-x\C-g": glob-complete-word
 	"\C-x\C-p": glob-expand-word
 	"\C-x\C-l": glob-list-expansions
+	"\C-o": dabbrev-expand
 	"\C-g": "\C-e\C-u fg || true\C-m"
 	"\eg": "\C-e\C-u fg || true\C-m\C-y"
 	"\es": "\C-e--color=always | less\C-m"
