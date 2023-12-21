@@ -987,20 +987,20 @@ unlet s:surround_textobj
 if has("gui_running") && has('win32')
 	set guifont=Consolas:h11
 	set lines=30 columns=86
-	let s:gvim_winpos_file = expand('~/.gvimwinpos')
-	function! s:SaveGVimPos()
-		let l:pos = [getwinposx(), getwinposy()]
-		call writefile(l:pos, s:gvim_winpos_file)
-	endfunction
-	augroup vimrc
-		autocmd VimLeavePre * call <SID>SaveGVimPos()
-	augroup END
-	if filereadable(s:gvim_winpos_file)
-		let s:pos = readfile(s:gvim_winpos_file)
-		let s:n = str2nr(strpart(v:servername, 4))
-		execute 'winpos ' .. (s:pos[0] + 32 * s:n) .. ' ' .. (s:pos[1] + 32 * s:n)
-		unlet s:pos s:n
-	endif
+	" let s:gvim_winpos_file = expand('~/.gvimwinpos')
+	" function! s:SaveGVimPos()
+	" 	let l:pos = [getwinposx(), getwinposy()]
+	" 	call writefile(l:pos, s:gvim_winpos_file)
+	" endfunction
+	" augroup vimrc
+	" 	autocmd VimLeavePre * call <SID>SaveGVimPos()
+	" augroup END
+	" if filereadable(s:gvim_winpos_file)
+	" 	let s:pos = readfile(s:gvim_winpos_file)
+	" 	let s:n = str2nr(strpart(v:servername, 4))
+	" 	execute 'winpos ' .. (s:pos[0] + 32 * s:n) .. ' ' .. (s:pos[1] + 32 * s:n)
+	" 	unlet s:pos s:n
+	" endif
 	function! g:Imzero()
 		if s:autoIminsertZero
 			set iminsert=0
