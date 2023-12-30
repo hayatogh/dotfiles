@@ -1,13 +1,5 @@
 set encoding=utf-8
 scriptencoding utf-8
-if !exists('$MYVIMRC')
-	set nocompatible
-	let $MYVIMRC = expand('<script>')
-	let $MYVIM = fnamemodify($MYVIMRC, ':h')
-	let &runtimepath = $MYVIM .. ',' .. &runtimepath .. ',' .. $MYVIM .. '/after'
-	let &packpath = $MYVIM .. ',' .. &packpath .. ',' .. $MYVIM .. '/after'
-endif
-
 set autoread
 set background=dark
 set backspace=indent
@@ -42,12 +34,7 @@ if s:in_screen
 endif
 set number relativenumber
 set pastetoggle=<F10>
-set path+=include,./include,arch/x86/include,./arch/x86/include
-if has('linux')
-	let s:moddir = '/lib/modules/' .. substitute(system('uname -r'), '\n', '', '') .. '/source'
-	let &path ..= ',' .. s:moddir .. '/include,' .. s:moddir .. '/arch/x86/include'
-	unlet s:moddir
-endif
+set path+=include,arch/x86/include
 set pumheight=10
 set report=15
 set scrolloff=3 sidescroll=1 sidescrolloff=10
@@ -331,7 +318,8 @@ function! s:RegexRubout(re)
 	return l:left .. l:right
 endfunction
 cnoremap <Esc>/     <C-\>e<SID>RegexRubout('\v[^/ ]*/? *$')<CR>
-cnoremap <C-W>      <C-\>e<SID>RegexRubout('\v([a-zA-Z0-9_]+\|[^ a-zA-Z0-9_]+) *$')<CR>
+cnoremap <C-W>      <C-\>e<SID>RegexRubout('\v([a-zA-Z0-9]+\|[^ a-zA-Z0-9]+) *$')<CR>
+cnoremap <Esc>h     <C-\>e<SID>RegexRubout('\v([a-zA-Z0-9]+\|[^ a-zA-Z0-9]+) *$')<CR>
 cnoremap <Esc><C-W> <C-\>e<SID>RegexRubout('\v[^ ]* *$')<CR>
 
 function! s:StayColumn(cmd)
@@ -471,12 +459,8 @@ nnoremap <expr> <C-W>]      <SID>Tjump(1, 1)
 vnoremap <expr> <C-W>]      <SID>Tjump(1, 1)
 command! -nargs=1 -bar Tj   call <SID>SetTagfunc(1) | tj  <args>
 command! -nargs=1 -bar Stj  call <SID>SetTagfunc(1) | stj <args>
-command! -nargs=1 -bar STj  call <SID>SetTagfunc(1) | stj <args>
 command! -nargs=1 -bar Gtj  call <SID>SetTagfunc(0) | tj  <args>
-command! -nargs=1 -bar GTj  call <SID>SetTagfunc(0) | tj  <args>
 command! -nargs=1 -bar Gstj call <SID>SetTagfunc(0) | stj <args>
-command! -nargs=1 -bar GStj call <SID>SetTagfunc(0) | stj <args>
-command! -nargs=1 -bar GSTj call <SID>SetTagfunc(0) | stj <args>
 
 function! s:Spacing(line1, line2)
 	let l:a = '[[:graph:]]'

@@ -1,4 +1,3 @@
-# C-a : source ~/.screenrc
 altscreen on
 attrcolor b ".I"
 caption splitonly '%?%F%{= gW}%:%{= Kk}%?%2n%f%07=%t%='

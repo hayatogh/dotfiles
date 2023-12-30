@@ -18,5 +18,5 @@ fi
 tmp=$(mktemp)
 curl -fsSo $tmp $url
 rm -rf ~/.goroot
-tar -xf $tmp -C $HOME --transform=s/^go/.goroot/
+tar -xf $tmp -C ~ --transform=s/^go/.goroot/
 rm -f $tmp

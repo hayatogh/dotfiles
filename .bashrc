@@ -25,21 +25,22 @@ alias fdall='fd -I'
 alias git_dotfiles_pull='git -C ~/dotfiles pull'
 alias git_empty_commit='git add -A && git commit -m '\''No commit message'\'' && git push'
 alias grep='grep --color=auto'
-alias info='info --init-file '$_home'/dotfiles/infokey'
+alias info='info --init-file ~/dotfiles/infokey'
 alias ls='ls --color=auto'
 alias la='ls -AF'
 alias ll='ls -lhF'
 alias al='ls -alhF'
+alias lls='ls -alhFs'
 alias ltime='ls -alhrtF'
 alias lsize='ls -alhrFS'
 alias manless='man -P less'
 alias rm='rm -i'
 alias sc='script -qc sh'
-alias scheme='scheme '$_home'/dotfiles/chezrc.ss'
+alias scheme='scheme ~/dotfiles/chezrc.ss'
 alias sudo_proxy='sudo --preserve-env=https_proxy,http_proxy,ftp_proxy,no_proxy'
 alias tm='tmux new -ADX'
 alias vi='vim --clean'
-alias wget='wget -N'
+alias which &>/dev/null && unalias which
 sr() {
 	local tty=${SCREEN_TTY:-${SSH_TTY:-$(tty)}}
 	screen -X setenv SCREEN_TTY $tty >/dev/null
@@ -72,9 +73,10 @@ _regex_rubout() {
 	READLINE_POINT=${#left}
 }
 _cw() {
-	_regex_rubout '([a-zA-Z0-9_]+|[^ a-zA-Z0-9_]+) *$'
+	_regex_rubout '([a-zA-Z0-9]+|[^ a-zA-Z0-9]+) *$'
 }
 bind -x '"\C-w": _cw'
+bind -x '"\eh": _cw'
 _mbackslash() {
 	_regex_rubout '([^ ;&|<>] *)*(;|&&|\|\||\||\|&|<|>|<<|>>|&>|>&)? *$'
 }
@@ -123,7 +125,7 @@ realwhich() {
 	realpath "$(which "$1")"
 }
 clean_history() {
-	local pat=${1:-pwd|(|ba|da|z)sh|sr|vim?|make|l[sal.]|al|git .|cd(| -| \.\.)|scheme}
+	local pat=${1:-make}
 	perl -0777 -pi -e 's/^#\d+\n('"$pat"') *\n//gm' $HISTFILE
 }
 fixmod() {
@@ -244,9 +246,8 @@ dl() {
 	wait ${pids[@]}
 	trap - SIGINT
 }
-alias which &>/dev/null && unalias which
 sush() {
-	sudo PATH="$PATH" $BASH --rcfile ~/.bash_profile
+	sudo -E --preserve-env=PATH $BASH --rcfile ~/.bash_profile
 }
 rpmt() {
 	[[ $# == 1 ]] || return 1
@@ -285,7 +286,7 @@ if [[ $_uname == MSYS ]]; then
 	[[ -r /usr/share/git/git-prompt.sh ]] && . /usr/share/git/git-prompt.sh
 elif [[ $_uname == Darwin ]]; then
 	alias batt='pmset -g batt'
-	alias scheme='chez '$_home'/dotfiles/chezrc.ss'
+	alias scheme='chez ~/dotfiles/chezrc.ss'
 	alias e=open
 	upgrade() {
 		brew upgrade
@@ -347,5 +348,5 @@ if ! type __git_ps1 &>/dev/null; then
 	PS1=$_pc1$_pc2
 fi
 
-[[ -r $_home/.localbashrc.bash ]] && . $_home/.localbashrc.bash
+[[ -r ~/.localbashrc.bash ]] && . ~/.localbashrc.bash
 true

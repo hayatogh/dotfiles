@@ -3,7 +3,7 @@ set -euo pipefail
 
 prefix=/usr/local
 if [[ ${1:-} == -l ]]; then
-	prefix=$HOME/.local
+	prefix=~/.local
 fi
 
 if [[ $EUID != 0 && $prefix == /usr/local ]]; then

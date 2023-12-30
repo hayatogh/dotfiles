@@ -324,13 +324,13 @@ function create_shortcuts {
   $shortcuts | % {
     $s = $shell.CreateShortcut($_.name)
     $s.TargetPath = $_.target
-    if( $_.ContainsKey('args') ) {
+    if ($_.ContainsKey('args')) {
       $s.Arguments = $_.args
     }
-    if( $_.ContainsKey('wd') ) {
+    if ($_.ContainsKey('wd')) {
       $s.WorkingDirectory = $_.wd
     }
-    if( $_.ContainsKey('style') ) {
+    if ($_.ContainsKey('style')) {
       $s.WindowStyle = $_.style
     }
     $s.Save()
