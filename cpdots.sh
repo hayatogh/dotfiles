@@ -21,7 +21,7 @@ cp_vim() {
 	rsync -rtz --exclude=.git/ --exclude=/.netrwhist --exclude=/.viminfo --exclude=/swap --delete $dotfiles/.vim/ "$winhome/vimfiles"
 }
 cp_vimfx() {
-	rsync -rt $dotfiles/.vimfx/ "$winhome/.vimfx/"
+	rsync -rt $dotfiles/vimfx/ "$winhome/vimfx/"
 }
 cp_vsvimrc() {
 	rsync -rt $dotfiles/.vsvimrc "$winhome/"

@@ -247,7 +247,7 @@ dl() {
 	trap - SIGINT
 }
 sush() {
-	sudo -E --preserve-env=PATH $BASH --rcfile ~/.bash_profile
+	sudo -E --preserve-env=PATH,HOME $BASH --rcfile ~/.bash_profile
 }
 rpmt() {
 	[[ $# == 1 ]] || return 1
