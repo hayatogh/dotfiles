@@ -47,6 +47,11 @@ export HISTSIZE=2000
 export HISTTIMEFORMAT='%c : '
 if [[ ${SUDO_USER:-} ]]; then
 	export HISTFILE=~/.root_history
+	export LESSHISTFILE=~/.root_lesshst
+	SCREENDIR=~/.root_screen
+	if [[ ! -e $SCREENDIR/$STY ]]; then
+		unset STY
+	fi
 fi
 
 export _uname

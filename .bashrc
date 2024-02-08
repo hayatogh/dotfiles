@@ -268,6 +268,13 @@ rpmi() {
 	[[ -n $tar ]] || return 1
 	rpm2cpio $rpm | cpio -idu --quiet $tar
 }
+rpmia() {
+	[[ $# -eq 1 ]] || return 1
+	local rpm=$(readlink -f $1) dir=$(basename $1 .src.rpm)
+	mkdir $dir || exit 1
+	cd $dir
+	rpm2cpio $rpm | cpio -idu --quiet
+}
 alias rpmc='rpm -qp --changelog'
 
 if [[ $_uname == MSYS ]]; then
