@@ -4,6 +4,7 @@ CursorBlinks=no
 Font=Consolas
 FontHeight=12
 Emojis=windows
+KeyAlphaMode=0
 RightClickAction=extend
 MiddleClickAction=paste
 Columns=106
