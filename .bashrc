@@ -194,21 +194,28 @@ s/[tT]i?[bB]?/*(1<<40)/g;
 s/[pP]i?[bB]?/*(1<<50)/g' <<<"$*")
 	perl -Mbignum -e '$x = ('"$exp"');
 if ($x->is_int()) {
-	$set = "";
-	for (my $b = 0; $x >> $b; $b++) {
-		if (($x >> $b) & 1) {
-			$set = $b . " " . $set;
-		}
-	}
 	$u64 = $x & 0xffffffffffffffff;
 	$i64 = $u64 >> 63 ? -1 * (($u64 ^ 0xffffffffffffffff) + 1) : $u64;
 	$u32 = $x & 0xffffffff;
 	$i32 = $u32 >> 31 ? -1 * (($u32 ^ 0xffffffff) + 1) : $u32;
-	$human = "";
-	for (my @s = ("", "Ki", "Mi", "Gi", "Ti"), my $i = 0; $i < 5; $i++) {
-		$human = ($x >> $i * 10) % 1024 . $s[$i] . " " . $human;
+	if ($x->is_positive()) {
+		$set = "";
+		for (my $b = 0; $x >> $b; $b++) {
+			if (($x >> $b) & 1) {
+				$set = $b . " " . $set;
+			}
+		}
+		$human = "";
+		for (my @s = ("", "Ki", "Mi", "Gi", "Ti"), my $i = 0; $i < 5; $i++) {
+			$human = ($x >> $i * 10) % 1024 . $s[$i] . " " . $human;
+		}
+		$human = ($x >> 50) . "Pi " . $human;
+		$bytes = $x->to_bytes();
+	} else {
+		$set = "(NaN)";
+		$human = "(NaN)";
+		$bytes = "(NaN)";
 	}
-	$human = ($x >> 50) . "Pi " . $human;
 	printf "hex:      %s
 decimal:  %s %s %s
 octal:    %s
@@ -218,7 +225,7 @@ bits set: %s
 64 bit:   %#x %u %d
 32 bit:   %#x %u %d
 human:    %s
-", $x->as_hex(), $x->bdstr(), $x->bnstr(), $x->bestr(), $x->as_oct(), $x->to_bytes(), $x->as_bin(), $set, $u64, $u64, $i64, $u32, $u32, $i32, $human;
+", $x->as_hex(), $x->bdstr(), $x->bnstr(), $x->bestr(), $x->as_oct(), $bytes, $x->as_bin(), $set, $u64, $u64, $i64, $u32, $u32, $i32, $human;
 } else {
 	printf "%s\n%s\n", $x->bdstr(), $x->bsstr();
 }'
