@@ -17,7 +17,7 @@ set fileencodings=ucs-bom,utf-8,default,euc-jp,cp932
 set fileformats=unix,dos
 set fillchars=vert:│,fold:-
 set guioptions=!Mr
-set formatoptions+=mMj
+set formatoptions+=mBj
 set guicursor=a:blinkon0
 set helplang=Ja,En
 set history=1000
@@ -886,7 +886,7 @@ let g:ale_linters = {
 	\ 'ocaml'   : ['ocamllsp'],
 	\ 'python'  : ['pylsp'],
 	\ 'rst'     : ['vale'],
-	\ 'rust'    : ['rls', 'cargo'],
+	\ 'rust'    : ['analyzer', 'cargo'],
 	\ 'tex'     : ['chktex'],
 	\ }
 let g:ale_fixers = {

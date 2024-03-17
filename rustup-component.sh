@@ -7,10 +7,9 @@ if ! type -a rustup &>/dev/null; then
 else
 	rustup update
 fi
-rustup component add rls rust-analysis rust-src
-# curl -fsSLo ~/.local/bin/rust-analyzer https://github.com/rust-analyzer/rust-analyzer/releases/latest/download/rust-analyzer-linux && chmod +x ~/.local/bin/rust-analyzer
+rustup component add rust-analyzer rust-src
 # curl -fsS https://wasmtime.dev/install.sh | bash
 
-cargo install bindgen evcxr_repl runner
+cargo install evcxr_repl runner
 
 $dotfiles/getbashcompletion.sh rustup cargo
