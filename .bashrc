@@ -43,7 +43,7 @@ alias vi='vim --clean'
 alias which &>/dev/null && unalias which
 sr() {
 	local tty=${SCREEN_TTY:-${SSH_TTY:-$(tty)}}
-	screen -X setenv SCREEN_TTY $tty >/dev/null
+	screen -X setenv SCREEN_TTY $tty &>/dev/null
 	SCREEN_TTY=$tty screen -DR
 }
 alias l. &>/dev/null && unalias l.
@@ -125,8 +125,12 @@ realwhich() {
 	realpath "$(which "$1")"
 }
 clean_history() {
-	local pat=${1:-make}
-	perl -0777 -pi -e 's/^#\d+\n('"$pat"') *\n//gm' $HISTFILE
+	[[ $# == 1 ]] || return 1
+	local pat=$1
+	perl -0777 -i -pe 's/^#\d+\n('"$pat"') *\n//gm' $HISTFILE
+}
+fix_history() {
+	perl -i -ne 'BEGIN { $sawtime = 0 } if (/^#/) { $sawtime = 1 } if ($sawtime) { print }' $HISTFILE
 }
 fixmod() {
 	if [[ ${1:-} == -r ]]; then

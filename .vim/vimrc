@@ -28,10 +28,6 @@ set list listchars=tab:»-,extends:»,precedes:«,nbsp:◦
 set showmatch matchtime=1 matchpairs+=（:）,｛:｝,＜:＞,［:］,「:」,『:』,【:】
 set modeline modelines=3
 set mouse=a mousemodel=extend nomousehide
-let s:in_screen = exists('$STY')
-if s:in_screen
-	set mouse=
-endif
 set number relativenumber
 set pastetoggle=<F10>
 set path+=include,arch/x86/include
@@ -95,7 +91,7 @@ endif
 
 let &t_TI = ""
 let &t_TE = ""
-if !s:in_screen
+if !exists('$SCREEN_TTY')
 	call echoraw("\e[<0t\e[<s")
 	let &t_SI ..= "\e[<r"
 	let &t_EI ..= "\e[<s\e[<0t"
@@ -122,6 +118,7 @@ if !s:in_screen
 		call echoraw("\e]52;c;" .. l:enc .. "\x7")
 	endfunction
 else
+	set mouse=
 	call echoraw("\eP\e[<0t\e[<s\e\\")
 	let &t_SI ..= "\eP\e[<r\e\\"
 	let &t_EI ..= "\eP\e[<s\e[<0t\e\\"
@@ -152,13 +149,24 @@ else
 		if a:str ==# ''
 			return
 		endif
+		if exists('$SUDO_USER') && systemlist('stat -c %U ' .. $SCREEN_TTY)[0] !=# $SUDO_USER
+			if !exists('b:sudo_clip_warned')
+				echom 'Recreate new window for copy to work!'
+				let b:sudo_clip_warned = 1
+			endif
+			return
+		endif
 		let l:escaped = shellescape(a:str)
 		let l:enc = systemlist('echo -n ' .. l:escaped .. ' | base64 -w0')[0]
-		if !filewritable($SCREEN_TTY)
-			let $SCREEN_TTY = systemlist('screen -QX echo \$SCREEN_TTY')[0]
+		if !filewritable($SCREEN_TTY) && exists('$STY')
+			call s:UpdateScreenTTY()
 		endif
 		call writefile(["\e]52;c;" .. l:enc .. "\x7"], $SCREEN_TTY, 'b')
 	endfunction
+	function! s:UpdateScreenTTY()
+		let $SCREEN_TTY = systemlist('screen -QX echo \$SCREEN_TTY 2>/dev/null')[0]
+	endfunction
+	command! -nargs=0 UpdateScreenTTY call <SID>UpdateScreenTTY()
 		" if len(l:enc) <= 504
 		" 	call echoraw("\eP\e]52;c;" .. l:enc .. "\x7\e\\")
 		" endif
@@ -167,12 +175,6 @@ if !executable('base64')
 	function! s:CopyToClip_OSC52(str)
 	endfunction
 endif
-" if executable('clip.exe')
-" 	function! s:CopyToClip_clipexe(str)
-" 		let l:escaped = shellescape(escape(a:str, '\'))
-" 		call job_start(['/bin/sh', '-c', 'echo -n ' .. l:escaped .. ' | clip.exe'])
-" 	endfunction
-" endif
 function! s:FontSizeGet()
 	call <SID>FontSizeSet("?")
 	for l:_ in range(7)
@@ -991,16 +993,17 @@ if has("gui_running") && has('win32')
 		endif
 		return ''
 	endfunction
+	let s:guifont_default_size = split(split(&guifont, '[^\\]\zs,')[0], '[^\\]\zs:')[1][1:]
 	function! s:FontSizeSet(amount)
 		let l:font = split(split(&guifont, '[^\\]\zs,')[0], '[^\\]\zs:')
 		let l:size = l:font[1][1:]
-		if !exists('s:guifont_default_size')
-			let s:guifont_default_size = l:size
-		endif
 		if a:amount ==# ""
 			let l:size = s:guifont_default_size
 		else
 			let l:size = eval(l:size .. a:amount)
+			if l:size == 0
+				let l:size = 1
+			endif
 		endif
 		let l:font[1] = l:font[1][0] .. l:size
 		let &guifont = join(l:font, ':')
