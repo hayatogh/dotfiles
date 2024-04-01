@@ -42,6 +42,10 @@ alias tm='tmux new -ADX'
 alias vi='vim --clean'
 alias which &>/dev/null && unalias which
 sr() {
+	if [[ ${STY:-} ]]; then
+		screen
+		return
+	fi
 	local tty=${SCREEN_TTY:-${SSH_TTY:-$(tty)}}
 	screen -X setenv SCREEN_TTY $tty &>/dev/null
 	SCREEN_TTY=$tty screen -DR
@@ -133,11 +137,6 @@ fix_history() {
 	perl -i -ne 'BEGIN { $sawtime = 0 } if (/^#/) { $sawtime = 1 } if ($sawtime) { print }' $HISTFILE
 }
 fixmod() {
-	if [[ ${1:-} == -r ]]; then
-		shift
-		fixmod "${@/%//**}"
-		return
-	fi
 	local x
 	for x; do
 		if [[ -d $x ]]; then

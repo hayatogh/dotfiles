@@ -504,11 +504,11 @@ nnoremap <silent> <Leader>S :call <SID>UnSpacing('.', '.')<CR>
 vnoremap <silent> <Leader>S :call <SID>UnSpacing('''<', '''>')<CR>
 
 function! s:CopyMode()
-	if !exists('b:copymode')
-		let b:copymode = 1
+	if !exists('w:copymode')
+		let w:copymode = 1
 		setl nolist nonumber norelativenumber nobreakindent
 	else
-		unlet b:copymode
+		unlet w:copymode
 		setl list number relativenumber breakindent
 	endif
 endfunction
@@ -761,6 +761,7 @@ augroup vimrc
 	autocmd ColorScheme * highlight TrailingWhiteSpace ctermbg=darkred guibg=darkred
 	autocmd ColorScheme * highlight IdeographicSpace term=underline ctermbg=DarkGreen guibg=DarkGreen
 	autocmd ColorScheme * call <SID>MultiHlSetup()
+	autocmd ColorScheme molokai highlight Visual ctermfg=none
 	autocmd BufRead,InsertLeave * call <SID>HlTrailingWhiteSpace(1)
 	autocmd InsertEnter * call <SID>HlTrailingWhiteSpace(0)
 	autocmd BufRead * call <SID>HlIdeographicSpace()
@@ -801,6 +802,7 @@ function! s:Minpac()
 	call minpac#add('hayatogh/vim-bash-completion')
 	call minpac#add('tyru/open-browser.vim')
 	" colorscheme
+	call minpac#add('lifepillar/vim-colortemplate')
 	call minpac#add('tomasr/molokai')
 	" syntax and filetype plugins
 	call minpac#add('chrisbra/csv.vim')
