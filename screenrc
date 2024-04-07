@@ -52,8 +52,8 @@ bind L bumpright
 bind ' ' copy
 bind ^@ copy
 bind \033
-# bind ] eval 'stuff \033[200~' 'paste .' 'stuff \033[201~'
-# bind ^] eval 'stuff \033[200~' 'paste .' 'stuff \033[201~'
+bind ] eval 'stuff \033[200~' 'paste .' 'stuff \033[201~'
+bind ^] eval 'stuff \033[200~' 'paste .' 'stuff \033[201~'
 bind = resize =
 bind + resize +2
 bind - resize -2
