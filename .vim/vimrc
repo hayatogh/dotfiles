@@ -43,8 +43,24 @@ set splitbelow splitright
 set suffixes=.bak,~,.swp,.o,.info,.aux,.log,.dvi,.bbl,.blg,.brf,.cb,.ind,.idx,.ilg,.inx,.out,.toc,.exe,.lock
 set suffixesadd=.tex
 set laststatus=2
-let g:CRLF = {'unix': 'LF', 'dos': 'CRLF', 'mac': 'CR'}
-set statusline=[%f]%<%h%m%r[%{&fileencoding}%{&bomb?'(bomb)':''}][%{g:CRLF[&fileformat]}][%Y][0x%02.4B]%{&paste?'<paste>':''}%=%l,%c%V\ %P\ %LL%{wordcount().chars-line('$')}C%{g:Imzero()}
+" let g:CRLF = {'unix': 'LF', 'dos': 'CRLF', 'mac': 'CR'}
+" set statusline=[%f]%<%h%m%r[%{&fileencoding}%{&bomb?'(bomb)':''}][%{g:CRLF[&fileformat]}][%Y][0x%02.4B]%{&paste?'<paste>':''}%=%l,%c%V\ %P\ %LL%{wordcount().chars-line('$')}C%{g:Imzero()}
+function! g:Statusline()
+	return '%f%<%h'
+		\ .. (&modified ? ' +' : '')
+		\ .. (!&modifiable ? ' -' : '')
+		\ .. (&readonly ? ' RO' : '')
+		\ .. (&paste ? ' <paste>' : '')
+		\ .. '%='
+		\ .. (&bomb ? toupper(&fileencoding) .. '-BOM'
+		\	: &fileencoding != 'utf-8' ? toupper(&fileencoding) : '')
+		\ .. (&fileformat == 'unix' ? ''
+		\	: &fileformat == 'dos' ? ' CRLF' : ' CR')
+		\ .. ' %Y 0x%02.4B %5l,%3c-%-3v %P %LL'
+		\ .. (wordcount().chars - line('$'))
+		\ .. 'C'
+endfunction
+set statusline=%{%Statusline()%}
 set showtabline=2
 function! s:Tablabel(tabpagenr)
 	let l:buflist = tabpagebuflist(a:tabpagenr)
