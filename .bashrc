@@ -197,6 +197,7 @@ s/[tT]i?[bB]?/*(1<<40)/g;
 s/[pP]i?[bB]?/*(1<<50)/g' <<<"$*")
 	perl -Mbignum -e '$x = ('"$exp"');
 if ($x->is_int()) {
+	$x = $x->as_int();
 	$u64 = $x & 0xffffffffffffffff;
 	$i64 = $u64 >> 63 ? -1 * (($u64 ^ 0xffffffffffffffff) + 1) : $u64;
 	$u32 = $x & 0xffffffff;
