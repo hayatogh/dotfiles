@@ -15,7 +15,6 @@ export WASMTIME_HOME=~/.wasmtime
 pathmunge $WASMTIME_HOME/bin
 export DISPLAY
 export CHKTEXRC=~/dotfiles/chktexrc
-export CRASHPAGER='/usr/bin/less -FX'
 export FZF_DEFAULT_COMMAND='fd -tf -HILE.git'
 export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --color='\''hl:9,hl+:9,spinner:16'\'
 export INPUTRC=~/dotfiles/inputrc

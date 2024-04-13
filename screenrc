@@ -7,7 +7,7 @@ defflow on
 defscrollback 1000
 defutf8 on
 escape ^j^v
-hardstatus alwayslastline '%{=}%m/%d%D %0c %{= .g}%H%{-} %L=%-w%45L>%{= gk}%n* %t%{-}%+w %-20<%=%{= .y}(%l)'
+hardstatus alwayslastline '%{=}%m/%d%D %0c %{= .g}%H%{-} %L=%-w%45L>%{= gk}%n* %t%{-}%+w %-15<%=%{= .y}%l'
 # %L=    only pad until this point. i.e. don't truncate
 # %45L>  truncate until this point is on 45% on screen
 # %-20<  trancate until this point is -20
@@ -21,6 +21,20 @@ startup_message off
 term 'screen-256color'
 termcapinfo xterm 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'
 vbell on
+bindkey \033z other
+bindkey \033e screen
+bindkey \033n next
+bindkey \033p prev
+bindkey \0330 select 0
+bindkey \0331 select 1
+bindkey \0332 select 2
+bindkey \0333 select 3
+bindkey \0334 select 4
+bindkey \0335 select 5
+bindkey \0336 select 6
+bindkey \0337 select 7
+bindkey \0338 select 8
+bindkey \0339 select 9
 # copy mode
 # Y = yy
 # W = yiw

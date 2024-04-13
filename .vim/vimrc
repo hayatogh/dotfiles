@@ -46,16 +46,16 @@ set laststatus=2
 " let g:CRLF = {'unix': 'LF', 'dos': 'CRLF', 'mac': 'CR'}
 " set statusline=[%f]%<%h%m%r[%{&fileencoding}%{&bomb?'(bomb)':''}][%{g:CRLF[&fileformat]}][%Y][0x%02.4B]%{&paste?'<paste>':''}%=%l,%c%V\ %P\ %LL%{wordcount().chars-line('$')}C%{g:Imzero()}
 function! g:Statusline()
-	return '%f%<%h'
+	return '%f%<%H'
 		\ .. (&modified ? ' +' : '')
 		\ .. (!&modifiable ? ' -' : '')
 		\ .. (&readonly ? ' RO' : '')
 		\ .. (&paste ? ' <paste>' : '')
 		\ .. '%='
 		\ .. (&bomb ? toupper(&fileencoding) .. '-BOM'
-		\	: &fileencoding != 'utf-8' ? toupper(&fileencoding) : '')
-		\ .. (&fileformat == 'unix' ? ''
-		\	: &fileformat == 'dos' ? ' CRLF' : ' CR')
+		\	: &fileencoding !=# 'utf-8' ? toupper(&fileencoding) : '')
+		\ .. (&fileformat ==# 'unix' ? ''
+		\	: &fileformat ==# 'dos' ? ' CRLF' : ' CR')
 		\ .. ' %Y 0x%02.4B %5l,%3c-%-3v %P %LL'
 		\ .. (wordcount().chars - line('$'))
 		\ .. 'C'
