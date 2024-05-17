@@ -276,6 +276,12 @@ nnoremap <silent> <Leader>f <Cmd>FixWhitespace<CR>
 
 command! -nargs=0 Cdhere cd %:p:h
 nnoremap <silent> <Leader>d <Cmd>Cdhere<CR>
+func! s:Cdcword()
+	let l:cword = expand('<cWORD>')
+	execute 'cd ' .. l:cword
+endfunc
+command! -nargs=0 Cdcword call <SID>Cdcword()
+nnoremap <silent> <Leader>D <Cmd>Cdcword<CR>
 
 func! s:ResetSearchDirection(cmd)
 	let @/=@/
@@ -288,24 +294,24 @@ func! s:ConsistentSearch(cmd)
 	nnoremap <expr> N <SID>ResetSearchDirection('N')
 	return a:cmd
 endfunc
-nnoremap <expr> ? <SID>ConsistentSearch('?')
-nnoremap <expr> # <SID>ConsistentSearch('#')
+nnoremap <expr> ?  <SID>ConsistentSearch('?')
+nnoremap <expr> #  <SID>ConsistentSearch('#')
 nnoremap <expr> g# <SID>ConsistentSearch('g#')
 
-func! s:Search(zero, word)
+func! s:Search(zero)
+	let l:cword = expand('<cword>')
 	if a:zero ==# 0
-		let l:pat = '\<' .. a:word .. '\>'
+		let l:pat = '\<' .. l:cword .. '\>'
 	else
-		let l:pat = a:word
+		let l:pat = l:cword
 	endif
 	call histadd('/', l:pat)
 	let @/=l:pat
-	call <SID>CopyToOther(a:word)
+	call <SID>CopyToOther(l:cword)
+	return "\"_yiw\<BS>\<C-\>\<C-N>n"
 endfunc
-nnoremap <silent> <Plug>Star0 <Cmd>call <SID>Search(0, expand('<cword>'))<CR>"_yiw<BS>
-nnoremap <silent> <Plug>Star1 <Cmd>call <SID>Search(1, expand('<cword>'))<CR>"_yiw<BS>
-nmap *  <Plug>Star0n
-nmap g* <Plug>Star1n
+nnoremap <silent> <expr> *  <SID>Search(0)
+nnoremap <silent> <expr> g* <SID>Search(1)
 
 func! g:RestoreRegister()
 	silent! let @* = s:restore_reg
@@ -412,7 +418,6 @@ func! s:TagfuncLinux(pattern, flags, info)
 	" Exclude prototypes
 	let l:tags = filter(taglist(l:pat), 'get(v:val, ''kind'', '''') !=# ''p''')
 	if len(l:tags) ==# 1 | echom '  Jump to the only' | return l:tags | endif
-	if l:cmdline | return l:tags | endif
 
 	" Limit to members or non-members
 	let l:before = expand('<cexpr>')[:-1 - len(expand('<cword>'))]
@@ -442,6 +447,7 @@ func! s:TagfuncLinux(pattern, flags, info)
 	if len(l:tags) ==# 1 | echom '  Jump to the only' | return l:tags | endif
 
 	" Guessing
+	if l:cmdline | return l:tags | endif
 	let l:current = filter(copy(l:tags), 'l:path ==# v:val[''filename'']')
 	if len(l:current) ==# 1 | echom '  Jump to the only current' | return l:current | endif
 

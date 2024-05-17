@@ -44,6 +44,7 @@ bindkey \0339 select 9
 # J join
 bind e screen
 bind ^e screen
+bind E screen -C
 bind f windowlist -b
 bind s split
 bind v split -v
