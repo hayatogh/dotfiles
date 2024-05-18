@@ -310,8 +310,8 @@ func! s:Search(zero)
 	call <SID>CopyToOther(l:cword)
 	return "\"_yiw\<BS>\<C-\>\<C-N>n"
 endfunc
-nnoremap <silent> <expr> *  <SID>Search(0)
-nnoremap <silent> <expr> g* <SID>Search(1)
+nnoremap <expr> *  <SID>Search(0)
+nnoremap <expr> g* <SID>Search(1)
 
 func! g:RestoreRegister()
 	silent! let @* = s:restore_reg
