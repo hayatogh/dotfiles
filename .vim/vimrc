@@ -935,6 +935,7 @@ let g:ale_linters = {
 	\ 'python'  : ['pylsp'],
 	\ 'rst'     : ['vale'],
 	\ 'rust'    : ['analyzer', 'cargo'],
+	\ 'sh'      : [],
 	\ 'tex'     : ['chktex'],
 	\ }
 let g:ale_fixers = {
