@@ -10,9 +10,8 @@ if [[ $EUID != 0 && $prefix == /usr/local ]]; then
 	exec sudo "$0" "$@"
 fi
 
-use_deb=0
-ver=$(curl -fsSL https://api.github.com/repos/extrawurst/gitui/releases/latest | grep -Po '(?<=/extrawurst/gitui/releases/download/v)([0-9.]+)(?=/gitui-linux-musl.tar.gz)' | head -n1)
-fname=gitui-linux-musl.tar.gz
+ver=$(curl -fsSL https://api.github.com/repos/extrawurst/gitui/releases/latest | grep -Po '(?<=/extrawurst/gitui/releases/download/v)([0-9.]+)(?=/gitui-linux-x86_64\.tar\.gz)' | head -n1)
+fname=gitui-linux-x86_64.tar.gz
 url=https://github.com/extrawurst/gitui/releases/download/v$ver/$fname
 
 echo "Installed:     $(gitui --version 2>/dev/null | grep -Po '(?<= )[0-9.]+$' || echo "Not installed")"
