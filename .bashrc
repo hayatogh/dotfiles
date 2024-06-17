@@ -255,6 +255,9 @@ dl() {
 		i=$((i + 1))
 	done
 	wait ${pids[@]}
+	for file in ${files[@]}; do
+		echo $file
+	done
 	trap - SIGINT
 }
 sush() {
@@ -277,7 +280,8 @@ rpmi() {
 	fi
 	tar=$(rpmt $rpm | grep -Po '^'$pat'([-0-9.]+(\.(el|fc)[0-9_]+)?.tar.(xz|bz2|gz))?$')
 	[[ -n $tar ]] || return 1
-	rpm2cpio $rpm | cpio -idu --quiet $tar
+	rpm2cpio $rpm | cpio -idu --quiet $tar || return $?
+	echo $tar
 }
 rpmia() {
 	[[ $# -eq 1 ]] || return 1
