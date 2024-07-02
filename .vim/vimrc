@@ -87,7 +87,6 @@ set wildmenu wildignorecase wildmode=list:longest,full
 set wrap
 let g:c_comment_strings = 1
 let g:c_gnu = 1
-let g:c_space_errors = 1
 let g:c_syntax_for_h = 1
 let g:is_bash = 1
 let g:mapleader = ' '
@@ -846,7 +845,7 @@ func! s:Minpac()
 	call minpac#add('hayatogh/vim-bash-completion')
 	call minpac#add('tyru/open-browser.vim')
 	" colorscheme
-	call minpac#add('lifepillar/vim-colortemplate')
+	" call minpac#add('lifepillar/vim-colortemplate')
 	call minpac#add('tomasr/molokai')
 	" syntax and filetype plugins
 	call minpac#add('chrisbra/csv.vim')
