@@ -285,7 +285,7 @@ rpmi() {
 }
 rpmia() {
 	[[ $# -eq 1 ]] || return 1
-	local rpm=$(readlink -f $1) dir=$(basename $1 .src.rpm)
+	local rpm=$(readlink -f $1) dir=$(basename $1 .rpm)
 	mkdir $dir || return 1
 	cd $dir
 	rpm2cpio $rpm | cpio -idu --quiet

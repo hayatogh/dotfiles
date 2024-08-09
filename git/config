@@ -1,19 +1,26 @@
 [alias]
-	s = status
-	ss = status --branch --short --
-	a = add
-	c = commit
-	d = diff
-	dc = diff --word-diff-regex=.
-	dw = diff --word-diff-regex='\\S+|[^\\S]'
-	ds = diff --staged
-	dn = !git -P diff --numstat
-	dt = !git -P diff --stat
-	g = log --graph --all --format=\"%x09%C(cyan bold)%<(19,trunc)%an %C(yellow nobold)%h %Creset%s%C(magenta bold)%d\"
-	l = log
-	cl = !sh -c 'git clone $0 && cd $(basename $0 .git) && git status'
-	sc = !sh -c 'git clone --depth 1 -- $0 && cd $(basename $0 .git) && git status'
+	s   = status
+	ss  = status --branch --short
+	a   = add
+	c   = commit
+	d   = diff
+	dc  = diff --word-diff-regex=.
+	dw  = diff --word-diff-regex='\\S+|[^\\S]'
+	ds  = diff --staged
+	dn  = !git -P diff --numstat
+	dt  = !git -P diff --stat
+	l   = log
+	lg  = log --graph --all --format=\"%x09%C(cyan bold)%<(19,trunc)%an %C(yellow nobold)%<(14,trunc)%H %Creset%s%C(magenta bold)%d\"
+	g   = log -P --grep
+	g1  = log -P -n1 --grep
+	g2  = log -P -n2 --grep
+	gw  = !sh -c 'git log -P --grep=\"\\b$0\\b\" \"$@\"'
+	gw1 = !sh -c 'git log -P -n1 --grep=\"\\b$0\\b\" \"$@\"'
+	gw2 = !sh -c 'git log -P -n2 --grep=\"\\b$0\\b\" \"$@\"'
+	cl  = !sh -c 'git clone $0 && cd $(basename $0 .git) && git status'
+	sc  = !sh -c 'git clone --depth 1 -- $0 && cd $(basename $0 .git) && git status'
 	scg = !sh -c 'git clone --depth 1 -- https://github.com/$0 && cd $(basename $0 .git) && git status'
+	b   = blame --abbrev=11
 [checkout]
 	workers = 0
 [core]
