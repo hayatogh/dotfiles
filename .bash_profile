@@ -13,6 +13,9 @@ pathmunge $GOROOT/bin
 pathmunge $GOPATH/bin
 export WASMTIME_HOME=~/.wasmtime
 pathmunge $WASMTIME_HOME/bin
+pathmunge ~/.npm/bin
+export DENO_INSTALL=~/.deno
+pathmunge $DENO_INSTALL/bin
 export DISPLAY
 export CHKTEXRC=~/dotfiles/chktexrc
 export FZF_DEFAULT_COMMAND='fd -tf -HILE.git'

@@ -291,6 +291,30 @@ rpmia() {
 	rpm2cpio $rpm | cpio -idu --quiet
 }
 alias rpmc='rpm -qp --changelog'
+diffh() {
+	local f1='sed -E '\''s:.*/::'\'
+	local title="diff $(eval $f1 <<<"$1") $(eval $f1 <<<"$2")"
+	local f2='sed -E '\''s:.*/::; s/(.+)\.[a-zA-Z0-9]+$/\1/'\'
+	local out="diff_$(eval $f2 <<<"$1")_$(eval $f2 <<<"$2").html"
+	diffl "$1" "$2" | diff2html-cli -s side --su hidden -t "$title" -i stdin -o stdout | _expand_links > "$out"
+}
+_expand_links() {
+	local l href media cachedir=~/.cache/diffh cache
+	mkdir -p $cachedir
+	while read -r l; do
+		if [[ $l =~ ^\<link\ rel=\"stylesheet\" ]]; then
+			href=$(grep -Po '(?<=href=")[^"]+(?=")' <<<$l)
+			media=$(grep -Po '(?<=media=")[^"]+(?=")' <<<$l)
+			cache=$cachedir/$(basename $href)
+			if [[ ! -e $cache ]]; then
+				curl -fsSLo $cache $href
+			fi
+			echo -e "<style>\n@media $media {\n$(cat $cache)\n}\n</style>"
+		else
+			echo "$l"
+		fi
+	done
+}
 
 if [[ $_uname == MSYS ]]; then
 	shopt -s completion_strip_exe
@@ -333,7 +357,7 @@ else
 			done
 			powershell.exe -NoProfile 'Invoke-Item '"${arg%, }"
 		}
-		diffh() {
+		diffhw() {
 			local f='sed -E '\''s:.*/::; s/(.+)\.[a-zA-Z0-9]+$/\1/'\'
 			local l=$(eval $f <<<"$1")
 			local r=$(eval $f <<<"$2")

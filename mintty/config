@@ -1,22 +1,28 @@
+# Looks
 CursorColour=255,0,0
 CursorType=block
 CursorBlinks=no
+# Text
 Font=Consolas
 FontHeight=12
 Emojis=windows
+# Keys
 KeyAlphaMode=0
+# Mouse
 RightClickAction=extend
 MiddleClickAction=paste
+# Window
 Columns=106
 Rows=50
 RewrapOnResize=yes
-AllowSetSelection=true
-IMECursorColour=0,0,255
-BoldAsColour=no
+# Terminal
 Term=xterm-256color
+AllowSetSelection=true
 BellType=0
 BellTaskbar=no
+# "Hidden" settings
 DisplaySpeedup=0
+IMECursorColour=0,0,255
 
 # 2560x1440
 X=910

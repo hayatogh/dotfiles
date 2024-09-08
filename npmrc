@@ -1,2 +1,2 @@
-prefix = ${HOME}/.local
+prefix = ${HOME}/.npm
 fund = false
