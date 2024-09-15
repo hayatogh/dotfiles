@@ -19,13 +19,11 @@ sudo apt-get -y install 7zip automake bash-completion bc chezscheme clang-format
 	gdb-doc
 ## kernel
 # libncurses-dev flex bison libssl-dev bc libelf-dev rsync linux-headers-`uname -r`
-## syzkaller
-# debootstrap qemu-system-x86
 
 sudo mkdir -p /usr/local/bin
 sudo ln -sf /usr/bin/fdfind /usr/local/bin/fd
 sudo ln -sf /usr/bin/yapf3 /usr/local/bin/yapf
 
-$dotfiles/install-delta.sh
+sudo $dotfiles/install-delta.sh
 
 $dotfiles/getbashcompletion.sh pip3
