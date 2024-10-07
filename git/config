@@ -43,6 +43,8 @@
 	diff = less -x9,17
 [pull]
 	rebase = false
+[tar "tar.xz"]
+	command = xz -c
 [user]
 	name = hayatogh
 	email = 28914976+hayatogh@users.noreply.github.com

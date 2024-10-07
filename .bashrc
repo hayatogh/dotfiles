@@ -315,6 +315,10 @@ _expand_links() {
 		fi
 	done
 }
+rm_rfchmod() {
+	find "$@" -not -perm -200 -type d -print0 | xargs -0 chmod 700
+	rm -rf "$@"
+}
 
 if [[ $_uname == MSYS ]]; then
 	shopt -s completion_strip_exe
