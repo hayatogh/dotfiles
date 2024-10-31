@@ -33,7 +33,7 @@ cp_latexmk() {
 	rsync -rt $dotfiles/latexmk/ "$winhome/.config/latexmk/"
 }
 cp_wsl() {
-	rsync -rt $dotfiles/wsl/wsl.conf "/etc/"
+	sudo rsync -rt $dotfiles/wsl/wsl.conf "/etc/"
 	rsync -rt $dotfiles/wsl/.wslconfig "$winhome/"
 }
 
