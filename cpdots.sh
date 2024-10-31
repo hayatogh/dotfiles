@@ -32,8 +32,12 @@ cp_alacritty() {
 cp_latexmk() {
 	rsync -rt $dotfiles/latexmk/ "$winhome/.config/latexmk/"
 }
+cp_wsl() {
+	rsync -rt $dotfiles/wsl/wsl.conf "/etc/"
+	rsync -rt $dotfiles/wsl/.wslconfig "$winhome/"
+}
 
-arg=(powershell vimfx vsvimrc)
+arg=(powershell vimfx)
 if [[ $# -ne 0 ]]; then
 	if [[ $1 == all ]]; then
 		arg=(mintty powershell vim vimfx vsvimrc)

@@ -73,7 +73,7 @@ func! s:Tablabel(tabpagenr)
 endfunc
 func! g:Cuitabline()
 	let l:tablabels = join(map(range(1, tabpagenr('$')), '<SID>Tablabel(v:val)'), ' ')
-	let l:info = strftime('%m/%d%a %H:%M') .. ' %#TabLine#' .. fnamemodify(getcwd(), ':~') .. ' '
+	let l:info = strftime('%m/%d%a %H:%M') .. ' %#TabLine#%<' .. fnamemodify(getcwd(), ':~') .. ' '
 	return l:tablabels .. ' %T%=' .. l:info
 endfunc
 set tabline=%!g:Cuitabline()
