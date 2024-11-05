@@ -12,7 +12,7 @@ set editing-mode emacs
 set history-size 500
 set input-meta on
 set keyseq-timeout 500
-set mark-modified-lines on
+set mark-modified-lines off
 set mark-symlinked-directories on
 set menu-complete-display-prefix on
 set output-meta on
@@ -25,7 +25,6 @@ set visible-stats on
 "\C-p": history-search-backward
 "\C-i": menu-complete
 "\e[Z": menu-complete-backward
-"\ec": insert-comment
 "\C-w": backward-kill-word
 "\e\C-w": unix-word-rubout
 "\e/": unix-filename-rubout
@@ -40,6 +39,16 @@ set visible-stats on
 "\eF": vi-char-search
 "\e;": vi-char-search
 "\e,": vi-char-search
+"\ec":
+"\ecc": insert-comment
+"\ec1": "\C-a\e1\eW\C-b\e\C-w"
+"\ec2": "\C-a\e2\eW\C-b\e\C-w"
+"\ec3": "\C-a\e3\eW\C-b\e\C-w"
+"\ec4": "\C-a\e4\eW\C-b\e\C-w"
+"\ec5": "\C-a\e5\eW\C-b\e\C-w"
+"\ec6": "\C-a\e6\eW\C-b\e\C-w"
+"\ec7": "\C-a\e7\eW\C-b\e\C-w"
+"\ec8": "\C-a\e8\eW\C-b\e\C-w"
 $if Bash
 	"\C-x\C-n": shell-expand-line
 	"\C-x\C-i": history-expand-line
@@ -56,7 +65,8 @@ $if Bash
 	"\C-o": dabbrev-expand
 	"\C-g": "\C-e\C-u fg || true\C-m"
 	"\eg": "\C-e\C-u fg || true\C-m\C-y"
-	"\es": "\C-e--color=always | less\C-m"
+	"\es": "\C-e --color=always | less\C-m"
+	"\eS": "\C-e | less\C-m"
 $endif
 $if Python
 	"\C-i": "\e4 "

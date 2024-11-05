@@ -20,9 +20,6 @@ cp_powershell() {
 cp_vim() {
 	rsync -rtz --exclude=.git/ --exclude=/.netrwhist --exclude=/.viminfo --exclude=/swap --delete $dotfiles/.vim/ "$winhome/vimfiles"
 }
-cp_vimfx() {
-	rsync -rt $dotfiles/vimfx/ "$winhome/vimfx/"
-}
 cp_vsvimrc() {
 	rsync -rt $dotfiles/.vsvimrc "$winhome/"
 }
@@ -37,13 +34,9 @@ cp_wsl() {
 	rsync -rt $dotfiles/wsl/.wslconfig "$winhome/"
 }
 
-arg=(powershell vimfx)
+arg=(powershell)
 if [[ $# -ne 0 ]]; then
-	if [[ $1 == all ]]; then
-		arg=(mintty powershell vim vimfx vsvimrc)
-	else
-		arg=("$@")
-	fi
+	arg=("$@")
 fi
 for x in ${arg[@]}; do
 	cp_${x}

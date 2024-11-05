@@ -1,0 +1,17 @@
+{
+  "prevent_autofocus": true,
+  "prev_patterns": "prev  previous  ‹  «  ◀  ←  <<  <  back  newer  前のページ  前のページへ  前へ",
+  "next_patterns": "next  ›  »  ▶  →  >>  >  more  older  次のページ  次のページへ  次へ",
+  "mode.normal.history_back": "J",
+  "mode.normal.history_forward": "K",
+  "mode.normal.history_list": "gJ",
+  "mode.normal.scroll_page_up": "<s-space> b",
+  "mode.normal.tab_select_previous": "H gT",
+  "mode.normal.tab_select_next": "L gt",
+  "mode.normal.tab_select_oldest_unvisited": "gk",
+  "mode.normal.tab_move_backward": "gH",
+  "mode.normal.tab_move_forward": "gL",
+  "mode.normal.find": "a/",
+  "mode.normal.find_highlight_all": "/",
+  "mode.normal.esc": "<force><escape> <force><c-[>"
+}
