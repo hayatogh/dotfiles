@@ -276,6 +276,13 @@ function fontlink {
   }
   New-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\FontLink\SystemLink\" -Name Consolas -Value 'HGRGM.TTC,HGRGM' -PropertyType MultiString -Force
 }
+function fontlink1 {
+  if (!(is_admin)) {
+    Write-Output "Permission denied"
+    return
+  }
+  New-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\FontLink\SystemLink\" -Name Consolas -Value 'BIZ-UDGOTHICR.TTC,BIZ UDGothic R' -PropertyType MultiString -Force
+}
 
 function create_shortcuts {
   $document = [Environment]::GetFolderPath("MyDocuments")

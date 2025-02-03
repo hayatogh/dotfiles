@@ -28,7 +28,7 @@ rm -rf $dir
 tar -xf $dir.tar.gz
 cd $dir
 ./autogen.sh &>/dev/null
-./configure --prefix=$prefix --enable-colors256 &>/dev/null
+./configure --prefix=$prefix &>/dev/null
 make -j4 &>/dev/null
 make install &>/dev/null
 mkdir -p $prefix/etc

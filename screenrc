@@ -7,7 +7,10 @@ defflow on
 defscrollback 1000
 defutf8 on
 escape ^j^v
-hardstatus alwayslastline '%{=}%m/%d%D %0c %{= .g}%H%{-} %L=%-w%45L>%{= gk}%n* %t%{-}%+w %-15<%=%{= .y}%l'
+# v4
+# hardstatus alwayslastline '%{=}%m/%d%D %0c %{= .g}%H%{-} %L=%-w%45L>%{= gk}%n* %t%{-}%+w %-15<%=%{= .y}%l'
+# v5
+hardstatus alwayslastline '%{=}%m/%d%D %0c %{2}%H%{-} %L=%-w%45L>%{0;2}%n* %t%{-}%+w %-15<%=%{3}%l'
 # %L=    only pad until this point. i.e. don't truncate
 # %45L>  truncate until this point is on 45% on screen
 # %-20<  trancate until this point is -20

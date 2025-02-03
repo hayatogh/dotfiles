@@ -6,6 +6,8 @@ CursorBlinks=no
 Font=Consolas
 FontHeight=12
 Emojis=windows
+#FontChoice=CJK:2
+#Font2=Noto Sans JP
 # Keys
 KeyAlphaMode=0
 # Mouse
