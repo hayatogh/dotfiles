@@ -24,6 +24,8 @@
 	alias = "!git config --get-regexp 'alias.*' | awk '{ $1 = sprintf(\"%-7s =\", substr($1, 7)); print; }'"
 	untrack = rm --cached --
 	cp  = cherry-pick
+	arz = "!f() { d=${PWD##*/}_$(git rev-parse HEAD | cut -b-12); f=\"$d\".tar.gz; [ \"${1:-}\" = -f ] || [ ! -e $f ] && git archive -o $f --prefix=$d/ HEAD; }; f"
+	arJ = "!f() { d=${PWD##*/}_$(git rev-parse HEAD | cut -b-12); f=\"$d\".tar.xz; [ \"${1:-}\" = -f ] || [ ! -e $f ] && git archive -o $f --prefix=$d/ HEAD; }; f"
 [checkout]
 	workers = 0
 [core]
