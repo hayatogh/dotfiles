@@ -91,8 +91,12 @@ else
 	fi
 fi
 unset pathmunge
+export _r
+_r() {
+	[[ -r $1 ]] && . "$1"
+}
 
-[[ -r ~/.opam/opam-init/init.sh ]] && . ~/.opam/opam-init/init.sh
-[[ -r ~/.ghcup/env ]] && . ~/.ghcup/env
-[[ -r ~/.bashrc ]] && . ~/.bashrc
+_r ~/.opam/opam-init/init.sh
+_r ~/.ghcup/env
+_r ~/.bashrc
 true

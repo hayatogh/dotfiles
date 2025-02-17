@@ -137,13 +137,13 @@ fix_history() {
 	perl -i -ne 'BEGIN { $sawtime = 0 } if (/^#/) { $sawtime = 1 } if ($sawtime) { print }' $HISTFILE
 }
 fixmod() {
-	local x
+	local x m
 	for x; do
+		m=644
 		if [[ -d $x ]]; then
-			chmod 755 "$x"
-		else
-			chmod 644 "$x"
+			m=755
 		fi
+		chmod $m "$x"
 	done
 }
 rgall() {
@@ -316,7 +316,7 @@ _expand_links() {
 	done
 }
 rm_rfchmod() {
-	find "$@" -not -perm -200 -type d -print0 | xargs -0 chmod 700
+	find "$@" ! -perm -200 -type d -print0 | xargs -0 chmod 700
 	rm -rf "$@"
 }
 
@@ -333,7 +333,7 @@ if [[ $_uname == MSYS ]]; then
 		pacman -Qtdq | pacman -Rns --noconfirm - 2>/dev/null
 		pacman -Syu --noconfirm
 	}
-	[[ -r /usr/share/git/git-prompt.sh ]] && . /usr/share/git/git-prompt.sh
+	_r /usr/share/git/git-prompt.sh
 elif [[ $_uname == Darwin ]]; then
 	alias batt='pmset -g batt'
 	alias scheme='chez ~/dotfiles/chezrc.ss'
@@ -341,7 +341,7 @@ elif [[ $_uname == Darwin ]]; then
 	upgrade() {
 		brew upgrade
 	}
-	[[ -r /usr/local/etc/profile.d/bash_completion.sh ]] && . /usr/local/etc/profile.d/bash_completion.sh
+	_r /usr/local/etc/profile.d/bash_completion.sh
 else
 	e() {
 		xdg-open &>/dev/null "${@:-.}"
@@ -374,21 +374,21 @@ else
 	fi
 	if [[ $_distro == debian ]]; then
 		upgrade() {
-			sudo apt-get -qq autoremove
 			sudo apt-get -qq update
 			apt list --upgradable
-			sudo apt upgrade -y
+			sudo apt-get -y upgrade
+			sudo apt-get -qq autoremove
 		}
-		# [[ -r /usr/lib/git-core/git-sh-prompt ]] && . /usr/lib/git-core/git-sh-prompt
+		# _r /usr/lib/git-core/git-sh-prompt
 	elif [[ $_distro =~ fedora|centos|rhel ]]; then
-		[[ -r /usr/share/git-core/contrib/completion/git-prompt.sh ]] && . /usr/share/git-core/contrib/completion/git-prompt.sh
+		_r /usr/share/git-core/contrib/completion/git-prompt.sh
 	fi
 fi
 
 # printf '\e]12;#ff0000\a'
 # printf '\e[2 q'
 
-[[ -r /etc/profile.d/bash_completion.sh ]] && . /etc/profile.d/bash_completion.sh
+_r /etc/profile.d/bash_completion.sh
 type _completion_loader &>/dev/null && ! _completion_loader ssh
 complete -F _ssh tryssh
 complete -c realwhich
@@ -398,5 +398,5 @@ if ! type __git_ps1 &>/dev/null; then
 	PS1=$_pc1$_pc2
 fi
 
-[[ -r ~/.localbashrc.bash ]] && . ~/.localbashrc.bash
+_r ~/.localbashrc.bash
 true

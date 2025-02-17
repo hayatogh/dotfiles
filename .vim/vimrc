@@ -273,11 +273,11 @@ endfunc
 command! -range=% FixWhitespace call <SID>FixWhitespace(<line1>, <line2>)
 nnoremap <silent> <Leader>f <Cmd>FixWhitespace<CR>
 
-command! -nargs=0 Cdhere cd %:p:h
+command! -nargs=0 Cdhere tcd %:p:h
 nnoremap <silent> <Leader>d <Cmd>Cdhere<CR>
 func! s:Cdcword()
 	let l:cword = expand('<cWORD>')
-	execute 'cd ' .. l:cword
+	execute 'tcd ' .. l:cword
 endfunc
 command! -nargs=0 Cdcword call <SID>Cdcword()
 nnoremap <silent> <Leader>D <Cmd>Cdcword<CR>
@@ -829,10 +829,9 @@ func! s:Minpac()
 	call minpac#add('mattn/emmet-vim', {'submodule': 0})
 	call minpac#add('tpope/vim-eunuch')
 	call minpac#add('tommcdo/vim-lion')
-	call minpac#add('scrooloose/nerdtree')
+	call minpac#add('preservim/nerdtree')
 	call minpac#add('luochen1990/rainbow')
 	call minpac#add('hayatogh/vim-surround')
-	call minpac#add('kana/vim-tabpagecd')
 	" call minpac#add('guns/xterm-color-table.vim')
 	" external commands
 	call minpac#add('dense-analysis/ale')
@@ -849,7 +848,7 @@ func! s:Minpac()
 	call minpac#add('tomasr/molokai')
 	" syntax and filetype plugins
 	call minpac#add('chrisbra/csv.vim')
-	call minpac#add('Shirk/vim-gas')
+	call minpac#add('HealsCodes/vim-gas')
 	call minpac#add('previm/previm')
 	" call minpac#add('kchmck/vim-coffee-script')
 	" call minpac#add('lervag/vimtex')
@@ -975,12 +974,12 @@ let g:NERDTreeMapOpenVSplit = 'v'
 " openbrowser
 nmap gx <Plug>(openbrowser-smart-search)
 vmap gx <Plug>(openbrowser-smart-search)
-nmap gX <Cmd>call openbrowser#search(expand('<cword>'), 'x')<CR>
-vmap gX <Cmd>call openbrowser#search(expand('<cword>'), 'x')<CR>
-let g:openbrowser_default_search = 'bing'
+nmap gX <Cmd>call openbrowser#search(expand('<cword>'), 'oald')<CR>
+vmap gX <Cmd>call openbrowser#search(expand('<cword>'), 'oald')<CR>
+let g:openbrowser_default_search = 'ddg'
 let g:openbrowser_search_engines = {
-	\ 'bing': 'https://www.bing.com/search?q={query}',
-	\ 'x'   : 'https://www.oxfordlearnersdictionaries.com/search/english/?q={query}',
+	\ 'ddg' : 'https://duckduckgo.com/?q={query}',
+	\ 'oald': 'https://www.oxfordlearnersdictionaries.com/search/english/?q={query}',
 	\ }
 " global
 if filereadable('/usr/local/share/gtags/gtags.vim')
