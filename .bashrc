@@ -1,5 +1,25 @@
 [[ ! $- =~ i ]] && return
 shopt -s autocd cdspell checkhash checkjobs checkwinsize dotglob execfail globstar lithist no_empty_cmd_completion nocaseglob
+
+_pc0='history -a; history -c; history -r'
+_pc1='\[\e]0;\u@\h \w \d \A [\j] \a\]'
+_pc2='\[\e[0m\]\n'
+_pc3='$PSM\[\e[32m\]\u@\h \[\e[33m\]\w \[\e[38;5;93m\]$PSSHLVL \[\e[38;5;166m\]$([[ \j -gt 0 ]] && echo \j)\[\e[0m\]'
+_pc4=' \[\e[38;5;245m\]\t ${PIPESTATUS[@]}\[\e[0m\]\n\[\ek\e\\\]\$ '
+GIT_PS1_SHOWDIRTYSTATE=1
+GIT_PS1_SHOWSTASHSTATE=1
+GIT_PS1_SHOWUNTRACKEDFILES=1
+GIT_PS1_SHOWUPSTREAM=auto
+GIT_PS1_SHOWCOLORHINTS=1
+GIT_PS1_HIDE_IF_PWD_IGNORED=1
+HISTCONTROL=ignoreboth:erasedups
+HISTIGNORE='pwd:bash:sr:vim:ls:la:ll:al:cd:cd -:cd ..:cd ../..:git s:git ss:git d:git dc:git dw:git ds:git dn:git dt:git g:git l:upgrade:sush'
+HISTSIZE=2000
+HISTTIMEFORMAT='%c : '
+if [[ ${SUDO_USER:-} ]]; then
+	HISTFILE=~/.root_history
+fi
+
 PSSHLVL=
 if [[ $TERM =~ screen ]]; then
 	if [[ $SHLVL > 2 ]]; then
@@ -137,14 +157,8 @@ fix_history() {
 	perl -i -ne 'BEGIN { $sawtime = 0 } if (/^#/) { $sawtime = 1 } if ($sawtime) { print }' $HISTFILE
 }
 fixmod() {
-	local x m
-	for x; do
-		m=644
-		if [[ -d $x ]]; then
-			m=755
-		fi
-		chmod $m "$x"
-	done
+	find "$@" -maxdepth 0 -type f -print0 | xargs -0 chmod 644
+	find "$@" -maxdepth 0 -type d -print0 | xargs -0 chmod 755
 }
 rgall() {
 	command rg --no-messages --hidden --no-ignore -g!tags -g!tags.x86 -g!tags.arm64 -g!.git/ "$@"
@@ -319,9 +333,15 @@ rm_rfchmod() {
 	find "$@" ! -perm -200 -type d -print0 | xargs -0 chmod 700
 	rm -rf "$@"
 }
+_cursor() {
+	local col=${1:-ff0000}
+	printf '\e]12;#'$col'\a'
+	printf '\e[2 q'
+}
 
 if [[ $_uname == MSYS ]]; then
 	shopt -s completion_strip_exe
+	_pc3=$(sed -E 's/\$\(|\)/`/g' <<<$_pc3)
 	rg() {
 		command rg --hidden --path-separator // "$@"
 	}
@@ -330,18 +350,16 @@ if [[ $_uname == MSYS ]]; then
 		start "${@:-.}"
 	}
 	upgrade() {
-		pacman -Qtdq | pacman -Rns --noconfirm - 2>/dev/null
 		pacman -Syu --noconfirm
+		pacman -Qtdq | pacman -Rns --noconfirm - 2>/dev/null
 	}
-	_r /usr/share/git/git-prompt.sh
-elif [[ $_uname == Darwin ]]; then
-	alias batt='pmset -g batt'
-	alias scheme='chez ~/dotfiles/chezrc.ss'
-	alias e=open
-	upgrade() {
-		brew upgrade
-	}
-	_r /usr/local/etc/profile.d/bash_completion.sh
+	_source_r /usr/share/git/git-prompt.sh
+# elif [[ $_uname == Darwin ]]; then
+# 	alias batt='pmset -g batt'
+# 	alias scheme='chez ~/dotfiles/chezrc.ss'
+# 	alias e=open
+# 	alias upgrade='brew upgrade'
+# 	_source_r /usr/local/etc/profile.d/bash_completion.sh
 else
 	e() {
 		xdg-open &>/dev/null "${@:-.}"
@@ -373,30 +391,27 @@ else
 		}
 	fi
 	if [[ $_distro == debian ]]; then
+		_pc3='${debian_chroot:+($debian_chroot)}'$_pc3
 		upgrade() {
 			sudo apt-get -qq update
 			apt list --upgradable
 			sudo apt-get -y upgrade
 			sudo apt-get -qq autoremove
 		}
-		# _r /usr/lib/git-core/git-sh-prompt
+		# _source_r /usr/lib/git-core/git-sh-prompt
 	elif [[ $_distro =~ fedora|centos|rhel ]]; then
-		_r /usr/share/git-core/contrib/completion/git-prompt.sh
+		_source_r /usr/share/git-core/contrib/completion/git-prompt.sh
 	fi
 fi
-
-# printf '\e]12;#ff0000\a'
-# printf '\e[2 q'
-
-_r /etc/profile.d/bash_completion.sh
+_source_r /etc/profile.d/bash_completion.sh
 type _completion_loader &>/dev/null && ! _completion_loader ssh
 complete -F _ssh tryssh
 complete -c realwhich
-
+PROMPT_COMMAND=$_pc0"; __git_ps1 '"$_pc1$_pc2$_pc3"' '"$_pc4"'"
 if ! type __git_ps1 &>/dev/null; then
 	PROMPT_COMMAND=$_pc0
-	PS1=$_pc1$_pc2
+	PS1=$_pc1$_pc2$_pc3$_pc4
 fi
 
-_r ~/.localbashrc.bash
+_source_r ~/.localbashrc.bash
 true
