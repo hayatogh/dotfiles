@@ -1,16 +1,16 @@
 altscreen on
 attrcolor b ".I"
-caption splitonly '%?%F%{= gW}%:%{= Kk}%?%2n%f%07=%t%='
+caption splitonly '%?%F%{7;2}%:%{0;8}%?%2n%f%07=%t%='
 compacthist on
 defencoding utf-8
 defflow on
 defscrollback 1000
 defutf8 on
 escape ^j^v
-# v4
-# hardstatus alwayslastline '%{=}%m/%d%D %0c %{= .g}%H%{-} %L=%-w%45L>%{= gk}%n* %t%{-}%+w %-15<%=%{= .y}%l'
-# v5
 hardstatus alwayslastline '%{=}%m/%d%D %0c %{2}%H%{-} %L=%-w%45L>%{0;2}%n* %t%{-}%+w %-15<%=%{3}%l'
+# v4
+# caption splitonly '%?%F%{= gW}%:%{= Kk}%?%2n%f%07=%t%='
+# hardstatus alwayslastline '%{=}%m/%d%D %0c %{= .g}%H%{-} %L=%-w%45L>%{= gk}%n* %t%{-}%+w %-15<%=%{= .y}%l'
 # %L=    only pad until this point. i.e. don't truncate
 # %45L>  truncate until this point is on 45% on screen
 # %-20<  trancate until this point is -20
