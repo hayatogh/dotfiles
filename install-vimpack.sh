@@ -62,11 +62,11 @@ update() {
 }
 update_all() {
 	local p
-	for p in "${plugs[@]:1:${#plugs[@]}-1}"; do
+	for p in "${plugs[@]:0:${#plugs[@]}-1}"; do
 		update $p
 	done
 
-	# for p in "${plugs[@]:1:$njobs-1}"; do
+	# for p in "${plugs[@]:0:$njobs-1}"; do
 	# 	update $p &
 	# done
 	# for p in "${plugs[@]:$njobs:${#plugs[@]}-1}"; do
