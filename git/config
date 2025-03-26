@@ -51,3 +51,5 @@
 [user]
 	name = hayatogh
 	email = 28914976+hayatogh@users.noreply.github.com
+[include]
+	path = ~/.localgitconfig.gitconfig

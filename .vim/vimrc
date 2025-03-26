@@ -765,7 +765,7 @@ aug vimrc
 	au BufNewFile,BufRead * if &ft ==# 'asm' | set ft=gas | endif
 	au BufNewFile,BufRead * if &ft ==# 'diff' | set ft=git | endif
 	au BufNewFile,BufRead *.lalrpop set ft=rust
-	au BufNewFile,BufRead */git/config set ft=gitconfig
+	au BufNewFile,BufRead */git/config,*.gitconfig set ft=gitconfig
 	au BufNewFile,BufRead */yapf/style set ft=cfg
 	au BufNewFile,BufRead .latexmkrc,latexmkrc set ft=perl
 	au BufNewFile,BufRead .clang-format set ft=yaml
