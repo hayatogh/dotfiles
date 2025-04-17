@@ -380,6 +380,7 @@ else
 			powershell.exe -NoProfile 'Invoke-Item '"${arg%, }"
 		}
 		diffhw() {
+			local winmerge='/mnt/c/Program Files/WinMerge/WinMergeU.exe'
 			local f='sed -E '\''s:.*/::; s/(.+)\.[a-zA-Z0-9]+$/\1/'\'
 			local l=$(eval $f <<<"$1")
 			local r=$(eval $f <<<"$2")
@@ -387,7 +388,7 @@ else
 			if [[ $l == $r ]]; then
 				out="diff_$l.html"
 			fi
-			WinMergeU.exe -noninteractive -or "$out" "$(wslpath -w "$1")" "$(wslpath -w "$2")"
+			"$winmerge" -noninteractive -or "$out" "$(wslpath -w "$1")" "$(wslpath -w "$2")"
 		}
 	fi
 	if [[ $_distro == debian ]]; then
