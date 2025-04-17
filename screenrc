@@ -1,5 +1,5 @@
 altscreen on
-attrcolor b ".I"
+# attrcolor b ".I"
 caption splitonly '%?%F%{7;2}%:%{0;8}%?%2n%f%07=%t%='
 compacthist on
 defencoding utf-8
@@ -21,7 +21,7 @@ msgminwait 0
 msgwait 2
 shelltitle '$ |'
 startup_message off
-term 'screen-256color'
+# term 'screen-256color'
 termcapinfo xterm 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'
 vbell on
 bindkey \033z other
@@ -52,13 +52,13 @@ bind f windowlist -b
 bind s split
 bind v split -v
 bind h focus left
-bind ^h focus left
 bind j focus down
-bind ^j focus down
 bind k focus up
-bind ^k focus up
 bind l focus right
-bind ^l focus right
+bind ^h prev
+bind ^j eval 'stuff \033[200~' 'paste .' 'stuff \033[201~'
+bind ^k paste .
+bind ^l next
 bind t focus top
 bind b focus bottom
 bind o only

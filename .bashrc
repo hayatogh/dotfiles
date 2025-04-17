@@ -21,7 +21,7 @@ if [[ ${SUDO_USER:-} ]]; then
 fi
 
 PSSHLVL=
-if [[ $TERM =~ screen ]]; then
+if [[ ${STY:-} ]]; then
 	if [[ $SHLVL > 2 ]]; then
 		PSSHLVL=$(($SHLVL - 1))
 	fi
