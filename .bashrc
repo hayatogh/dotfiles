@@ -60,7 +60,6 @@ alias scheme='scheme '$HOME'/dotfiles/chezrc.ss'
 alias sudo_proxy='sudo --preserve-env=https_proxy,http_proxy,ftp_proxy,no_proxy'
 alias tm='tmux new -ADX'
 alias vi='vim --clean'
-alias which &>/dev/null && unalias which
 sr() {
 	if [[ ${STY:-} ]]; then
 		screen
@@ -401,6 +400,8 @@ else
 		}
 		# _source_r /usr/lib/git-core/git-sh-prompt
 	elif [[ $_distro =~ fedora|centos|rhel ]]; then
+		alias which &>/dev/null && unalias which
+		unset -f which
 		_source_r /usr/share/git-core/contrib/completion/git-prompt.sh
 	fi
 fi

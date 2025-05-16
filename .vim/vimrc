@@ -794,6 +794,7 @@ aug vimrc
 	au FileType scheme nnoremap <buffer> <expr> = g:SchemeIndentExpr()
 	au FileType scheme vnoremap <buffer> <expr> = g:SchemeIndentExpr()
 	au FileType scheme nnoremap <buffer> == ==
+	au FileType html setl indentkeys=
 
 	" au FileType tex nmap <silent><buffer><nowait> <LocalLeader>ls <plug>(vimtex-compile-ss)
 	au BufWinEnter * call <SID>DisableALE()
