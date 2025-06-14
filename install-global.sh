@@ -12,7 +12,8 @@ fi
 
 ver=$(curl -fsS 'https://ftp.gnu.org/pub/gnu/global/?C=M;O=D' | grep -Po '(?<=href="global-)[0-9.]+(?=\.tar\.gz")' | head -n1)
 dir=global-$ver
-url=https://ftp.gnu.org/gnu/global/$dir.tar.gz
+fname=$dir.tar.gz
+url=https://ftp.gnu.org/gnu/global/$fname
 
 echo "Installed:     $(global --version 2>/dev/null | head -n1 | grep -Po '(?<= )[0-9.]+$' || echo "Not installed")"
 echo "Remote latest: $ver"
@@ -23,9 +24,9 @@ fi
 
 mkdir -p $prefix/src
 cd $prefix/src
-curl -fsSo $dir.tar.gz $url
+curl -fsSo $fname $url
 rm -rf $dir
-tar -xf $dir.tar.gz
+tar -xf $fname
 cd $dir
 ./configure --prefix=$prefix &>/dev/null
 make -j4 &>/dev/null

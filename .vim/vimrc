@@ -883,8 +883,10 @@ endfu
 let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
 let g:ale_linters = {
 	\ 'asciidoc': ['vale'],
-	\ 'c'       : ['clangd'],
-	\ 'cpp'     : ['clangd'],
+	\ 'c'       : [],
+	\ 'cpp'     : [],
+	"\ 'c'       : ['clangd'],
+	"\ 'cpp'     : ['clangd'],
 	\ 'go'      : ['govet', 'gopls'],
 	\ 'mail'    : ['vale'],
 	\ 'markdown': ['vale'],
@@ -896,8 +898,10 @@ let g:ale_linters = {
 	\ 'tex'     : ['chktex'],
 	\ }
 let g:ale_fixers = {
-	\ 'c'     : ['clang-format'],
-	\ 'cpp'   : ['clang-format'],
+	\ 'c'       : [],
+	\ 'cpp'     : [],
+	"\ 'c'     : ['clang-format'],
+	"\ 'cpp'   : ['clang-format'],
 	\ 'go'    : ['gofmt', 'goimports'],
 	\ 'ocaml' : ['ocamlformat'],
 	\ 'python': ['isort', 'yapf'],

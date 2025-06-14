@@ -11,13 +11,13 @@ if [[ $EUID != 0 && $prefix == /usr/local ]]; then
 fi
 
 use_deb=0
-if grep -Pq '^ID=(debian|ubuntu)$' /etc/os-release 2>/dev/null; then
+if grep -Pqs '^ID=(debian|ubuntu)$' /etc/os-release; then
 	use_deb=1
 fi
 arch=$(uname -m)
-ver=$(curl -fsSL https://api.github.com/repos/BurntSushi/ripgrep/releases/latest | grep -Po '(?<=/BurntSushi/ripgrep/releases/download/)([0-9.]+)(?=/ripgrep_\1_amd64\.deb)' | head -n1)
+ver=$(curl -fsSL https://api.github.com/repos/BurntSushi/ripgrep/releases/latest | grep -Po '(?<="name": ")([0-9.]+)(?=",)' | head -n1)
 if (( $use_deb )); then
-	fname=ripgrep_${ver}_amd64.deb
+	fname=ripgrep_$ver-1_amd64.deb
 else
 	dir=ripgrep-$ver-x86_64-unknown-linux-musl
 	fname=$dir.tar.gz
@@ -44,11 +44,6 @@ else
 	cp rg $prefix/bin/rg
 	mkdir -p $prefix/share/man/man1
 	cp doc/rg.1 $prefix/share/man/man1/rg.1
-	if [[ $EUID == 0 ]]; then
-		mkdir -p /etc/bash_completion.d
-		cp complete/rg.bash /etc/bash_completion.d/rg.bash
-	else
-		mkdir -p $prefix/share/bash-completion/completions
-		cp complete/rg.bash $prefix/share/bash-completion/completions/rg.bash
-	fi
+	mkdir -p $prefix/share/bash-completion/completions
+	cp complete/rg.bash $prefix/share/bash-completion/completions/rg.bash
 fi

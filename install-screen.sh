@@ -2,7 +2,6 @@
 set -euo pipefail
 
 prefix=/usr/local
-patch=~/dotfiles/screen/new_windows_in_cwd_for_screenv4.patch
 if [[ ${1:-} == -l ]]; then
 	prefix=~/.local
 fi
@@ -15,7 +14,8 @@ fi
 # ver=$(curl -fsS 'https://ftp.gnu.org/gnu/screen/?C=M;O=D' | grep -Po '(?<=href="screen-)[0-9.]+(?=\.tar\.gz")' | head -n1)
 ver=$(curl -fsS 'https://ftp.gnu.org/gnu/screen/?C=M;O=D' | grep -Po '(?<=href="screen-)4\.[0-9.]+(?=\.tar\.gz")' | head -n1)
 dir=screen-$ver
-url=https://ftp.gnu.org/gnu/screen/$dir.tar.gz
+fname=$dir.tar.gz
+url=https://ftp.gnu.org/gnu/screen/$fname
 
 echo "Installed:     $(screen --version 2>/dev/null | grep -Po '(?<= )[0-9.]+(?= )' | sed -E 's/0([0-9])/\1/g' || echo "Not installed")"
 echo "Remote latest: $ver"
@@ -24,11 +24,13 @@ if [[ ${1:-} == -n ]]; then
 	exit
 fi
 
+patch=~/dotfiles/screen/new_windows_in_cwd_for_screenv4.patch
+
 mkdir -p $prefix/src
 cd $prefix/src
-curl -fsSo $dir.tar.gz $url
+curl -fsSo $fname $url
 rm -rf $dir
-tar -xf $dir.tar.gz
+tar -xf $fname
 cd $dir
 patch -p2 <$patch
 ./configure --prefix=$prefix --enable-colors256 &>/dev/null

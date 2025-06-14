@@ -21,7 +21,7 @@ if [[ ${SUDO_USER:-} ]]; then
 fi
 
 PSSHLVL=
-if [[ ${STY:-} ]]; then
+if [[ ${ZELLIJ:-} || ${STY:-} ]]; then
 	if [[ $SHLVL > 2 ]]; then
 		PSSHLVL=$(($SHLVL - 1))
 	fi
@@ -58,8 +58,10 @@ alias rm='rm -i'
 alias sc='script -qc sh'
 alias scheme='scheme '$HOME'/dotfiles/chezrc.ss'
 alias sudo_proxy='sudo --preserve-env=https_proxy,http_proxy,ftp_proxy,no_proxy'
+alias timespan='systemd-analyze --user timespan'
 alias tm='tmux new -ADX'
 alias vi='vim --clean'
+alias zel='zellij attach -c'
 sr() {
 	if [[ ${STY:-} ]]; then
 		screen

@@ -29,6 +29,7 @@ plugs=(
 	"gh:chrisbra/csv.vim"
 	"gh:HealsCodes/vim-gas"
 	"gh:previm/previm"
+	"gh:imsnif/kdl.vim"
 	# "gh:kchmck/vim-coffee-script"
 	# "gh:lervag/vimtex"
 )
@@ -62,30 +63,31 @@ update() {
 }
 update_all() {
 	local p
-	for p in "${plugs[@]:0:${#plugs[@]}-1}"; do
-		update $p
-	done
+	# for p in ${plugs[@]}; do
+	# 	update $p
+	# done
 
-	# for p in "${plugs[@]:0:$njobs-1}"; do
-	# 	update $p &
-	# done
-	# for p in "${plugs[@]:$njobs:${#plugs[@]}-1}"; do
-	# 	wait -n < <(jobs -p)
-	# 	update $p &
-	# done
-	# wait
+	for p in "${plugs[@]:0:$njobs}"; do
+		update $p &
+	done
+	for p in "${plugs[@]:$njobs:${#plugs[@]}-$njobs}"; do
+		wait -n < <(jobs -p)
+		update $p &
+	done
+	wait
 }
 clean() {
-	local installed p dir base
-	p=${plugs[@]:0:1}
-	installed=${p##*/}
-	for p in "${plugs[@]:1:${#plugs[@]}-1}"; do
-		installed=$installed'|'${p##*/}
+	local installed= p dir
+	for p in ${plugs[@]}; do
+		p=${p##*/}
+		p=${p//./\\.}
+		installed=$installed$p'|'
 	done
+	installed=${installed%|}
 
 	for dir in $dest/*; do
-		base=${dir##*/}
-		if [[ ! $base =~ $installed ]]; then
+		dir=${dir##*/}
+		if [[ ! $dir =~ $installed ]]; then
 			rm -rf $dir
 		fi
 	done

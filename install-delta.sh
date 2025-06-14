@@ -11,13 +11,12 @@ if [[ $EUID != 0 && $prefix == /usr/local ]]; then
 fi
 
 use_deb=0
-# Exclude debian due to libc6 dependency problem
-if grep -Pq '^ID=ubuntu$' /etc/os-release 2>/dev/null; then
+if grep -Pqs '^ID=(debian|ubuntu)$' /etc/os-release; then
 	use_deb=1
 fi
-ver=$(curl -fsSL https://api.github.com/repos/dandavison/delta/releases/latest | grep -Po '(?<=/dandavison/delta/releases/download/)([0-9.]+)(?=/git-delta_\1_amd64\.deb)' | head -n1)
+ver=$(curl -fsSL https://api.github.com/repos/dandavison/delta/releases/latest | grep -Po '(?<="tag_name": ")([0-9.]+)(?=",)' | head -n1)
 if (( $use_deb )); then
-	fname=git-delta_${ver}_amd64.deb
+	fname=git-delta-musl_${ver}_amd64.deb
 else
 	dir=delta-$ver-x86_64-unknown-linux-musl
 	fname=$dir.tar.gz
@@ -40,6 +39,6 @@ else
 	rm -rf $dir
 	tar -xf $fname
 	cd $dir
-	mkdir -p ../../bin
-	cp delta ../../bin/delta
+	mkdir -p $prefix/bin
+	cp delta $prefix/bin/delta
 fi

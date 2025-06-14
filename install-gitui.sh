@@ -10,7 +10,7 @@ if [[ $EUID != 0 && $prefix == /usr/local ]]; then
 	exec sudo "$0" "$@"
 fi
 
-ver=$(curl -fsSL https://api.github.com/repos/extrawurst/gitui/releases/latest | grep -Po '(?<=/extrawurst/gitui/releases/download/v)([0-9.]+)(?=/gitui-linux-x86_64\.tar\.gz)' | head -n1)
+ver=$(curl -fsSL https://api.github.com/repos/extrawurst/gitui/releases/latest | grep -Po '(?<="tag_name": "v)([0-9.]+)(?=",)' | head -n1)
 fname=gitui-linux-x86_64.tar.gz
 url=https://github.com/extrawurst/gitui/releases/download/v$ver/$fname
 
