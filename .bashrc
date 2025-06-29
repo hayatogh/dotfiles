@@ -1,5 +1,5 @@
 [[ ! $- =~ i ]] && return
-shopt -s autocd cdspell checkhash checkjobs checkwinsize dotglob execfail globstar lithist no_empty_cmd_completion nocaseglob
+shopt -s autocd cdspell checkhash checkjobs checkwinsize dotglob execfail globstar histreedit lithist no_empty_cmd_completion nocaseglob
 
 _pc0='history -a; history -c; history -r'
 _pc1='\[\e]0;\u@\h \w \d \A [\j] \a\]'
@@ -13,7 +13,6 @@ GIT_PS1_SHOWUPSTREAM=auto
 GIT_PS1_SHOWCOLORHINTS=1
 GIT_PS1_HIDE_IF_PWD_IGNORED=1
 HISTCONTROL=ignoreboth:erasedups
-HISTIGNORE='pwd:bash:sr:vim:ls:la:ll:al:cd:cd -:cd ..:cd ../..:git s:git ss:git d:git dc:git dw:git ds:git dn:git dt:git g:git l:upgrade:sush'
 HISTSIZE=2000
 HISTTIMEFORMAT='%c : '
 if [[ ${SUDO_USER:-} ]]; then
