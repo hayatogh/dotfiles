@@ -9,8 +9,8 @@
   "mode.normal.tab_select_previous": "H gT",
   "mode.normal.tab_select_next": "L gt",
   "mode.normal.tab_select_oldest_unvisited": "gk",
-  "mode.normal.tab_move_backward": "gH",
-  "mode.normal.tab_move_forward": "gL",
+  "mode.normal.tab_move_backward": "gH <<",
+  "mode.normal.tab_move_forward": "gL >>",
   "mode.normal.find": "a/",
   "mode.normal.find_highlight_all": "/",
   "mode.normal.esc": "<force><escape> <force><c-[>"
