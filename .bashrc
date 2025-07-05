@@ -204,18 +204,24 @@ to16() {
 	_bc 10 16 "$@"
 }
 calc() {
-	local exp=$(sed -E 's/[kK]i?[bB]?/*(1<<10)/g;
-s/[mM]i?[bB]?/*(1<<20)/g;
-s/[gG]i?[bB]?/*(1<<30)/g;
-s/[tT]i?[bB]?/*(1<<40)/g;
-s/[pP]i?[bB]?/*(1<<50)/g' <<<"$*")
-	perl -Mbignum -e '$x = ('"$exp"');
+	perl -e '
+use strict;
+use bignum;
+
+my $x = $ARGV[0];
+$x =~ s/[kK]i?[bB]?/*(1<<10)/g;
+$x =~ s/[mM]i?[bB]?/*(1<<20)/g;
+$x =~ s/[gG]i?[bB]?/*(1<<30)/g;
+$x =~ s/[tT]i?[bB]?/*(1<<40)/g;
+$x =~ s/[pP]i?[bB]?/*(1<<50)/g;
+$x = eval $x;
 if ($x->is_int()) {
 	$x = $x->as_int();
-	$u64 = $x & 0xffffffffffffffff;
-	$i64 = $u64 >> 63 ? -1 * (($u64 ^ 0xffffffffffffffff) + 1) : $u64;
-	$u32 = $x & 0xffffffff;
-	$i32 = $u32 >> 31 ? -1 * (($u32 ^ 0xffffffff) + 1) : $u32;
+	my $u64 = $x & 0xffffffffffffffff;
+	my $i64 = $u64 >> 63 ? -1 * (($u64 ^ 0xffffffffffffffff) + 1) : $u64;
+	my $u32 = $x & 0xffffffff;
+	my $i32 = $u32 >> 31 ? -1 * (($u32 ^ 0xffffffff) + 1) : $u32;
+	my $set, my $human, my $bytes;
 	if ($x->is_positive()) {
 		$set = "";
 		for (my $b = 0; $x >> $b; $b++) {
@@ -234,7 +240,8 @@ if ($x->is_int()) {
 		$human = "(NaN)";
 		$bytes = "(NaN)";
 	}
-	printf "hex:      %s
+	printf <<EOT, $x->as_hex(), $x->bdstr(), $x->bnstr(), $x->bestr(), $x->as_oct(), $bytes, $x->as_bin(), $set, $u64, $u64, $i64, $u32, $u32, $i32, $human;
+hex:      %s
 decimal:  %s %s %s
 octal:    %s
 string:   %s
@@ -243,10 +250,11 @@ bits set: %s
 64 bit:   %#x %u %d
 32 bit:   %#x %u %d
 human:    %s
-", $x->as_hex(), $x->bdstr(), $x->bnstr(), $x->bestr(), $x->as_oct(), $bytes, $x->as_bin(), $set, $u64, $u64, $i64, $u32, $u32, $i32, $human;
+EOT
 } else {
 	printf "%s\n%s\n", $x->bdstr(), $x->bsstr();
-}'
+}
+' -- "$*"
 }
 dl() {
 	if (($#)); then
@@ -338,6 +346,38 @@ _cursor() {
 	printf '\e]12;#'$col'\a'
 	printf '\e[2 q'
 }
+binoffset() {
+	[[ $# == 3 ]] || return 1
+	perl -e '
+use strict;
+use autodie;
+use bignum;
+
+my $file = $ARGV[0];
+my $offset = $ARGV[1];
+my $length = $ARGV[2];
+
+my $offset_bit = $offset % 8;
+my $offset_byte = ($offset - $offset_bit) / 8;
+
+open my $fh, "<:raw", $file;
+seek $fh, $offset_byte, 0;
+my $bytes_read = read $fh, my $str, 8;
+close $fh;
+
+my $bitstr = unpack "b" . $bytes_read * 8, $str;
+$bitstr = substr $bitstr, $offset_bit, $length;
+
+my $rev = reverse $bitstr;
+my $int = Math::BigInt->from_bin("0b" . $rev);
+printf <<EOT, $bitstr, $rev, $int, $int->as_hex();
+lower to higher: %s
+reversed:        %s
+  as int:        %s
+  as hex:        %s
+EOT
+' -- "$@"
+}
 
 if [[ $_uname == MSYS ]]; then
 	shopt -s completion_strip_exe
@@ -401,6 +441,7 @@ else
 		}
 		# _source_r /usr/lib/git-core/git-sh-prompt
 	elif [[ $_distro =~ fedora|centos|rhel ]]; then
+		alias upgrade='sudo dnf upgrade'
 		alias which &>/dev/null && unalias which
 		unset -f which
 		_source_r /usr/share/git-core/contrib/completion/git-prompt.sh
