@@ -29,10 +29,6 @@ cp_alacritty() {
 cp_latexmk() {
 	rsync -rt $dotfiles/latexmk/ "$winhome/.config/latexmk/"
 }
-cp_wsl() {
-	sudo rsync -rt $dotfiles/wsl/wsl.conf "/etc/"
-	rsync -rt $dotfiles/wsl/.wslconfig "$winhome/"
-}
 
 arg=(powershell)
 if [[ $# -ne 0 ]]; then

@@ -36,9 +36,12 @@ fi
 
 if [[ $_uname == MSYS ]] || [[ $_uname == WSL ]]; then
 	winhome=$(pspath 'Get-Content Env:USERPROFILE')
-	winbox="$winhome/Box Sync"
+	wincloud=/mnt/g/マイドライブ
 	rm_ln "$winhome" ~/WinHome
-	rm_ln "$winbox" ~/Box
+	rm_ln "$wincloud" ~/Drive
+	cp $dotfiles/wsl/.wslconfig "$winhome/.wslconfig"
+	sudo cp $dotfiles/wsl/wsl.conf /etc/wsl.conf
+	sudo cp $dotfiles/wsl/fstab /etc/fstab
 fi
 for fname in $tohome; do
 	rm_ln $dotfiles/$fname ~/$fname

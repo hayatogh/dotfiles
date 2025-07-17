@@ -74,6 +74,9 @@ alias l. &>/dev/null && unalias l.
 l.() {
 	([[ $# != 0 ]] && cd "$1"; ls -dF .*)
 }
+e() {
+	open &>/dev/null "${@:-.}"
+}
 tryssh() {
 	local sleeptime=5
 	[[ $# == 0 ]] && return 1
@@ -382,12 +385,9 @@ EOT
 if [[ $_uname == MSYS ]]; then
 	shopt -s completion_strip_exe
 	_pc3=$(sed -E 's/\$\(|\)/`/g' <<<$_pc3)
+	alias open=start
 	rg() {
 		command rg --hidden --path-separator // "$@"
-	}
-	alias open=start
-	e() {
-		start "${@:-.}"
 	}
 	upgrade() {
 		pacman -Syu --noconfirm
@@ -396,17 +396,13 @@ if [[ $_uname == MSYS ]]; then
 	_source_r /usr/share/git/git-prompt.sh
 # elif [[ $_uname == Darwin ]]; then
 # 	alias batt='pmset -g batt'
-# 	alias scheme='chez ~/dotfiles/chezrc.ss'
-# 	alias e=open
+# 	alias scheme=chez
 # 	alias upgrade='brew upgrade'
 # 	_source_r /usr/local/etc/profile.d/bash_completion.sh
 else
-	e() {
-		xdg-open &>/dev/null "${@:-.}"
-	}
 	if [[ $_uname == WSL ]]; then
-		alias open=xdg-open
-		xdg-open() {
+		alias shutdown='wsl.exe --shutdown'
+		open() {
 			[[ $# == 0 ]] && return 1
 			local arg
 			while (($#)); do

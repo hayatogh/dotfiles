@@ -1,0 +1,1 @@
+G:\ /mnt/g drvfs noatime,uid=1000,gid=1000,metadata,umask=077 0 0
