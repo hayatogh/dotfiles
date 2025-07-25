@@ -46,32 +46,29 @@ update() {
 
 	if [[ -d $dir ]]; then
 		echo "Fetch $plug" >&2
-		git -C $dir fetch --depth 1 &>/dev/null \
+		timeout 10 git -C $dir fetch --depth 1 &>/dev/null \
 			&& git -C $dir reset --hard &>/dev/null
 		ret=$?
 	else
 		echo "Clone $plug" >&2
 		url=$(to_url $plug)
-		git clone --depth 1 -- $url $dir &>/dev/null
+		timeout 10 git clone --depth 1 -- $url $dir &>/dev/null
 		ret=$?
 	fi
 	if [[ $ret -eq 0 ]]; then
 		echo " Done $plug" >&2
 	else
-		echo " Error $plug" >&2
+		echo " Error($ret) $plug" >&2
 	fi
 }
 update_all() {
 	local p
-	# for p in ${plugs[@]}; do
-	# 	update $p
-	# done
 
 	for p in "${plugs[@]:0:$njobs}"; do
 		update $p &
 	done
 	for p in "${plugs[@]:$njobs:${#plugs[@]}-$njobs}"; do
-		wait -n < <(jobs -p)
+		wait -n
 		update $p &
 	done
 	wait
@@ -92,11 +89,16 @@ clean() {
 		fi
 	done
 }
+helptags() {
+	vim -i NONE --not-a-term '+helptags ALL' '+q' >/dev/null
+}
 
 main() {
+	shopt -s nullglob
 	mkdir -p $dest
 	update_all
 	clean
+	helptags
 }
 
 main
