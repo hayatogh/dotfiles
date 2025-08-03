@@ -21,8 +21,9 @@
 	sc  = !sh -c 'git clone --depth 1 -- $0 && cd $(basename $0 .git) && git status'
 	scg = !sh -c 'git clone --depth 1 -- https://github.com/$0 && cd $(basename $0 .git) && git status'
 	b   = blame --abbrev=12
-	alias = "!git config --get-regexp 'alias.*' | awk '{ $1 = sprintf(\"%-7s =\", substr($1, 7)); print; }'"
-	untrack = rm --cached --
+	alias = "!git config --get-regexp 'alias\\..*' | awk '{ $1 = sprintf(\"%-7s =\", substr($1, 7)); print; }'"
+	unstage = restore --staged
+	untrack = rm --cached
 	cp  = cherry-pick
 	arz = "!f() { d=${PWD##*/}_$(git rev-parse HEAD | cut -b-12); f=\"$d\".tar.gz; [ \"${1:-}\" = -f ] || [ ! -e $f ] && git archive -o $f --prefix=$d/ HEAD; }; f"
 	arJ = "!f() { d=${PWD##*/}_$(git rev-parse HEAD | cut -b-12); f=\"$d\".tar.xz; [ \"${1:-}\" = -f ] || [ ! -e $f ] && git archive -o $f --prefix=$d/ HEAD; }; f"

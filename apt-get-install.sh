@@ -14,7 +14,7 @@ sudo sed -i 's/main$/& non-free non-free-firmware/' /etc/apt/sources.list
 
 sudo apt-get update
 sudo apt-get -y upgrade
-sudo apt-get -y install 7zip automake bash-completion bc chezscheme clang-format clangd command-not-found curl fd-find gcc gdb gnutls-dev htop info lftp libc-dev libncurses-dev libpam-dev lshw lsof make man-db moreutils perl-doc pkg-config pmount ripgrep rlwrap rsync screen texinfo tree uchardet universal-ctags vim wget wl-clipboard xfsprogs zip \
+sudo apt-get -y install 7zip automake bash-completion bc chezscheme clang-format clangd command-not-found curl fd-find gcc gdb gnutls-dev htop info lftp libc-dev libncurses-dev libpam-dev libpng-dev libtool lshw lsof make man-db moreutils nasm perl-doc pkg-config pmount ripgrep rlwrap rsync screen texinfo tree uchardet universal-ctags vim wget wl-clipboard xfsprogs zip \
 	python3-venv yapf3 python3-pylsp python3-pylsp-isort python3-pylsp-mypy \
 	gdb-doc
 ## kernel
