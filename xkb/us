@@ -1,6 +1,0 @@
-partial alphanumeric_keys
-xkb_symbols "us" {
-	include "us(basic)"
-	include "capslock(ctrl_modifier)"
-	name[Group1]= "us";
-};

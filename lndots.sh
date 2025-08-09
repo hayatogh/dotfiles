@@ -10,7 +10,7 @@ case $(uname -sr) in
 esac
 
 tohome=".bash_profile .bashrc .themes .vim"
-toconfig="gdb git gitui latexmk lessfilter yapf zellij"
+toconfig="gdb git gitui lessfilter yapf"
 
 mkdir -p ~/.screen ~/.ssh ~/.config $dotfiles/.vim/swap
 chmod 700 ~/.screen ~/.ssh $dotfiles/.vim/swap

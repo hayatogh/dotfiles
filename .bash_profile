@@ -17,7 +17,6 @@ pathmunge ~/.npm/bin
 export DENO_INSTALL=~/.deno
 pathmunge $DENO_INSTALL/bin
 export DISPLAY
-# export CHKTEXRC=~/dotfiles/chktexrc
 # export FZF_DEFAULT_COMMAND='fd -tf -HILE.git'
 # export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --color='\''hl:9,hl+:9,spinner:16'\'
 export INPUTRC=~/dotfiles/inputrc
@@ -44,7 +43,6 @@ export _uname
 case $(uname -sr) in
 	*icrosoft*) _uname=WSL;;
 	*Linux*) _uname=Linux;;
-	*Darwin*) _uname=Darwin;;
 	*_NT*) _uname=MSYS;;
 	*) _uname=Unknown;;
 esac
@@ -59,10 +57,6 @@ if [[ $_uname == MSYS ]]; then
 	pathmunge $GOROOT/bin
 	pathmunge $GOPATH/bin
 	export MSYS=winsymlinks:nativestrict
-# elif [[ $_uname == Darwin ]]; then
-# 	pathmunge /usr/local/opt/coreutils/libexec/gnubin
-# 	export MANPATH=/usr/local/opt/coreutils/libexec/gnuman:$MANPATH
-# 	export INFOPATH=/usr/local/opt/coreutils/share/info:$INFOPATH
 else
 	if [[ $_uname == WSL ]]; then
 		LC_CTYPE=en_US.UTF-8

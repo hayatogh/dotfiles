@@ -23,12 +23,6 @@ cp_vim() {
 cp_vsvimrc() {
 	rsync -rt $dotfiles/.vsvimrc "$winhome/"
 }
-cp_alacritty() {
-	rsync -rt $dotfiles/alacritty/ "$appdata/alacritty/"
-}
-cp_latexmk() {
-	rsync -rt $dotfiles/latexmk/ "$winhome/.config/latexmk/"
-}
 
 arg=(powershell)
 if [[ $# -ne 0 ]]; then

@@ -20,7 +20,7 @@ if [[ ${SUDO_USER:-} ]]; then
 fi
 
 PSSHLVL=
-if [[ ${ZELLIJ:-} || ${STY:-} ]]; then
+if [[ ${STY:-} ]]; then
 	if [[ $SHLVL > 2 ]]; then
 		PSSHLVL=$(($SHLVL - 1))
 	fi
@@ -60,7 +60,6 @@ alias sudo_proxy='sudo --preserve-env=https_proxy,http_proxy,ftp_proxy,no_proxy'
 alias timespan='systemd-analyze --user timespan'
 alias tm='tmux new -ADX'
 alias vi='vim --clean'
-alias zel='zellij attach -c'
 sr() {
 	if [[ ${STY:-} ]]; then
 		screen
@@ -108,27 +107,6 @@ _mbackslash() {
 	_regex_rubout '([^ ;&|<>] *)*(;|&&|\|\||\||\|&|<|>|<<|>>|&>|>&)? *$'
 }
 bind -x '"\e\\": _mbackslash'
-stopwatch() {
-	local c t acc=0 start=${EPOCHREALTIME/./} int=${1:-.1}
-	[[ $int < 0.1 ]] && read -N1 -t.1 c
-	while true; do
-		read -N1 -t$int c
-		t=$(($acc + ${EPOCHREALTIME/./} - $start))
-		printf "\r${t:: -6}.${t: -6}"
-
-		if [[ -z $c || $c == $'\n' ]]; then
-			continue
-		elif [[ $c == ' ' ]]; then
-			printf '\n'
-			acc=$t
-			read -N1 c
-			start=${EPOCHREALTIME/./}
-			printf '\n'
-		else
-			break
-		fi
-	done
-}
 cdd() {
 	cd "$(dirname "$1")"
 }
@@ -180,31 +158,6 @@ rgarm() {
 }
 vl() {
 	vim $($1 -l "${@:2}")
-}
-_bc() {
-	local in=$1 out=$2 opt exp=${@:3} ifilter=cat ofilter=cat
-	if [[ $in == 10 && $out == 10 ]] && grep -Fq . <<<$exp; then
-		opt=-l
-	fi
-	if [[ $in == 16 ]]; then
-		ifilter='sed -E '\''s/\b(0[xX])?([0-9a-fA-F]+)/\U\2/g'\'
-	fi
-	if [[ $out == 16 ]]; then
-		ofilter='sed -E '\''s/\b([0-9A-F]+)/\L\1/'\'
-	fi
-	bc $opt <<<"obase=$out; ibase=$in; $(eval $ifilter <<<$exp)" | eval $ofilter
-}
-bc10() {
-	_bc 10 10 "$@"
-}
-bc16() {
-	_bc 16 16 "$@"
-}
-to10() {
-	_bc 16 10 "$@"
-}
-to16() {
-	_bc 10 16 "$@"
 }
 calc() {
 	perl -e '
@@ -317,6 +270,7 @@ rpmia() {
 }
 alias rpmc='rpm -qp --changelog'
 diffh() {
+	[[ $# -eq 2 ]] || return 1
 	local f1='sed -E '\''s:.*/::'\'
 	local title="diff $(eval $f1 <<<"$1") $(eval $f1 <<<"$2")"
 	local f2='sed -E '\''s:.*/::; s/(.+)\.[a-zA-Z0-9]+$/\1/'\'
@@ -349,38 +303,6 @@ _cursor() {
 	printf '\e]12;#'$col'\a'
 	printf '\e[2 q'
 }
-binoffset() {
-	[[ $# == 3 ]] || return 1
-	perl -e '
-use strict;
-use autodie;
-use bignum;
-
-my $file = $ARGV[0];
-my $offset = $ARGV[1];
-my $length = $ARGV[2];
-
-my $offset_bit = $offset % 8;
-my $offset_byte = ($offset - $offset_bit) / 8;
-
-open my $fh, "<:raw", $file;
-seek $fh, $offset_byte, 0;
-my $bytes_read = read $fh, my $str, 8;
-close $fh;
-
-my $bitstr = unpack "b" . $bytes_read * 8, $str;
-$bitstr = substr $bitstr, $offset_bit, $length;
-
-my $rev = reverse $bitstr;
-my $int = Math::BigInt->from_bin("0b" . $rev);
-printf <<EOT, $bitstr, $rev, $int, $int->as_hex();
-lower to higher: %s
-reversed:        %s
-  as int:        %s
-  as hex:        %s
-EOT
-' -- "$@"
-}
 
 if [[ $_uname == MSYS ]]; then
 	shopt -s completion_strip_exe
@@ -394,11 +316,6 @@ if [[ $_uname == MSYS ]]; then
 		pacman -Qtdq | pacman -Rns --noconfirm - 2>/dev/null
 	}
 	_source_r /usr/share/git/git-prompt.sh
-# elif [[ $_uname == Darwin ]]; then
-# 	alias batt='pmset -g batt'
-# 	alias scheme=chez
-# 	alias upgrade='brew upgrade'
-# 	_source_r /usr/local/etc/profile.d/bash_completion.sh
 else
 	if [[ $_uname == WSL ]]; then
 		alias shutdown='wsl.exe --shutdown'

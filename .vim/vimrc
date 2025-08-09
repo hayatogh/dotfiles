@@ -796,7 +796,6 @@ aug vimrc
 	au FileType scheme nnoremap <buffer> == ==
 	au FileType html setl indentkeys=
 
-	" au FileType tex nmap <silent><buffer><nowait> <LocalLeader>ls <plug>(vimtex-compile-ss)
 	au BufWinEnter * call <SID>DisableALE()
 	au CmdwinEnter * nnoremap <buffer> g<CR> :let g:CmdwinLastLine=line('.')<CR><CR>q::execute g:CmdwinLastLine<CR>
 	au ColorScheme * hi Cursor guifg=fg guibg=Red
@@ -810,7 +809,6 @@ aug vimrc
 	au InsertEnter * call <SID>HlTrailingWhiteSpace(0)
 	au BufRead * call <SID>HlIdeographicSpace()
 	au TextYankPost * call <SID>CopyToOtherUnnamed()
-	au BufWritePre *.tex call <SID>HalfCommas()
 	au BufWritePre *.txt call <SID>ConvertPunctuation()
 	au VimResume * call <SID>SetScreenTitle()
 aug END
@@ -819,12 +817,6 @@ aug END
 let g:previm_enable_realtime = 1
 let g:loaded_previm = 1
 command! -nargs=0 PrevimOpen unlet g:loaded_previm | runtime plugin/previm.vim | doautocmd Previm FileType | PrevimOpen
-" vimtex
-" if has('win32')
-" 	let g:vimtex_view_general_viewer = 'SumatraPDF'
-" 	let g:vimtex_view_general_options_latexmk = '-reuse-instance'
-" 	let g:vimtex_view_general_options = '-reuse-instance -forward-search @tex @line @pdf'
-" endif
 " quickrun
 nmap <Leader>r <Plug>(quickrun)
 let g:quickrun_config = {
@@ -882,30 +874,31 @@ endfu
 
 let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
 let g:ale_linters = {
-	\ 'asciidoc': ['vale'],
-	\ 'c'       : [],
-	\ 'cpp'     : [],
-	"\ 'c'       : ['clangd'],
-	"\ 'cpp'     : ['clangd'],
-	\ 'go'      : ['govet', 'gopls'],
-	\ 'mail'    : ['vale'],
-	\ 'markdown': ['vale'],
-	\ 'ocaml'   : ['ocamllsp'],
-	\ 'python'  : ['pylsp'],
-	\ 'rst'     : ['vale'],
-	\ 'rust'    : ['analyzer', 'cargo'],
-	\ 'sh'      : [],
-	\ 'tex'     : ['chktex'],
+	\ 'asciidoc'  : ['vale'],
+	\ 'c'         : [],
+	\ 'cpp'       : [],
+	"\ 'c'         : ['clangd'],
+	"\ 'cpp'       : ['clangd'],
+	\ 'go'        : ['govet', 'gopls'],
+	\ 'mail'      : ['vale'],
+	\ 'markdown'  : ['vale'],
+	\ 'ocaml'     : ['ocamllsp'],
+	\ 'python'    : ['pylsp'],
+	\ 'rst'       : ['vale'],
+	\ 'rust'      : ['analyzer', 'cargo'],
+	\ 'sh'        : [],
+	\ 'typescript': [],
 	\ }
 let g:ale_fixers = {
-	\ 'c'       : [],
-	\ 'cpp'     : [],
-	"\ 'c'     : ['clang-format'],
-	"\ 'cpp'   : ['clang-format'],
-	\ 'go'    : ['gofmt', 'goimports'],
-	\ 'ocaml' : ['ocamlformat'],
-	\ 'python': ['isort', 'yapf'],
-	\ 'rust'  : ['rustfmt'],
+	\ 'c'         : [],
+	\ 'cpp'       : [],
+	"\ 'c'         : ['clang-format'],
+	"\ 'cpp'       : ['clang-format'],
+	\ 'go'        : ['gofmt', 'goimports'],
+	\ 'ocaml'     : ['ocamlformat'],
+	\ 'python'    : ['isort', 'yapf'],
+	\ 'rust'      : ['rustfmt'],
+	\ 'typescript': [],
 	\ }
 let g:ale_c_clangformat_style_option = '-n'
 let g:ale_c_clangformat_use_local_file = 1

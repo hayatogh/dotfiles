@@ -52,3 +52,11 @@ colors256()
 		printf "\n"
 	done
 }
+
+if [[ $0 == ${BASH_SOURCE[0]} ]]; then
+	if [[ ${1:-} == format ]]; then
+		colors_and_formatting
+	else
+		colors256
+	fi
+fi
