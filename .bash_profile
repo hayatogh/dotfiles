@@ -26,17 +26,11 @@ export MANPAGER='vim +MANPAGER --not-a-term -'
 export NPM_CONFIG_USERCONFIG=~/dotfiles/npmrc
 export RLWRAP_HOME=~/.local/state/rlwrap
 export RUST_BACKTRACE=1
-export SCREENDIR=~/.screen
-export SCREENRC=~/dotfiles/screenrc
 export VISUAL=vim
 export XDG_CONFIG_HOME=~/.config
 
 if [[ ${SUDO_USER:-} ]]; then
 	export LESSHISTFILE=~/.root_lesshst
-	SCREENDIR=~/.root_screen
-	if [[ ! -e $SCREENDIR/$STY ]]; then
-		unset STY
-	fi
 fi
 
 export _uname

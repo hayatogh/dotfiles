@@ -60,15 +60,6 @@ alias sudo_proxy='sudo --preserve-env=https_proxy,http_proxy,ftp_proxy,no_proxy'
 alias timespan='systemd-analyze --user timespan'
 alias tm='tmux new -ADX'
 alias vi='vim --clean'
-sr() {
-	if [[ ${STY:-} ]]; then
-		screen
-		return
-	fi
-	local tty=${SCREEN_TTY:-${SSH_TTY:-$(tty)}}
-	screen -X setenv SCREEN_TTY $tty &>/dev/null
-	SCREEN_TTY=$tty screen -DR
-}
 alias l. &>/dev/null && unalias l.
 l.() {
 	([[ $# != 0 ]] && cd "$1"; ls -dF .*)

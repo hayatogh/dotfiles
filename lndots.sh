@@ -10,10 +10,10 @@ case $(uname -sr) in
 esac
 
 tohome=".bash_profile .bashrc .themes .vim"
-toconfig="gdb git gitui lessfilter yapf"
+toconfig="gdb git gitui lessfilter tmux yapf"
 
-mkdir -p ~/.screen ~/.ssh ~/.config $dotfiles/.vim/swap
-chmod 700 ~/.screen ~/.ssh $dotfiles/.vim/swap
+mkdir -p ~/.ssh ~/.config $dotfiles/.vim/swap
+chmod 700 ~/.ssh $dotfiles/.vim/swap
 touch ~/.ssh/authorized_keys
 chmod 600 ~/.ssh/authorized_keys
 

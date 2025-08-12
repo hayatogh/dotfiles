@@ -105,88 +105,36 @@ if &term ==# 'xterm' || has('win32')
 	set t_Co=256
 endif
 
-let &t_TI = ""
-let &t_TE = ""
-if !exists('$SCREEN_TTY')
-	call echoraw("\e[<0t\e[<s")
-	let &t_SI ..= "\e[<r"
-	let &t_EI ..= "\e[<s\e[<0t"
-	let &t_te ..= "\e[<0t\e[<s"
-	fu! g:Imzero()
-		if s:autoIminsertZero
-			call echoraw("\e[<0t\e[<s")
-		endif
-		return ''
+fu! s:Passthrough(seq)
+	return "\ePtmux;" .. substitute(a:seq, "\e", "\e\e", 'g') .. "\e\\"
+endfu
+if !exists('$TMUX')
+	fu! s:Passthrough(seq)
+		return a:seq
 	endfu
-	fu! s:FontSizeSet(amount)
-		call echoraw("\e]7770;" .. a:amount .. "\x7")
-	endfu
-	fu! s:SetScreenTitle()
-	endfu
-	fu! s:CopyToScreenReg(str)
-	endfu
-	fu! s:CopyToClip_OSC52(str)
-		if a:str ==# ''
-			return
-		endif
-		let l:escaped = shellescape(a:str)
-		let l:enc = systemlist('echo -n ' .. l:escaped .. ' | base64 -w0')[0]
-		call echoraw("\e]52;c;" .. l:enc .. "\x7")
-	endfu
-else
-	set mouse=
-	call echoraw("\eP\e[<0t\e[<s\e\\")
-	let &t_SI ..= "\eP\e[<r\e\\"
-	let &t_EI ..= "\eP\e[<s\e[<0t\e\\"
-	let &t_te ..= "\eP\e[<0t\e[<s\e\\"
-	let &t_BE = "\eP\e[?2004h\e\\"
-	let &t_BD = "\eP\e[?2004l\e\\"
-	let &t_PS = "\e[200~"
-	let &t_PE = "\e[201~"
-	fu! g:Imzero()
-		if s:autoIminsertZero
-			call echoraw("\eP\e[<0t\e[<s\e\\")
-		endif
-		return ''
-	endfu
-	fu! s:FontSizeSet(amount)
-		call echoraw("\eP\e]7770;" .. a:amount .. "\x7\e\\")
-	endfu
-	fu! s:SetScreenTitle()
-		call job_start(['screen', '-X', 'title', 'vim'])
-	endfu
-	fu! s:CopyToScreenReg(str)
-		let l:escaped = escape(a:str, '\$^')
-		if len(l:escaped) <= 749
-			call job_start(['screen', '-X', 'register', '.', l:escaped])
-		endif
-	endfu
-	fu! s:CopyToClip_OSC52(str)
-		if a:str ==# ''
-			return
-		endif
-		if exists('$SUDO_USER') && systemlist('stat -c %U ' .. $SCREEN_TTY)[0] !=# $SUDO_USER
-			if !exists('b:sudo_clip_warned')
-				echom 'Recreate new window for copy to work!'
-				let b:sudo_clip_warned = 1
-			endif
-			return
-		endif
-		let l:escaped = shellescape(a:str)
-		let l:enc = systemlist('echo -n ' .. l:escaped .. ' | base64 -w0')[0]
-		if !filewritable($SCREEN_TTY) && exists('$STY')
-			call s:UpdateScreenTTY()
-		endif
-		call writefile(["\e]52;c;" .. l:enc .. "\x7"], $SCREEN_TTY, 'b')
-	endfu
-	fu! s:UpdateScreenTTY()
-		let $SCREEN_TTY = systemlist('screen -QX echo \$SCREEN_TTY 2>/dev/null')[0]
-	endfu
-	command! -nargs=0 UpdateScreenTTY call <SID>UpdateScreenTTY()
-		" if len(l:enc) <= 504
-		" 	call echoraw("\eP\e]52;c;" .. l:enc .. "\x7\e\\")
-		" endif
 endif
+let s:imzero = s:Passthrough("\e[<0t\e[<s")
+call echoraw(s:imzero)
+let &t_SI ..= s:Passthrough("\e[<r")
+let &t_EI ..= s:Passthrough("\e[<s\e[<0t")
+let &t_te ..= s:Passthrough("\e[<0t\e[<s")
+fu! g:Imzero()
+	if s:autoIminsertZero
+		call echoraw(s:imzero)
+	endif
+	return ''
+endfu
+fu! s:FontSizeSet(amount)
+	call echoraw(s:Passthrough("\e]7770;" .. a:amount .. "\x7"))
+endfu
+fu! s:CopyToClip_OSC52(str)
+	if a:str ==# ''
+		return
+	endif
+	let l:escaped = shellescape(a:str)
+	let l:enc = systemlist('echo -n ' .. l:escaped .. ' | base64 -w0')[0]
+	call echoraw("\e]52;c;" .. l:enc .. "\x7")
+endfu
 if !executable('base64')
 	fu! s:CopyToClip_OSC52(str)
 	endfu
@@ -743,7 +691,6 @@ fu! s:ConvertPunctuation()
 endfu
 
 fu! s:CopyToOther(str)
-	call <SID>CopyToScreenReg(a:str)
 	call <SID>CopyToClip_OSC52(a:str)
 endfu
 fu! s:CopyToOtherUnnamed()
@@ -810,7 +757,6 @@ aug vimrc
 	au BufRead * call <SID>HlIdeographicSpace()
 	au TextYankPost * call <SID>CopyToOtherUnnamed()
 	au BufWritePre *.txt call <SID>ConvertPunctuation()
-	au VimResume * call <SID>SetScreenTitle()
 	au VimEnter * silent! call textobj#user#plugin('surround', {
 		\ 'surround-mb': {'pattern': ['（', '）'], 'select-a': 'amb', 'select-i': 'imb'},
 		\ 'surround-mB': {'pattern': ['｛', '｝'], 'select-a': 'amB', 'select-i': 'imB'},
