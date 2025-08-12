@@ -73,7 +73,7 @@ fu! s:Tablabel(tabpagenr)
 endfu
 fu! g:Cuitabline()
 	let l:tablabels = join(map(range(1, tabpagenr('$')), '<SID>Tablabel(v:val)'), ' ')
-	let l:info = strftime('%m/%d%a %H:%M') .. ' %#TabLine#%<' .. fnamemodify(getcwd(), ':~') .. ' '
+	let l:info = '%#TabLine#%<' .. fnamemodify(getcwd(), ':~') .. ' '
 	return l:tablabels .. ' %T%=' .. l:info
 endfu
 set tabline=%!g:Cuitabline()
@@ -100,8 +100,6 @@ let g:tex_conceal = ''
 let g:tex_flavor = 'latex'
 let g:vim_indent_cont = &tabstop
 let g:vim_json_conceal = 0
-filetype plugin indent on
-syntax enable
 
 if &term ==# 'xterm' || has('win32')
 	set t_Co=256
@@ -243,9 +241,11 @@ nnoremap <Esc>P <C-W>+
 cnoremap <C-G> <C-\><C-N>
 inoremap <C-G> <C-\><C-N>
 
-nnoremap <silent> <Esc>= <Cmd>call <SID>FontSizeSet('')<CR>
-nnoremap <silent> <Esc>+ <Cmd>call <SID>FontSizeSet('+1')<CR>
-nnoremap <silent> <Esc>- <Cmd>call <SID>FontSizeSet('-1')<CR>
+nnoremap <silent> <Esc>=              <Cmd>call <SID>FontSizeSet('')<CR>
+nnoremap <silent> <Esc>+              <Cmd>call <SID>FontSizeSet('+1')<CR>
+nnoremap <silent> <Esc>-              <Cmd>call <SID>FontSizeSet('-1')<CR>
+nnoremap <silent> <C-ScrollWheelUp>   <Cmd>call <SID>FontSizeSet('+1')<CR>
+nnoremap <silent> <C-ScrollWheelDown> <Cmd>call <SID>FontSizeSet('-1')<CR>
 
 nnoremap g/ /\<\><Left><Left>
 
@@ -642,7 +642,7 @@ else
 endif
 
 let s:template = {
-	\ 'c'     : ['#include <stdio.h>', '', 'int main(void) {', '	printf("Hello\n");', '	return 0;', '}'],
+	\ 'c'     : ['#include <stdio.h>', '', 'int main(void)', '{', '	printf("Hello\n");', '	return 0;', '}'],
 	\ 'go'    : ['package main', '', 'import "fmt"', '', 'func main() {', '	fmt.Println("Hello")', '}'],
 	\ 'perl'  : ['#!/usr/bin/perl', 'use strict;', 'use warnings;'],
 	\ 'python': '#!/usr/bin/env ' .. s:pythonexe,
@@ -811,6 +811,15 @@ aug vimrc
 	au TextYankPost * call <SID>CopyToOtherUnnamed()
 	au BufWritePre *.txt call <SID>ConvertPunctuation()
 	au VimResume * call <SID>SetScreenTitle()
+	au VimEnter * silent! call textobj#user#plugin('surround', {
+		\ 'surround-mb': {'pattern': ['（', '）'], 'select-a': 'amb', 'select-i': 'imb'},
+		\ 'surround-mB': {'pattern': ['｛', '｝'], 'select-a': 'amB', 'select-i': 'imB'},
+		\ 'surround-ma': {'pattern': ['＜', '＞'], 'select-a': 'ama', 'select-i': 'ima'},
+		\ 'surround-mA': {'pattern': ['［', '］'], 'select-a': 'amA', 'select-i': 'imA'},
+		\ 'surround-mk': {'pattern': ['「', '」'], 'select-a': 'amk', 'select-i': 'imk'},
+		\ 'surround-mn': {'pattern': ['『', '』'], 'select-a': 'amn', 'select-i': 'imn'},
+		\ 'surround-ms': {'pattern': ['【', '】'], 'select-a': 'ams', 'select-i': 'ims'},
+		\ })
 aug END
 
 " previm
@@ -849,7 +858,6 @@ endif
 nmap <Leader>j <Plug>(ale_next)
 nmap <Leader>k <Plug>(ale_previous)
 nmap <Leader>h <Plug>(ale_detail)
-
 fu! s:ALEFixOnSaveToggle(vartype, value)
 	let l:new = a:value ==# -1 ? '!' .. get(eval(a:vartype .. ':'), 'ale_fix_on_save', 0) : a:value
 	execute 'let ' .. a:vartype .. ':ale_fix_on_save = ' .. l:new
@@ -865,13 +873,11 @@ command! -bar ALEEnableAllBuffer  ALEEnableBuffer | ALEFixOnSaveEnableBuffer
 command! -bar ALEDisableAll       ALEDisable | ALEFixOnSaveDisable
 command! -bar ALEDisableAllBuffer ALEDisableBuffer | ALEFixOnSaveDisableBuffer
 command! -bar WriteNoFix          ALEFixOnSaveDisableBuffer | w
-
 fu! s:DisableALE()
 	if fnamemodify(bufname(), ':p') =~# '/linux/'
 		ALEDisableAllBuffer
 	endif
 endfu
-
 let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
 let g:ale_linters = {
 	\ 'asciidoc'  : ['vale'],
@@ -952,22 +958,10 @@ let g:lion_squeeze_spaces = 1
 let g:user_emmet_leader_key='<F7>'
 let g:csv_default_delim=','
 
-packloadall!
-packadd matchit
-silent! packadd termdebug
+packadd! matchit
+packadd! termdebug
+packadd! editorconfig
 runtime ftplugin/man.vim
-" vim-surround
-let s:surround_textobj = {
-	\ 'surround-mb': {'pattern': ['（', '）'], 'select-a': 'amb', 'select-i': 'imb'},
-	\ 'surround-mB': {'pattern': ['｛', '｝'], 'select-a': 'amB', 'select-i': 'imB'},
-	\ 'surround-ma': {'pattern': ['＜', '＞'], 'select-a': 'ama', 'select-i': 'ima'},
-	\ 'surround-mA': {'pattern': ['［', '］'], 'select-a': 'amA', 'select-i': 'imA'},
-	\ 'surround-mk': {'pattern': ['「', '」'], 'select-a': 'amk', 'select-i': 'imk'},
-	\ 'surround-mn': {'pattern': ['『', '』'], 'select-a': 'amn', 'select-i': 'imn'},
-	\ 'surround-ms': {'pattern': ['【', '】'], 'select-a': 'ams', 'select-i': 'ims'},
-	\ }
-silent! call textobj#user#plugin('surround', s:surround_textobj)
-unlet s:surround_textobj
 
 " gui
 if has('gui_running') && has('win32')
@@ -1016,15 +1010,16 @@ if has('gui_running') && has('win32')
 	cnoremap <M-w> <C-\>e<SID>RegexRubout('\v[^ ]* *$')<CR>
 	nnoremap <M-m> <C-W>-
 	nnoremap <M-p> <C-W>+
-	nnoremap <silent> <M-=>               <Cmd>call <SID>FontSizeSet('')<CR>
-	nnoremap <silent> <M-+>               <Cmd>call <SID>FontSizeSet('+1')<CR>
-	nnoremap <silent> <M-->               <Cmd>call <SID>FontSizeSet('-1')<CR>
-	nnoremap <silent> <C-=>               <Cmd>call <SID>FontSizeSet('')<CR>
-	nnoremap <silent> <C-ScrollWheelUp>   <Cmd>call <SID>FontSizeSet('+1')<CR>
-	nnoremap <silent> <C-ScrollWheelDown> <Cmd>call <SID>FontSizeSet('-1')<CR>
+	nnoremap <silent> <M-=> <Cmd>call <SID>FontSizeSet('')<CR>
+	nnoremap <silent> <M-+> <Cmd>call <SID>FontSizeSet('+1')<CR>
+	nnoremap <silent> <M--> <Cmd>call <SID>FontSizeSet('-1')<CR>
+	nnoremap <silent> <C-=> <Cmd>call <SID>FontSizeSet('')<CR>
 endif
 
 if filereadable(expand('~/.localvimrc.vim'))
 	source ~/.localvimrc.vim
 endif
+
+filetype plugin indent on
+syntax enable
 silent! colorscheme molokai

@@ -4,7 +4,6 @@ dest=~/.vim/pack/remote/start
 njobs=4
 plugs=(
 	"gh:tpope/vim-commentary"
-	"gh:editorconfig/editorconfig-vim"
 	"gh:mattn/emmet-vim"
 	"gh:tpope/vim-eunuch"
 	"gh:tommcdo/vim-lion"
