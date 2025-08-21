@@ -1,2 +1,2 @@
 [wsl2]
-networkingMode=mirrored
+networkingMode=virtioproxy

@@ -2,10 +2,9 @@
 shopt -s autocd cdspell checkhash checkjobs checkwinsize dotglob execfail globstar histreedit lithist no_empty_cmd_completion nocaseglob
 
 _pc0='history -a; history -c; history -r'
-_pc1='\[\e]0;\u@\h \w \d \A [\j] \a\]'
-_pc2='\[\e[0m\]\n'
-_pc3='$PSM\[\e[32m\]\u@\h \[\e[33m\]\w \[\e[38;5;93m\]$PSSHLVL \[\e[38;5;166m\]$([[ \j -gt 0 ]] && echo \j)\[\e[0m\]'
-_pc4=' \[\e[38;5;245m\]\t ${PIPESTATUS[@]}\[\e[0m\]\n\[\ek\e\\\]\$ '
+_pc1='\[\e[0m\]\n'
+_pc2='$PSM\[\e[32m\]\u@\h \[\e[33m\]\w \[\e[38;5;93m\]$PSSHLVL \[\e[38;5;166m\]$([[ \j -gt 0 ]] && echo \j)\[\e[0m\]'
+_pc3=' \[\e[38;5;245m\]\t ${PIPESTATUS[@]}\[\e[0m\]\n\[\ek\e\\\]\$ '
 GIT_PS1_SHOWDIRTYSTATE=1
 GIT_PS1_SHOWSTASHSTATE=1
 GIT_PS1_SHOWUNTRACKEDFILES=1
@@ -19,13 +18,9 @@ if [[ ${SUDO_USER:-} ]]; then
 	HISTFILE=~/.root_history
 fi
 
-PSSHLVL=
-if [[ ${STY:-} ]]; then
-	if [[ $SHLVL > 2 ]]; then
-		PSSHLVL=$(($SHLVL - 1))
-	fi
-elif [[ $SHLVL > 1 ]]; then
-	PSSHLVL=$SHLVL
+PSSHLVL=$((SHLVL ${TMUX:+- 1}))
+if [[ $PSSHLVL -eq 1 ]]; then
+	PSSHLVL=
 fi
 PSM=${PSM:-}
 alias chgrp='chgrp --preserve-root'
@@ -44,7 +39,7 @@ alias fdall='fd -I'
 alias git_dotfiles_pull='git -C ~/dotfiles pull'
 alias git_empty_commit='git add -A && git commit -m '\''No commit message'\'' && git push'
 alias grep='grep --color=auto'
-alias info='info --init-file '$HOME'/dotfiles/infokey'
+alias info='info --init-file ~/dotfiles/infokey'
 alias ls='ls --color=auto'
 alias la='ls -AF'
 alias ll='ls -lhF'
@@ -54,9 +49,7 @@ alias ltime='ls -alhrtF'
 alias lsize='ls -alhrFS'
 alias manless='man -P less'
 alias rm='rm -i'
-alias sc='script -qc sh'
-alias scheme='scheme '$HOME'/dotfiles/chezrc.ss'
-alias sudo_proxy='sudo --preserve-env=https_proxy,http_proxy,ftp_proxy,no_proxy'
+alias scheme='scheme ~/dotfiles/chezrc.ss'
 alias timespan='systemd-analyze --user timespan'
 alias tm='tmux new -ADX'
 alias vi='vim --clean'
@@ -69,8 +62,8 @@ e() {
 }
 tryssh() {
 	local sleeptime=5
-	[[ $# == 0 ]] && return 1
-	[[ $# == 2 ]] && sleeptime=$2
+	[[ $# -eq 0 ]] && return 1
+	[[ $# -eq 2 ]] && sleeptime=$2
 	while printf .; do
 		ssh $1 true &>/dev/null && printf '\n' && break
 		sleep $sleeptime
@@ -111,7 +104,7 @@ mktags() {
 		make SRCARCH=$arch tags &>/dev/null
 		mv tags tags.$arch
 		ln -s tags.$arch tags
-	elif [[ ${#@} != 0 ]]; then
+	elif [[ $# != 0 ]]; then
 		ctags "$@" &>/dev/null
 	else
 		ctags -R &>/dev/null
@@ -121,7 +114,7 @@ realwhich() {
 	realpath "$(which "$1")"
 }
 clean_history() {
-	[[ $# == 1 ]] || return 1
+	[[ $# -eq 1 ]] || return 1
 	local pat=$1
 	perl -0777 -i -pe 's/^#\d+\n('"$pat"') *\n//gm' $HISTFILE
 }
@@ -129,8 +122,8 @@ fix_history() {
 	perl -i -ne 'BEGIN { $sawtime = 0 } if (/^#/) { $sawtime = 1 } if ($sawtime) { print }' $HISTFILE
 }
 fixmod() {
-	find "$@" -maxdepth 0 -type f -print0 | xargs -0 chmod 644
 	find "$@" -maxdepth 0 -type d -print0 | xargs -0 chmod 755
+	find "$@" -maxdepth 0 -type f -print0 | xargs -0 chmod 644
 }
 rgall() {
 	command rg --no-messages --hidden --no-ignore -g!tags -g!tags.x86 -g!tags.arm64 -g!.git/ "$@"
@@ -149,6 +142,9 @@ rgarm() {
 }
 vl() {
 	vim $($1 -l "${@:2}")
+}
+vll() {
+	vim $("$@")
 }
 calc() {
 	perl -e '
@@ -232,72 +228,16 @@ dl() {
 sush() {
 	sudo -E --preserve-env=PATH,HOME $BASH --rcfile ~/.bash_profile
 }
-rpmt() {
-	[[ $# == 1 ]] || return 1
-	rpm2cpio $1 | cpio -t --quiet
-}
-rpmi() {
-	[[ $# -lt 3 ]] || return 1
-	local rpm=$1 base=${1##*/} pat tar
-	if [[ ${2:-} ]]; then
-		pat=$2
-	elif [[ $base =~ ^kernel ]]; then
-		pat=linux
-	else
-		pat=$(grep -Po '[a-z0-9]+(-[a-z]+)*' <<<$base | head -n1)
-		[[ -n $pat ]] || return 1
-	fi
-	tar=$(rpmt $rpm | grep -Po '^'$pat'([-0-9.]+(\.(el|fc)[0-9_]+)?.tar.(xz|bz2|gz))?$')
-	[[ -n $tar ]] || return 1
-	rpm2cpio $rpm | cpio -idu --quiet $tar || return $?
-	echo $tar
-}
-rpmia() {
-	[[ $# -eq 1 ]] || return 1
-	local rpm=$(readlink -f $1) dir=$(basename $1 .rpm)
-	mkdir $dir || return 1
-	cd $dir
-	rpm2cpio $rpm | cpio -idu --quiet
-}
-alias rpmc='rpm -qp --changelog'
-diffh() {
-	[[ $# -eq 2 ]] || return 1
-	local f1='sed -E '\''s:.*/::'\'
-	local title="diff $(eval $f1 <<<"$1") $(eval $f1 <<<"$2")"
-	local f2='sed -E '\''s:.*/::; s/(.+)\.[a-zA-Z0-9]+$/\1/'\'
-	local out="diff_$(eval $f2 <<<"$1")_$(eval $f2 <<<"$2").html"
-	diffl "$1" "$2" | diff2html-cli -s side --su hidden -t "$title" -i stdin -o stdout | _expand_links > "$out"
-}
-_expand_links() {
-	local l href media cachedir=~/.cache/diffh cache
-	mkdir -p $cachedir
-	while read -r l; do
-		if [[ $l =~ ^\<link\ rel=\"stylesheet\" ]]; then
-			href=$(grep -Po '(?<=href=")[^"]+(?=")' <<<$l)
-			media=$(grep -Po '(?<=media=")[^"]+(?=")' <<<$l)
-			cache=$cachedir/$(basename $href)
-			if [[ ! -e $cache ]]; then
-				curl -fsSLo $cache $href
-			fi
-			echo -e "<style>\n@media $media {\n$(cat $cache)\n}\n</style>"
-		else
-			echo "$l"
-		fi
-	done
-}
+. ~/dotfiles/rpm-commands.sh
+alias diffh='~/dotfiles/diffh.sh d2hc'
 rm_rfchmod() {
 	find "$@" ! -perm -200 -type d -print0 | xargs -0 chmod 700
 	rm -rf "$@"
 }
-_cursor() {
-	local col=${1:-ff0000}
-	printf '\e]12;#'$col'\a'
-	printf '\e[2 q'
-}
 
 if [[ $_uname == MSYS ]]; then
 	shopt -s completion_strip_exe
-	_pc3=$(sed -E 's/\$\(|\)/`/g' <<<$_pc3)
+	_pc2=$(sed -E 's/\$\(|\)/`/g' <<<$_pc2)
 	alias open=start
 	rg() {
 		command rg --hidden --path-separator // "$@"
@@ -307,58 +247,32 @@ if [[ $_uname == MSYS ]]; then
 		pacman -Qtdq | pacman -Rns --noconfirm - 2>/dev/null
 	}
 	_source_r /usr/share/git/git-prompt.sh
-else
-	if [[ $_uname == WSL ]]; then
-		alias shutdown='wsl.exe --shutdown'
-		open() {
-			[[ $# == 0 ]] && return 1
-			local arg
-			while (($#)); do
-				if [[ -r $1 ]]; then
-					arg=$arg'"'$(wslpath -w "$1")'", '
-				else
-					arg=$arg'"'$1'", '
-				fi
-				shift
-			done
-			powershell.exe -NoProfile 'Invoke-Item '"${arg%, }"
-		}
-		diffhw() {
-			local winmerge='/mnt/c/Program Files/WinMerge/WinMergeU.exe'
-			local f='sed -E '\''s:.*/::; s/(.+)\.[a-zA-Z0-9]+$/\1/'\'
-			local l=$(eval $f <<<"$1")
-			local r=$(eval $f <<<"$2")
-			local out="diff_${l}_$r.html"
-			if [[ $l == $r ]]; then
-				out="diff_$l.html"
-			fi
-			"$winmerge" -noninteractive -or "$out" "$(wslpath -w "$1")" "$(wslpath -w "$2")"
-		}
-	fi
-	if [[ $_distro == debian ]]; then
-		_pc3='${debian_chroot:+($debian_chroot)}'$_pc3
-		upgrade() {
-			sudo apt-get -qq update
-			apt list --upgradable
-			sudo apt-get -y upgrade
-			sudo apt-get -qq autoremove
-		}
-		# _source_r /usr/lib/git-core/git-sh-prompt
-	elif [[ $_distro =~ fedora|centos|rhel ]]; then
-		alias upgrade='sudo dnf upgrade'
-		alias which &>/dev/null && unalias which
-		unset -f which
-		_source_r /usr/share/git-core/contrib/completion/git-prompt.sh
-	fi
+elif [[ $_uname == WSL ]]; then
+	alias shutdown='wsl.exe --shutdown'
+	alias diffhw='~/dotfiles/diffh.sh winmerge'
 fi
-_source_r /etc/profile.d/bash_completion.sh
+if [[ $_distro == debian ]]; then
+	_pc2='${debian_chroot:+($debian_chroot)}'$_pc2
+	upgrade() {
+		sudo apt-get -qq update
+		sudo apt-get -y upgrade
+		sudo apt-get -qq autoremove
+	}
+	# _source_r /usr/lib/git-core/git-sh-prompt
+elif [[ $_distro =~ fedora|centos|rhel ]]; then
+	alias upgrade='sudo dnf upgrade'
+	alias which &>/dev/null && unalias which
+	unset -f which
+	_source_r /usr/share/git-core/contrib/completion/git-prompt.sh
+fi
+
 type _completion_loader &>/dev/null && ! _completion_loader ssh
-complete -F _ssh tryssh
+complete -F _comp_cmd_ssh tryssh
 complete -c realwhich
-PROMPT_COMMAND=$_pc0"; __git_ps1 '"$_pc1$_pc2$_pc3"' '"$_pc4"'"
+PROMPT_COMMAND=$_pc0"; __git_ps1 '"$_pc1$_pc2"' '"$_pc3"'"
 if ! type __git_ps1 &>/dev/null; then
 	PROMPT_COMMAND=$_pc0
-	PS1=$_pc1$_pc2$_pc3$_pc4
+	PS1=$_pc1$_pc2$_pc3
 fi
 
 _source_r ~/.localbashrc.bash

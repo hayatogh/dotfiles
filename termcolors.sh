@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # \e[Xm
 # can be combined as many you want with separator ';'
 
@@ -45,7 +45,7 @@ colors256()
 	for fgbg in 38 48; do
 		for color in {0..255}; do
 			printf "\e[${fgbg};5;%sm  %3s  \e[0m" $color $color
-			if [[ $((($color + 1) % 6)) == 4 ]]; then
+			if [[ $((($color + 1) % 6)) -eq 4 ]]; then
 				printf "\n"
 			fi
 		done

@@ -1,21 +1,18 @@
-#!/usr/bin/env bash
+#!/bin/bash
 set -euo pipefail
 
 dir=~/.local/share/bash-completion/completions
 mkdir -p $dir
-exists() {
-	type $1 &>/dev/null
-}
 
 rustup_comp() {
-	exists rustup || return
+	type rustup &>/dev/null || return
 	rustup completions bash >$dir/rustup
 }
 cargo_comp() {
 	curl -fsSo $dir/cargo https://raw.githubusercontent.com/rust-lang/cargo/master/src/etc/cargo.bashcomp.sh
 }
 pip3_comp() {
-	exists pip3 || return
+	type pip3 &>/dev/null || return
 	pip3 completion --bash >$dir/pip3
 }
 

@@ -28,7 +28,6 @@ export RLWRAP_HOME=~/.local/state/rlwrap
 export RUST_BACKTRACE=1
 export VISUAL=vim
 export XDG_CONFIG_HOME=~/.config
-
 if [[ ${SUDO_USER:-} ]]; then
 	export LESSHISTFILE=~/.root_lesshst
 fi
@@ -38,7 +37,7 @@ case $(uname -sr) in
 	*icrosoft*) _uname=WSL;;
 	*Linux*) _uname=Linux;;
 	*_NT*) _uname=MSYS;;
-	*) _uname=Unknown;;
+	*) _uname=Other;;
 esac
 export _distro=$(grep -Po '(?<=^ID=).*$' /etc/os-release 2>/dev/null || true)
 
@@ -51,14 +50,12 @@ if [[ $_uname == MSYS ]]; then
 	pathmunge $GOROOT/bin
 	pathmunge $GOPATH/bin
 	export MSYS=winsymlinks:nativestrict
-else
-	if [[ $_uname == WSL ]]; then
-		LC_CTYPE=en_US.UTF-8
-	fi
-	if [[ $_distro == debian ]]; then
-		export LESSOPEN='| /usr/bin/lesspipe %s'
-		export LESSCLOSE='/usr/bin/lesspipe %s %s'
-	fi
+elif [[ $_uname == WSL ]]; then
+	LC_CTYPE=en_US.UTF-8
+fi
+if [[ $_distro == debian ]]; then
+	export LESSOPEN='| /usr/bin/lesspipe %s'
+	export LESSCLOSE='/usr/bin/lesspipe %s %s'
 fi
 unset pathmunge
 _source_r() {

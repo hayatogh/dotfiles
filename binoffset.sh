@@ -1,7 +1,8 @@
-#!/usr/bin/bash
+#!/bin/bash
 
-binoffset() {
-	[[ $# == 3 ]] || return 1
+binoffset()
+{
+	[[ $# -eq 3 ]] || return 1
 	perl -e '
 use strict;
 use autodie;

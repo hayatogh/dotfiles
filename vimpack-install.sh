@@ -1,6 +1,6 @@
-#!/usr/bin/bash
+#!/bin/bash
 
-dest=~/.vim/pack/remote/start
+dest=~/.config/vim/pack/remote/start
 njobs=4
 plugs=(
 	"gh:tpope/vim-commentary"

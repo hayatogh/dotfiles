@@ -33,6 +33,7 @@ set pastetoggle=<F10>
 set path+=include,arch/x86/include
 set pumheight=10
 set report=15
+set runtimepath+=/usr/share/vim/addons
 set scrolloff=3 sidescroll=1 sidescrolloff=10
 set incsearch hlsearch nowrapscan
 if has('win32') && !has('gui_win32')
@@ -113,49 +114,13 @@ if !exists('$TMUX')
 		return a:seq
 	endfu
 endif
-let s:imzero = s:Passthrough("\e[<0t\e[<s")
-call echoraw(s:imzero)
 let &t_SI ..= s:Passthrough("\e[<r")
 let &t_EI ..= s:Passthrough("\e[<s\e[<0t")
 let &t_te ..= s:Passthrough("\e[<0t\e[<s")
-fu! g:Imzero()
-	if s:autoIminsertZero
-		call echoraw(s:imzero)
-	endif
-	return ''
+
+fu! s:CopyOSC52(str)
+	call echoraw("\e]52;c;" .. base64_encode(str2blob([a:str])) .. "\x7")
 endfu
-fu! s:FontSizeSet(amount)
-	call echoraw(s:Passthrough("\e]7770;" .. a:amount .. "\x7"))
-endfu
-fu! s:CopyToClip_OSC52(str)
-	if a:str ==# ''
-		return
-	endif
-	let l:escaped = shellescape(a:str)
-	let l:enc = systemlist('echo -n ' .. l:escaped .. ' | base64 -w0')[0]
-	call echoraw("\e]52;c;" .. l:enc .. "\x7")
-endfu
-if !executable('base64')
-	fu! s:CopyToClip_OSC52(str)
-	endfu
-endif
-fu! s:FontSizeGet()
-	call <SID>FontSizeSet('?')
-	for l:_ in range(7)
-		call getcharstr()
-	endfor
-	let l:size = ""
-	while 1
-		let l:char = getcharstr()
-		if l:char ==# "\x7"
-			break
-		else
-			let l:size ..= l:char
-		endif
-	endwhile
-	echo l:size
-endfu
-let s:pythonexe = executable('python3') ? 'python3' : 'python'
 
 " mapping
 map Y y$
@@ -188,12 +153,6 @@ nnoremap <Esc>P <C-W>+
 
 cnoremap <C-G> <C-\><C-N>
 inoremap <C-G> <C-\><C-N>
-
-nnoremap <silent> <Esc>=              <Cmd>call <SID>FontSizeSet('')<CR>
-nnoremap <silent> <Esc>+              <Cmd>call <SID>FontSizeSet('+1')<CR>
-nnoremap <silent> <Esc>-              <Cmd>call <SID>FontSizeSet('-1')<CR>
-nnoremap <silent> <C-ScrollWheelUp>   <Cmd>call <SID>FontSizeSet('+1')<CR>
-nnoremap <silent> <C-ScrollWheelDown> <Cmd>call <SID>FontSizeSet('-1')<CR>
 
 nnoremap g/ /\<\><Left><Left>
 
@@ -254,7 +213,7 @@ fu! s:Search(zero)
 	endif
 	call histadd('/', l:pat)
 	let @/=l:pat
-	call <SID>CopyToOther(l:cword)
+	call <SID>CopyOSC52(l:cword)
 	return "\"_yiw\<BS>\<C-\>\<C-N>n"
 endfu
 nnoremap <expr> *  <SID>Search(0)
@@ -278,7 +237,7 @@ fu! s:Getfname()
 	let l:fname = bufname() .. ':' .. getcurpos()[1]
 	silent! let @* = l:fname
 	silent! let @+ = l:fname
-	call <SID>CopyToOther(l:fname)
+	call <SID>CopyOSC52(l:fname)
 	return l:fname
 endfu
 command! Getfname echo <SID>Getfname()
@@ -296,15 +255,6 @@ cnoremap <C-W>      <C-\>e<SID>RegexRubout('\v([a-zA-Z0-9]+\|[^ a-zA-Z0-9]+) *$'
 cnoremap <Esc>h     <C-\>e<SID>RegexRubout('\v([a-zA-Z0-9]+\|[^ a-zA-Z0-9]+) *$')<CR>
 cnoremap <Esc><C-W> <C-\>e<SID>RegexRubout('\v[^ ]* *$')<CR>
 
-fu! s:StayColumn(cmd)
-	let l:save_cursor = getcurpos()
-	let l:save_cursor[4] = virtcol('.')
-	call setpos('.', l:save_cursor)
-	return a:cmd
-endfu
-nnoremap <silent> <expr> gj <SID>StayColumn(v:count1 .. 'gj')
-nnoremap <silent> <expr> gk <SID>StayColumn(v:count1 .. 'gk')
-
 fu! s:MultiHlSetup()
 	hi Multihl1 ctermbg=14 ctermfg=8 guibg=#00ffff guifg=#808080
 	hi Multihl2 ctermbg=13 ctermfg=8 guibg=#ff00ff guifg=#808080
@@ -315,7 +265,9 @@ fu! s:MultiHlSetup()
 endfu
 fu! s:Hi(num, ...)
 	if a:num ==# 0
-		call clearmatches()
+		for l:num in range(1, 6)
+			silent! call matchdelete(l:num + 5)
+		endfor
 	else
 		silent! call matchdelete(a:num + 5)
 		if a:0 !=# 0
@@ -340,6 +292,29 @@ nnoremap <Leader>3 :<C-U>Hi3 <C-R><C-W><CR>
 nnoremap <Leader>4 :<C-U>Hi4 <C-R><C-W><CR>
 nnoremap <Leader>5 :<C-U>Hi5 <C-R><C-W><CR>
 nnoremap <Leader>6 :<C-U>Hi6 <C-R><C-W><CR>
+
+fu! s:FontSizeSet(amount)
+	call echoraw(s:Passthrough("\e]7770;" .. a:amount .. "\x7"))
+endfu
+fu! s:FontSizeGet()
+	let l:ret = ""
+	call <SID>FontSizeSet('?')
+	while 1
+		let l:c = getcharstr()
+		let l:ret ..= l:c
+		if l:c ==# "\x7"
+			break
+		endif
+	endwhile
+	echo l:ret[7:-2]
+endfu
+command! FontSizeGet call <SID>FontSizeGet()
+command! FontSizeReset call <SID>FontSizeSet('')
+nnoremap <silent> <Esc>=              <Cmd>call <SID>FontSizeSet('')<CR>
+nnoremap <silent> <Esc>+              <Cmd>call <SID>FontSizeSet('+1')<CR>
+nnoremap <silent> <Esc>-              <Cmd>call <SID>FontSizeSet('-1')<CR>
+nnoremap <silent> <C-ScrollWheelUp>   <Cmd>call <SID>FontSizeSet('+1')<CR>
+nnoremap <silent> <C-ScrollWheelDown> <Cmd>call <SID>FontSizeSet('-1')<CR>
 
 fu! s:TagfuncLinux(pattern, flags, info)
 	if ! b:guesstag | let b:guesstag = 1 | return v:null | endif
@@ -484,48 +459,28 @@ fu! s:CopyMode()
 		setl list number relativenumber breakindent
 	endif
 endfu
+command! CopyMode call <SID>CopyMode()
 nnoremap <silent> <Leader>v <Cmd>call <SID>CopyMode()<CR>
-
-fu! g:SchemeIndentExpr(type = '') abort
-	if a:type == ''
-		set opfunc=g:SchemeIndentExpr
-		return 'g@'
-	endif
-	'[,']normal! ==
-endfu
 
 " excommand
 command! DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis | wincmd p | diffthis
-
-fu! s:ReadTypescript()
-	let l:ts = map(readfile('typescript')[1:-3], {_, val -> substitute(val, '\s\+$', '', '')})
-	if &ft ==# 'c'
-		let l:ts = ['/*'] + l:ts + ['*/']
-	endif
-	call append(getpos('.')[1], l:ts)
-endfu
-command! Typesc call <SID>ReadTypescript()
-
 command! Hitest runtime syntax/hitest.vim
 command! Colortest runtime syntax/colortest.vim
 
-fu! s:XXD(do)
-	if a:do
+fu! s:XXD()
+	if !exists('b:save_ft_binary')
 		let b:save_ft_binary = [&filetype, &binary]
 		let &binary = 1
 		silent edit " for binary to take effect
 		let &ft = 'xxd'
 		%!xxd
 	else
-		if exists('b:save_ft_binary')
-			let [&filetype, &binary] = b:save_ft_binary
-			unlet b:save_ft_binary
-		endif
+		let [&filetype, &binary] = b:save_ft_binary
+		unlet b:save_ft_binary
 		%!xxd -r
 	endif
 endfu
-command! XXD call <SID>XXD(1)
-command! XXDundo call <SID>XXD(0)
+command! XXD call <SID>XXD()
 
 fu! s:Align(cmd, line1, line2, ...)
 	let l:save_cursor = getcurpos()
@@ -543,22 +498,20 @@ command! -range -nargs=? AlignLeft  call <SID>Align('gl', <line1>, <line2>, <f-a
 command! -nargs=0 Reload let s:undoreload = &undoreload | set undoreload=0 | edit | let &undoreload = s:undoreload
 
 fu! s:Nkf()
-	let l:fname = fnamemodify(expand('%'), ':p')
 	if executable('uchardet')
-		let l:enc = system('uchardet ' .. l:fname)
+		let l:cmd = 'uchardet'
 	elseif executable('nkf')
-		let l:enc = system('nkf --guess=1 ' .. l:fname)
+		let l:cmd = 'nkf --guess=1 '
 	else
 		echoerr 'uchardet or nkf must be installed!'
 		return
 	endif
-	execute 'e ++enc=' .. l:enc
+	execute 'e ++enc=' .. system(l:cmd .. ' ' .. fnamemodify(expand('%'), ':p'))
 endfu
 command! -nargs=0 Nkf call <SID>Nkf()
 
 fu! s:Command(env, reuse, focus, close, arg)
-	let l:shiflag = has('win32') ? &shellcmdflag : '-ic'
-	let l:cmd = &shell .. ' ' .. l:shiflag .. ' "' .. join(a:arg) .. '"'
+	let l:cmd = '/bin/bash -ic "' .. join(a:arg) .. '"'
 	let l:opt = {'term_rows': &lines / 4, 'term_cols': &columns - 7, 'term_kill': 'term', 'env': a:env}
 	if a:close
 		let l:opt['term_finish'] = 'close'
@@ -580,40 +533,31 @@ endfu
 fu! s:GitComp(ArgLead, CmdLine, CursorPos)
 	return g:bash#complete(substitute(strpart(a:CmdLine, 0, a:CursorPos), '^\s*\a\+ ', 'git ', ''))
 endfu
-if has('win32')
-	command! -nargs=* -complete=file S call <SID>Command({}, 0, 0, 0, [<f-args>])
-else
-	command! -nargs=* -complete=customlist,<SID>BashComp S call <SID>Command({}, 0, 0, 0, [<f-args>])
-	command! -nargs=* -complete=customlist,<SID>BashComp I call <SID>Command({}, 0, 1, 1, [<f-args>])
-	command! -nargs=* -complete=customlist,<SID>GitComp Git call <SID>Command({'GIT_PAGER': ''}, 1, 1, 0, ['git', <f-args>])
-	command! -nargs=* -complete=customlist,<SID>GitComp Gitpager call <SID>Command({}, 1, 1, 0, ['git', <f-args>])
-endif
+command! -nargs=* -complete=customlist,<SID>BashComp S call <SID>Command({}, 0, 0, 0, [<f-args>])
+command! -nargs=* -complete=customlist,<SID>BashComp I call <SID>Command({}, 0, 1, 1, [<f-args>])
+command! -nargs=* -complete=customlist,<SID>GitComp Git call <SID>Command({'GIT_PAGER': ''}, 1, 1, 0, ['git', <f-args>])
+command! -nargs=* -complete=customlist,<SID>GitComp Gitpager call <SID>Command({}, 1, 1, 0, ['git', <f-args>])
 
 let s:template = {
 	\ 'c'     : ['#include <stdio.h>', '', 'int main(void)', '{', '	printf("Hello\n");', '	return 0;', '}'],
 	\ 'go'    : ['package main', '', 'import "fmt"', '', 'func main() {', '	fmt.Println("Hello")', '}'],
 	\ 'perl'  : ['#!/usr/bin/perl', 'use strict;', 'use warnings;'],
-	\ 'python': '#!/usr/bin/env ' .. s:pythonexe,
-	\ 'sh'    : ['#!/usr/bin/bash', 'set -euxo pipefail'],
+	\ 'python': '#!/usr/bin/env python3',
+	\ 'sh'    : ['#!/bin/bash', 'set -euxo pipefail'],
 	\ }
 let s:template_after = {
-	\ 'c' : 'call cursor(4, 2)',
+	\ 'c' : 'call cursor(5, 2)',
 	\ 'go': 'call cursor(6, 2)',
 	\ '_' : 'call cursor(line(''$''), 1)',
 	\ }
 fu! s:Template()
-	if has_key(s:template, &filetype)
-		call append(0, s:template[&filetype])
-		if getline('$') ==# ''
-			$delete _
-		endif
-		if has_key(s:template_after, &filetype)
-			execute(s:template_after[&filetype])
-		else
-			execute(s:template_after['_'])
-		endif
-		echon ' Template loaded'
+	if !has_key(s:template, &ft) | return | endif
+	call append(0, s:template[&ft])
+	if getline('$') ==# ''
+		$delete _
 	endif
+	execute get(s:template_after, &ft, s:template_after['_'])
+	echon ' Template loaded'
 endfu
 command! -nargs=0 Template call <SID>Template()
 
@@ -628,74 +572,34 @@ command! -range Sort call <SID>Sort(' ')
 command! -range SortComma call <SID>Sort(', ')
 command! -nargs=1 -range SortSep call <SID>Sort(<f-args>)
 
-command! FontSizeGet call <SID>FontSizeGet()
-command! FontSizeReset call <SID>FontSizeSet('')
-
 " autocommand
-command! AUTOiminsertzero let s:autoIminsertZero = !s:autoIminsertZero
-let s:autoIminsertZero=0
-
-command! AUTOhltrailingwhitespaces call <SID>ToggleAutoHlTrailingWhiteSpaces()
-let s:autoHlTrailingWhiteSpaces = 1
-fu! s:ToggleAutoHlTrailingWhiteSpaces()
-	let s:autoHlTrailingWhiteSpaces = !s:autoHlTrailingWhiteSpaces
-	call <SID>HlTrailingWhiteSpace(1)
-endfu
-fu! s:HlTrailingWhiteSpace(isNormal)
-	silent! call matchdelete(4)
-	if !s:autoHlTrailingWhiteSpaces | return | endif
-	if !get(b:, 'autoHlTrailingWhiteSpaces', 1) | return | endif
-	if a:isNormal
-		call matchadd('TrailingWhiteSpace', '\\\@<!\s\+$', 10, 4)
-	else
-		call matchadd('TrailingWhiteSpace', '\\\@<!\s\+\%#\@<!$', 10, 4)
+let s:show_trailing_ws = 1
+let s:trailing_ws_pat = ['\\\@<!\s\+$', '\\\@<!\s\+\%#\@<!$']
+fu! s:HlTrailingWs(toggle, mode)
+	if a:toggle
+		let s:show_trailing_ws = !s:show_trailing_ws
 	endif
+	silent! call matchdelete(4)
+	if !s:show_trailing_ws | return | endif
+	if !get(b:, 'show_trailing_ws', 1) | return | endif
+	silent! call matchadd('TrailingWhiteSpace', s:trailing_ws_pat[a:mode], 10, 4)
 endfu
+command! Togglehltrailingwhitespaces call <SID>HlTrailingWs(1, 0)
 
-command! AUTOhlideographicspace call <SID>ToggleAutoHlIdeographicSpace()
-let s:autoHlIdeographicSpace = 1
-fu! s:ToggleAutoHlIdeographicSpace()
-	let s:autoHlIdeographicSpace = !s:autoHlIdeographicSpace
-	call <SID>HlIdeographicSpace()
-endfu
-fu! s:HlIdeographicSpace()
+let s:show_ideo_space = 1
+fu! s:HlIdeoSpace(toggle)
+	if a:toggle
+		let s:show_ideo_space = !s:show_ideo_space
+	endif
 	silent! call matchdelete(5)
-	if !s:autoHlIdeographicSpace | return | endif
-	call matchadd('IdeographicSpace', '[\u3000]', 10, 5)
+	if !s:show_ideo_space | return | endif
+	silent! call matchadd('IdeographicSpace', '[\u3000]', 10, 5)
 endfu
+command! Togglehlideographicspace call <SID>HlIdeoSpace(1)
 
-command! AUTOhalfcommas let s:autoHalfCommas = !s:autoHalfCommas
-let s:autoHalfCommas = 0
-fu! s:HalfCommas()
-	if !s:autoHalfCommas | return | endif
-	let l:curpos = getcurpos()
-	silent! keeppatterns %s/，\+$/\=repeat(',', strchars(submatch(0)))/g
-	silent! keeppatterns %s/．\+$/\=repeat('.', strchars(submatch(0)))/g
-	silent! keeppatterns %s/，\+\ze /\=repeat(',', strchars(submatch(0)))/g
-	silent! keeppatterns %s/．\+\ze /\=repeat('.', strchars(submatch(0)))/g
-	silent! keeppatterns %s/，\+/\=repeat(',', strchars(submatch(0))) .. ' '/g
-	silent! keeppatterns %s/．\+/\=repeat('.', strchars(submatch(0))) .. ' '/g
-	call setpos('.', l:curpos)
-endfu
-
-command! AUTOconvertpunctuation let s:autoConvertPunctuation = !s:autoConvertPunctuation
-let s:autoConvertPunctuation = 0
-fu! s:ConvertPunctuation()
-	if !s:autoConvertPunctuation | return | endif
-	let l:curpos = getcurpos()
-	silent! keeppatterns %s/．/。/g
-	silent! keeppatterns %s/，/、/g
-	silent! keeppatterns %s/\.\.\./…/g
-	" ―
-	call setpos('.', l:curpos)
-endfu
-
-fu! s:CopyToOther(str)
-	call <SID>CopyToClip_OSC52(a:str)
-endfu
-fu! s:CopyToOtherUnnamed()
+fu! s:CopyUnnamed()
 	if v:event.regname ==# ''
-		call <SID>CopyToOther(join(v:event.regcontents, "\n"))
+		call <SID>CopyOSC52(join(v:event.regcontents, "\n"))
 	endif
 endfu
 
@@ -706,67 +610,43 @@ fu! s:GoToLastLine()
 	endif
 endfu
 
-aug vimrc
-	au!
-	au BufNewFile *.go,*.pl,*.py,*.sh call <SID>Template()
-	au BufNewFile,BufRead * if &ft ==# 'asm' | set ft=gas | endif
-	au BufNewFile,BufRead * if &ft ==# 'diff' | set ft=git | endif
-	au BufNewFile,BufRead *.lalrpop set ft=rust
-	au BufNewFile,BufRead */git/config,*.gitconfig set ft=gitconfig
-	au BufNewFile,BufRead */yapf/style set ft=cfg
-	au BufNewFile,BufRead .latexmkrc,latexmkrc set ft=perl
-	au BufNewFile,BufRead .clang-format set ft=yaml
-	au BufNewFile,BufRead dir_colors set ft=dircolors
-	au BufReadPost * call <SID>GoToLastLine()
-	au StdinReadPost * setl nomodified
-	au FileType autohotkey setl commentstring=;%s
-	au FileType c setl textwidth=80 cindent cinoptions=:0(s
-	au FileType git setl vartabstop=9,8 | let b:autoHlTrailingWhiteSpaces = 0
-	au FileType help nnoremap <buffer> <CR> <C-]>
-	au FileType info nmap <buffer> gu <Plug>(InfoUp)
-	au FileType info nmap <buffer> gn <Plug>(InfoNext)
-	au FileType info nmap <buffer> gp <Plug>(InfoPrev)
-	au FileType info nmap <buffer> gm <Plug>(InfoMenu)
-	au FileType info nmap <buffer> gf <Plug>(InfoFollow)
-	au FileType info nmap <buffer> go <Plug>(InfoGoto)
-	au FileType java setl cindent cinoptions=(sJ1j1
-	au FileType markdown setl tabstop=8
-	au FileType php setl matchpairs-=<:>
-	au FileType ps1 setl expandtab shiftwidth=2
-	au FileType rust setl softtabstop=0 textwidth=100
-	au FileType rust nnoremap <buffer> <Leader>t <Cmd>call <SID>Command({}, 1, 0, 0, ['cargo', 'test'])<CR>
-	au FileType rust nnoremap <buffer> <Leader>u <Cmd>call <SID>Command({}, 1, 0, 0, ['cargo', 'run'])<CR>
-	au FileType scheme setl expandtab shiftwidth=2 lispwords+=syntax-case,with-syntax
-	au FileType scheme inoremap <buffer> <C-F> <C-O>==
-	au FileType scheme nnoremap <buffer> <expr> = g:SchemeIndentExpr()
-	au FileType scheme vnoremap <buffer> <expr> = g:SchemeIndentExpr()
-	au FileType scheme nnoremap <buffer> == ==
-	au FileType html setl indentkeys=
+" gui
+if has('gui_running') && has('win32')
+	set guifont=Consolas:h11
+	set lines=30 columns=86
+	let s:guifont_default_size = split(split(&guifont, '[^\\]\zs,')[0], '[^\\]\zs:')[1][1:]
+	fu! s:FontSizeSet(amount)
+		let l:font = split(split(&guifont, '[^\\]\zs,')[0], '[^\\]\zs:')
+		let l:size = l:font[1][1:]
+		if a:amount ==# ""
+			let l:size = s:guifont_default_size
+		else
+			let l:size = eval(l:size .. a:amount)
+			if l:size == 0
+				let l:size = 1
+			endif
+		endif
+		let l:font[1] = l:font[1][0] .. l:size
+		let &guifont = join(l:font, ':')
+	endfu
+	fu! s:CopyOSC52(str)
+	endfu
 
-	au BufWinEnter * call <SID>DisableALE()
-	au CmdwinEnter * nnoremap <buffer> g<CR> :let g:CmdwinLastLine=line('.')<CR><CR>q::execute g:CmdwinLastLine<CR>
-	au ColorScheme * hi Cursor guifg=fg guibg=Red
-	au ColorScheme * hi CursorIM guifg=Black guibg=Blue
-	au ColorScheme * hi TabLineFill guibg=#808080
-	au ColorScheme * hi TrailingWhiteSpace ctermbg=darkred guibg=darkred
-	au ColorScheme * hi IdeographicSpace term=underline ctermbg=DarkGreen guibg=DarkGreen
-	au ColorScheme * call <SID>MultiHlSetup()
-	au ColorScheme molokai hi Visual ctermfg=none
-	au BufRead,InsertLeave * call <SID>HlTrailingWhiteSpace(1)
-	au InsertEnter * call <SID>HlTrailingWhiteSpace(0)
-	au BufRead * call <SID>HlIdeographicSpace()
-	au TextYankPost * call <SID>CopyToOtherUnnamed()
-	au BufWritePre *.txt call <SID>ConvertPunctuation()
-	au VimEnter * silent! call textobj#user#plugin('surround', {
-		\ 'surround-mb': {'pattern': ['（', '）'], 'select-a': 'amb', 'select-i': 'imb'},
-		\ 'surround-mB': {'pattern': ['｛', '｝'], 'select-a': 'amB', 'select-i': 'imB'},
-		\ 'surround-ma': {'pattern': ['＜', '＞'], 'select-a': 'ama', 'select-i': 'ima'},
-		\ 'surround-mA': {'pattern': ['［', '］'], 'select-a': 'amA', 'select-i': 'imA'},
-		\ 'surround-mk': {'pattern': ['「', '」'], 'select-a': 'amk', 'select-i': 'imk'},
-		\ 'surround-mn': {'pattern': ['『', '』'], 'select-a': 'amn', 'select-i': 'imn'},
-		\ 'surround-ms': {'pattern': ['【', '】'], 'select-a': 'ams', 'select-i': 'ims'},
-		\ })
-aug END
+	nnoremap <silent> <M-Space> <Cmd>simalt ~<CR>
+	cnoremap <M-/> <C-\>e<SID>RegexRubout('\v[^/\\]*(/\|\\)? *$')<CR>
+	cnoremap <M-w> <C-\>e<SID>RegexRubout('\v[^ ]* *$')<CR>
+	nnoremap <M-m> <C-W>-
+	nnoremap <M-p> <C-W>+
+	nnoremap <silent> <M-=> <Cmd>call <SID>FontSizeSet('')<CR>
+	nnoremap <silent> <M-+> <Cmd>call <SID>FontSizeSet('+1')<CR>
+	nnoremap <silent> <M--> <Cmd>call <SID>FontSizeSet('-1')<CR>
+	nnoremap <silent> <C-=> <Cmd>call <SID>FontSizeSet('')<CR>
+endif
+
+packadd! matchit
+packadd! termdebug
+packadd! editorconfig
+runtime ftplugin/man.vim
 
 " previm
 let g:previm_enable_realtime = 1
@@ -776,11 +656,7 @@ command! -nargs=0 PrevimOpen unlet g:loaded_previm | runtime plugin/previm.vim |
 nmap <Leader>r <Plug>(quickrun)
 let g:quickrun_config = {
 	\ 'python': {
-	\   'command': s:pythonexe
-	\ },
-	\ 'rust': {
-	\   'command': 'runner',
-	\   'exec': '%c %s %o',
+	\   'command': 'python3',
 	\ },
 	\ 'scheme': {
 	\   'command': 'chezscheme',
@@ -792,14 +668,6 @@ let g:quickrun_config = {
 	\   'runner': 'terminal',
 	\ },
 	\ }
-if has('win32')
-	let g:quickrun_config.scheme = {
-		\ 'command': 'C:\Program Files\Racket\mzscheme.exe',
-		\ 'exec': '%c %o -e ''(load "%s")'' %a',
-		\ }
-elseif has('osxdarwin')
-	let g:quickrun_config.scheme.command = 'chez'
-endif
 " ale
 nmap <Leader>j <Plug>(ale_next)
 nmap <Leader>k <Plug>(ale_previous)
@@ -819,11 +687,6 @@ command! -bar ALEEnableAllBuffer  ALEEnableBuffer | ALEFixOnSaveEnableBuffer
 command! -bar ALEDisableAll       ALEDisable | ALEFixOnSaveDisable
 command! -bar ALEDisableAllBuffer ALEDisableBuffer | ALEFixOnSaveDisableBuffer
 command! -bar WriteNoFix          ALEFixOnSaveDisableBuffer | w
-fu! s:DisableALE()
-	if fnamemodify(bufname(), ':p') =~# '/linux/'
-		ALEDisableAllBuffer
-	endif
-endfu
 let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
 let g:ale_linters = {
 	\ 'asciidoc'  : ['vale'],
@@ -889,14 +752,6 @@ let g:openbrowser_search_engines = {
 	\ 'ddg' : 'https://duckduckgo.com/?q={query}',
 	\ 'oald': 'https://www.oxfordlearnersdictionaries.com/search/english/?q={query}',
 	\ }
-" global
-if filereadable('/usr/local/share/gtags/gtags.vim')
-	source /usr/local/share/gtags/gtags.vim
-elseif filereadable('/usr/share/vim/addons/plugin/gtags.vim')
-	source /usr/share/vim/addons/plugin/gtags.vim
-elseif filereadable('/usr/share/gtags/gtags.vim')
-	source /usr/share/gtags/gtags.vim
-endif
 " rainbow vim-gas vim-lion emmet csv
 let g:rainbow_active = 1
 let g:gasCppComments = 1
@@ -904,68 +759,63 @@ let g:lion_squeeze_spaces = 1
 let g:user_emmet_leader_key='<F7>'
 let g:csv_default_delim=','
 
-packadd! matchit
-packadd! termdebug
-packadd! editorconfig
-runtime ftplugin/man.vim
-
-" gui
-if has('gui_running') && has('win32')
-	set guifont=Consolas:h11
-	set lines=30 columns=86
-	" let s:gvim_winpos_file = expand('~/.gvimwinpos')
-	" fu! s:SaveGVimPos()
-	" 	let l:pos = [getwinposx(), getwinposy()]
-	" 	call writefile(l:pos, s:gvim_winpos_file)
-	" endfu
-	" aug vimrc
-	" 	au VimLeavePre * call <SID>SaveGVimPos()
-	" aug END
-	" if filereadable(s:gvim_winpos_file)
-	" 	let s:pos = readfile(s:gvim_winpos_file)
-	" 	let s:n = str2nr(strpart(v:servername, 4))
-	" 	execute 'winpos ' .. (s:pos[0] + 32 * s:n) .. ' ' .. (s:pos[1] + 32 * s:n)
-	" 	unlet s:pos s:n
-	" endif
-	fu! g:Imzero()
-		if s:autoIminsertZero
-			set iminsert=0
-		endif
-		return ''
-	endfu
-	let s:guifont_default_size = split(split(&guifont, '[^\\]\zs,')[0], '[^\\]\zs:')[1][1:]
-	fu! s:FontSizeSet(amount)
-		let l:font = split(split(&guifont, '[^\\]\zs,')[0], '[^\\]\zs:')
-		let l:size = l:font[1][1:]
-		if a:amount ==# ""
-			let l:size = s:guifont_default_size
-		else
-			let l:size = eval(l:size .. a:amount)
-			if l:size == 0
-				let l:size = 1
-			endif
-		endif
-		let l:font[1] = l:font[1][0] .. l:size
-		let &guifont = join(l:font, ':')
-	endfu
-	fu! s:CopyToClip_OSC52(str)
-	endfu
-
-	nnoremap <silent> <M-Space> <Cmd>simalt ~<CR>
-	cnoremap <M-/> <C-\>e<SID>RegexRubout('\v[^/\\]*(/\|\\)? *$')<CR>
-	cnoremap <M-w> <C-\>e<SID>RegexRubout('\v[^ ]* *$')<CR>
-	nnoremap <M-m> <C-W>-
-	nnoremap <M-p> <C-W>+
-	nnoremap <silent> <M-=> <Cmd>call <SID>FontSizeSet('')<CR>
-	nnoremap <silent> <M-+> <Cmd>call <SID>FontSizeSet('+1')<CR>
-	nnoremap <silent> <M--> <Cmd>call <SID>FontSizeSet('-1')<CR>
-	nnoremap <silent> <C-=> <Cmd>call <SID>FontSizeSet('')<CR>
-endif
-
+filetype plugin indent on
+syntax enable
+aug vimrc
+	au!
+	au ColorScheme * hi Cursor guifg=fg guibg=Red
+	au ColorScheme * hi CursorIM guifg=Black guibg=Blue
+	au ColorScheme * hi TabLineFill guibg=#808080
+	au ColorScheme * hi TrailingWhiteSpace ctermbg=darkred guibg=darkred
+	au ColorScheme * hi IdeographicSpace term=underline ctermbg=DarkGreen guibg=DarkGreen
+	au ColorScheme * call <SID>MultiHlSetup()
+	au ColorScheme molokai hi Visual ctermfg=none
+	au VimEnter * silent! call textobj#user#plugin('surround', {
+		\ 'surround-mb': {'pattern': ['（', '）'], 'select-a': 'amb', 'select-i': 'imb'},
+		\ 'surround-mB': {'pattern': ['｛', '｝'], 'select-a': 'amB', 'select-i': 'imB'},
+		\ 'surround-ma': {'pattern': ['＜', '＞'], 'select-a': 'ama', 'select-i': 'ima'},
+		\ 'surround-mA': {'pattern': ['［', '］'], 'select-a': 'amA', 'select-i': 'imA'},
+		\ 'surround-mk': {'pattern': ['「', '」'], 'select-a': 'amk', 'select-i': 'imk'},
+		\ 'surround-mn': {'pattern': ['『', '』'], 'select-a': 'amn', 'select-i': 'imn'},
+		\ 'surround-ms': {'pattern': ['【', '】'], 'select-a': 'ams', 'select-i': 'ims'},
+		\ })
+	au FileType c setl textwidth=80 cindent cinoptions=:0(s
+	au FileType git setl vartabstop=9,8 | let b:show_trailing_ws = 0
+	au FileType help nnoremap <buffer> <CR> <C-]>
+	au FileType html setl indentkeys=
+	au FileType info nmap <buffer> gu <Plug>(InfoUp)
+	au FileType info nmap <buffer> gn <Plug>(InfoNext)
+	au FileType info nmap <buffer> gp <Plug>(InfoPrev)
+	au FileType info nmap <buffer> gm <Plug>(InfoMenu)
+	au FileType info nmap <buffer> gf <Plug>(InfoFollow)
+	au FileType info nmap <buffer> go <Plug>(InfoGoto)
+	au FileType java setl cindent cinoptions=(sJ1j1
+	au FileType man nnoremap <buffer> <silent> q :q<CR>
+	au FileType markdown setl tabstop=8
+	au FileType php setl matchpairs-=<:>
+	au FileType ps1 setl expandtab shiftwidth=2
+	au FileType rust setl softtabstop=0 textwidth=100
+	au FileType rust nnoremap <buffer> <Leader>t <Cmd>call <SID>Command({}, 1, 0, 0, ['cargo', 'test'])<CR>
+	au FileType rust nnoremap <buffer> <Leader>u <Cmd>call <SID>Command({}, 1, 0, 0, ['cargo', 'run'])<CR>
+	au FileType scheme setl expandtab shiftwidth=2 lispwords+=syntax-case,with-syntax
+	au FileType scheme inoremap <expr> <buffer> <C-F> empty(getline('.')) ? "<C-O>cc" : "<C-O>=="
+	au FileType sh setl isfname-== | call autocmd_add([#{bufnr: bufnr(), cmd: 'setl indentkeys-=)', event: 'BufEnter', once: v:true}])
+	au BufNewFile *.go,*.pl,*.py,*.sh call <SID>Template()
+	au BufNewFile,BufRead * if &ft ==# 'asm' | set ft=gas | endif
+	au BufNewFile,BufRead * if &ft ==# 'diff' | set ft=git textwidth=0 | endif
+	au BufNewFile,BufRead */git/config,*.gitconfig set ft=gitconfig
+	au BufNewFile,BufRead */yapf/style set ft=cfg
+	au BufNewFile,BufRead dircolors set ft=dircolors
+	au BufReadPost * call <SID>GoToLastLine()
+	au StdinReadPost * setl nomodified
+	au BufWinEnter,InsertLeave * call <SID>HlTrailingWs(0, 0)
+	au InsertEnter * call <SID>HlTrailingWs(0, 1)
+	au BufWinEnter * call <SID>HlIdeoSpace(0)
+	au BufWinEnter */linux/* ALEDisableAllBuffer
+	au CmdwinEnter * nnoremap <buffer> g<CR> :let g:CmdwinLastLine=line('.')<CR><CR>q::execute g:CmdwinLastLine<CR>
+	au TextYankPost * call <SID>CopyUnnamed()
+aug END
+silent! colorscheme molokai
 if filereadable(expand('~/.localvimrc.vim'))
 	source ~/.localvimrc.vim
 endif
-
-filetype plugin indent on
-syntax enable
-silent! colorscheme molokai

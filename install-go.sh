@@ -1,10 +1,7 @@
-#!/usr/bin/env bash
+#!/bin/bash
 set -euo pipefail
 
 os=linux
-if [[ $(uname) == Darwin ]]; then
-	os=darwin
-fi
 ver=$(curl -fsS https://go.dev/dl/ | grep -Po '(?<=/dl/go)[0-9.]+(?=\.'$os'-amd64\.tar\.gz)' | head -n1)
 url=https://golang.org/dl/go$ver.$os-amd64.tar.gz
 

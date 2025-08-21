@@ -25,13 +25,20 @@
 	unstage = restore --staged
 	untrack = rm --cached
 	cp  = cherry-pick
-	arz = "!f() { d=${PWD##*/}_$(git rev-parse HEAD | cut -b-12); f=\"$d\".tar.gz; [ \"${1:-}\" = -f ] || [ ! -e $f ] && git archive -o $f --prefix=$d/ HEAD; }; f"
-	arJ = "!f() { d=${PWD##*/}_$(git rev-parse HEAD | cut -b-12); f=\"$d\".tar.xz; [ \"${1:-}\" = -f ] || [ ! -e $f ] && git archive -o $f --prefix=$d/ HEAD; }; f"
+	implarhead = "!f() { d=$1; e=$2; f=$d.tar.$e; [ \"${3:-}\" = -f ] || [ ! -e $f ] && git archive -o $f --prefix=$d/ HEAD; }; f"
+	implarhash = "!git implarhead \"${PWD##*/}_$(git rev-parse HEAD | cut -b-12)\""
+	arz  = implarhash gz
+	arJ  = implarhash xz
+	implardate = "!git implarhead \"${PWD##*/}_$(date +%Y%m%d)\""
+	arzd = implardate gz
+	arJd = implardate xz
 [checkout]
 	workers = 0
 [core]
 	autocrlf = false
 	safecrlf = false
+[diff]
+	algorithm=histogram
 [fetch]
 	prune = true
 [init]

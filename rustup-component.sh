@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 set -euo pipefail
 
 dotfiles=$(cd $(dirname $0); pwd -P)
@@ -10,6 +10,6 @@ fi
 rustup component add rust-analyzer rust-src
 # curl -fsS https://wasmtime.dev/install.sh | bash
 
-cargo install evcxr_repl runner
+# cargo install evcxr_repl runner
 
 $dotfiles/getbashcompletion.sh rustup cargo
