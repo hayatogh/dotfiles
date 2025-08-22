@@ -18,9 +18,6 @@ cp_powershell() {
 cp_vim() {
 	rsync -rtz --exclude=.git/ --exclude=/.netrwhist --exclude=/.viminfo --exclude=/swap --delete ~/.config/vim/ "$winhome/vimfiles"
 }
-cp_vsvimrc() {
-	rsync -rt $dotfiles/.vsvimrc "$winhome/"
-}
 
 arg=(powershell)
 if [[ $# -ne 0 ]]; then
