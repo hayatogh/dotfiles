@@ -12,4 +12,7 @@ rustup component add rust-analyzer rust-src
 
 # cargo install evcxr_repl runner
 
-$dotfiles/getbashcompletion.sh rustup cargo
+dir=~/.local/share/bash-completion/completions
+mkdir -p $dir
+rustup completions bash >$dir/rustup
+ln -sf "$(rustc --print sysroot)"/etc/bash_completion.d/cargo $dir/cargo
