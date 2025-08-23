@@ -17,3 +17,4 @@ curl -fsSo $tmp $url
 rm -rf ~/.goroot
 tar -xf $tmp -C ~ --transform=s/^go/.goroot/
 rm -f $tmp
+go install golang.org/x/tools/gopls@latest
