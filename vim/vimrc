@@ -118,8 +118,8 @@ let &t_SI ..= s:Passthrough("\e[<r")
 let &t_EI ..= s:Passthrough("\e[<s\e[<0t")
 let &t_te ..= s:Passthrough("\e[<0t\e[<s")
 
-fu! s:CopyOSC52(str)
-	call echoraw("\e]52;c;" .. base64_encode(str2blob([a:str])) .. "\x7")
+fu! s:CopyOSC52(list)
+	call echoraw("\e]52;c;" .. base64_encode(str2blob(a:list)) .. "\x7")
 endfu
 
 " mapping
@@ -213,7 +213,7 @@ fu! s:Search(zero)
 	endif
 	call histadd('/', l:pat)
 	let @/=l:pat
-	call <SID>CopyOSC52(l:cword)
+	call <SID>CopyOSC52([l:cword])
 	return "\"_yiw\<BS>\<C-\>\<C-N>n"
 endfu
 nnoremap <expr> *  <SID>Search(0)
@@ -237,7 +237,7 @@ fu! s:Getfname()
 	let l:fname = bufname() .. ':' .. getcurpos()[1]
 	silent! let @* = l:fname
 	silent! let @+ = l:fname
-	call <SID>CopyOSC52(l:fname)
+	call <SID>CopyOSC52([l:fname])
 	return l:fname
 endfu
 command! Getfname echo <SID>Getfname()
@@ -599,7 +599,7 @@ command! Togglehlideographicspace call <SID>HlIdeoSpace(1)
 
 fu! s:CopyUnnamed()
 	if v:event.regname ==# ''
-		call <SID>CopyOSC52(join(v:event.regcontents, "\n"))
+		call <SID>CopyOSC52(v:event.regcontents)
 	endif
 endfu
 
@@ -629,7 +629,7 @@ if has('gui_running') && has('win32')
 		let l:font[1] = l:font[1][0] .. l:size
 		let &guifont = join(l:font, ':')
 	endfu
-	fu! s:CopyOSC52(str)
+	fu! s:CopyOSC52(list)
 	endfu
 
 	nnoremap <silent> <M-Space> <Cmd>simalt ~<CR>
