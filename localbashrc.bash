@@ -1,3 +1,3 @@
-if [[ -z ${TMUX:-} && -z ${SUDO_USER:-} ]] && ! tmux ls &>/dev/null; then
+if [[ -z ${TMUX:-} && -z ${SUDO_USER:-} && -z $(tmux lsc 2>/dev/null) ]]; then
 	tm
 fi
