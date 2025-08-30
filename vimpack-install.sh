@@ -4,13 +4,11 @@ dest=~/.config/vim/pack/remote/start
 njobs=4
 plugs=(
 	"gh:tpope/vim-commentary"
-	"gh:mattn/emmet-vim"
 	"gh:tpope/vim-eunuch"
 	"gh:tommcdo/vim-lion"
 	"gh:preservim/nerdtree"
 	"gh:luochen1990/rainbow"
 	"gh:hayatogh/vim-surround"
-	# "gh:guns/xterm-color-table.vim"
 	# external commands
 	"gh:dense-analysis/ale"
 	"gh:HiPhish/info.vim"
@@ -20,17 +18,11 @@ plugs=(
 	"gh:kana/vim-textobj-indent"
 	"gh:kana/vim-textobj-user"
 	"gh:hayatogh/vim-bash-completion"
-	"gh:tyru/open-browser.vim"
 	# colorscheme
-	# "gh:lifepillar/vim-colortemplate"
 	"gh:tomasr/molokai"
 	# syntax and filetype plugins
-	"gh:chrisbra/csv.vim"
 	"gh:HealsCodes/vim-gas"
-	"gh:previm/previm"
-	"gh:imsnif/kdl.vim"
 	# "gh:kchmck/vim-coffee-script"
-	# "gh:lervag/vimtex"
 )
 
 to_url() {

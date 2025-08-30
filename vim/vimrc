@@ -648,10 +648,6 @@ packadd! termdebug
 packadd! editorconfig
 runtime ftplugin/man.vim
 
-" previm
-let g:previm_enable_realtime = 1
-let g:loaded_previm = 1
-command! -nargs=0 PrevimOpen unlet g:loaded_previm | runtime plugin/previm.vim | doautocmd Previm FileType | PrevimOpen
 " quickrun
 nmap <Leader>r <Plug>(quickrun)
 let g:quickrun_config = {
@@ -742,22 +738,10 @@ let g:surround_dict = {
 let g:NERDTreeMapActivateNode = 'e'
 let g:NERDTreeMapOpenSplit = 's'
 let g:NERDTreeMapOpenVSplit = 'v'
-" openbrowser
-nmap gx <Plug>(openbrowser-smart-search)
-vmap gx <Plug>(openbrowser-smart-search)
-nmap gX <Cmd>call openbrowser#search(expand('<cword>'), 'oald')<CR>
-vmap gX <Cmd>call openbrowser#search(expand('<cword>'), 'oald')<CR>
-let g:openbrowser_default_search = 'ddg'
-let g:openbrowser_search_engines = {
-	\ 'ddg' : 'https://duckduckgo.com/?q={query}',
-	\ 'oald': 'https://www.oxfordlearnersdictionaries.com/search/english/?q={query}',
-	\ }
-" rainbow vim-gas vim-lion emmet csv
+" rainbow vim-gas vim-lion
 let g:rainbow_active = 1
 let g:gasCppComments = 1
 let g:lion_squeeze_spaces = 1
-let g:user_emmet_leader_key='<F7>'
-let g:csv_default_delim=','
 
 filetype plugin indent on
 syntax enable
