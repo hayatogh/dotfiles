@@ -48,7 +48,6 @@ WSL)
 	wincloud=/mnt/g/マイドライブ
 	wsl()
 	{
-		cp $dotfiles/wsl/.wslconfig "$winhome/.wslconfig"
 		sudo cp $dotfiles/wsl/wsl.conf /etc/wsl.conf
 		sudo cp $dotfiles/wsl/fstab /etc/fstab
 	}
