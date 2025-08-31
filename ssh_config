@@ -1,3 +1,5 @@
+Include localssh.conf
+
 Host gh
 	User git
 	HostName github.com
