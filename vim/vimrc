@@ -462,6 +462,18 @@ endfu
 command! CopyMode call <SID>CopyMode()
 nnoremap <silent> <Leader>v <Cmd>call <SID>CopyMode()<CR>
 
+fu! s:OpenEmpty()
+	if !get(b:, 'openempty_active', 0)
+		let b:save_openempty = [&comments, &indentexpr, &autoindent, &smartindent]
+		setl comments= indentexpr= noautoindent nosmartindent
+		let b:openempty_active = 1
+	else
+		let [&comments, &indentexpr, &autoindent, &smartindent] = b:save_openempty
+		let b:openempty_active = 0
+	endif
+endfu
+nnoremap <silent> go <Cmd>call <SID>OpenEmpty()<CR>o<Cmd>call <SID>OpenEmpty()<CR>
+
 " excommand
 command! DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis | wincmd p | diffthis
 command! Hitest runtime syntax/hitest.vim
