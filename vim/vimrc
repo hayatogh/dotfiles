@@ -317,7 +317,7 @@ nnoremap <silent> <C-ScrollWheelUp>   <Cmd>call <SID>FontSizeSet('+1')<CR>
 nnoremap <silent> <C-ScrollWheelDown> <Cmd>call <SID>FontSizeSet('-1')<CR>
 
 fu! s:TagfuncLinux(pattern, flags, info)
-	if ! b:guesstag | let b:guesstag = 1 | return v:null | endif
+	if !get(b:, 'guesstag', 1) | let b:guesstag = 1 | return v:null | endif
 
 	let l:cmdline = 0
 	if a:flags ==# 'c'
@@ -376,17 +376,14 @@ fu! s:TagfuncLinux(pattern, flags, info)
 	" Failed guessing, return likelies
 	return l:tags
 endfu
-fu! s:SetTagfunc(guess)
-	let b:guesstag = a:guess
-	if fnamemodify(tagfiles()[0], ':p') =~# '/linux/'
+fu! s:SetTagfunc()
+	if fnamemodify(get(tagfiles(), 0, '/'), ':p') =~# '/linux/'
 		setl tagfunc=<SID>TagfuncLinux
-	else
-		setl tagfunc=
 	endif
 endfu
 fu! s:Tjump(sp, guess)
 	if len(tagfiles())
-		call <SID>SetTagfunc(a:guess)
+		let b:guesstag = a:guess
 		return (a:sp ? "\<C-W>" : '') .. "g\<C-]>"
 	else
 		return ":ALEGoToDefinition" .. (a:sp ? ' -split' : '') .. "\<CR>"
@@ -406,10 +403,8 @@ nnoremap <expr> <C-W><C-]>  <SID>Tjump(1, 1)
 vnoremap <expr> <C-W><C-]>  <SID>Tjump(1, 1)
 nnoremap <expr> <C-W>]      <SID>Tjump(1, 1)
 vnoremap <expr> <C-W>]      <SID>Tjump(1, 1)
-command! -nargs=1 -bar Tj   call <SID>SetTagfunc(1) | tj  <args>
-command! -nargs=1 -bar Stj  call <SID>SetTagfunc(1) | stj <args>
-command! -nargs=1 -bar Gtj  call <SID>SetTagfunc(0) | tj  <args>
-command! -nargs=1 -bar Gstj call <SID>SetTagfunc(0) | stj <args>
+command! -nargs=1 -bar Gtj  let b:guesstag = 0 | tj  <args>
+command! -nargs=1 -bar Gstj let b:guesstag = 0 | stj <args>
 
 fu! s:Spacing(line1, line2)
 	let l:a = '[[:graph:]]'
@@ -807,8 +802,9 @@ aug vimrc
 	au BufWinEnter,InsertLeave * call <SID>HlTrailingWs(0, 0)
 	au InsertEnter * call <SID>HlTrailingWs(0, 1)
 	au BufWinEnter * call <SID>HlIdeoSpace(0)
+	au BufWinEnter * call <SID>SetTagfunc()
 	au BufWinEnter */linux/* ALEDisableAllBuffer
-	au CmdwinEnter * nnoremap <buffer> g<CR> :let g:CmdwinLastLine=line('.')<CR><CR>q::execute g:CmdwinLastLine<CR>
+	au CmdwinEnter * nnoremap <buffer> g<CR> <Cmd>let g:CmdwinLastLine = line('.')<CR><CR>q:<Cmd>exe g:CmdwinLastLine<CR>
 	au TextYankPost * call <SID>CopyUnnamed()
 aug END
 silent! colorscheme molokai
