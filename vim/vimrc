@@ -1,49 +1,49 @@
-set encoding=utf-8
-scriptencoding utf-8
-set autoread
-set background=dark
-set backspace=indent
-set belloff=backspace,cursor,error,showmatch,esc visualbell
-set showbreak= breakindent breakindentopt=shift:2 cpoptions+=n
-set ignorecase smartcase
-set casemap=keepascii
-set clipboard=unnamed,unnamedplus
-set colorcolumn=+1
-set completeopt=menu,menuone,preview
-set cursorline
-set diffopt=filler,vertical,closeoff
-set display=lastline
-set fileencodings=ucs-bom,utf-8,default,euc-jp,cp932
-set fileformats=unix,dos
-set fillchars=vert:│,fold:-
-set guioptions=!Mr
-set formatoptions+=mBj
-set guicursor=a:blinkon0
-set helplang=Ja,En
-set history=1000
-set smartindent autoindent
-set keywordprg=:Man
-set lispwords-=if
-set list listchars=tab:»-,extends:»,precedes:«,nbsp:◦
-set showmatch matchtime=1 matchpairs+=（:）,｛:｝,＜:＞,［:］,「:」,『:』,【:】
-set modeline modelines=3
-set mouse=a mousemodel=extend nomousehide
-set number relativenumber
-set pastetoggle=<F10>
-set path+=include,arch/x86/include
-set pumheight=10
-set report=15
-set runtimepath+=/usr/share/vim/addons
-set scrolloff=3 sidescroll=1 sidescrolloff=10
-set incsearch hlsearch nowrapscan
+se encoding=utf-8
+scripte utf-8
+se autoread
+se background=dark
+se backspace=indent
+se belloff=backspace,cursor,error,showmatch,esc visualbell
+se showbreak= breakindent breakindentopt=shift:2 cpoptions+=n
+se ignorecase smartcase
+se casemap=keepascii
+se clipboard=unnamed,unnamedplus
+se colorcolumn=+1
+se completeopt=menu,menuone,preview
+se cursorline
+se diffopt=filler,vertical,closeoff
+se display=lastline
+se fileencodings=ucs-bom,utf-8,default,euc-jp,cp932
+se fileformats=unix,dos
+se fillchars=vert:│,fold:-
+se guioptions=!Mr
+se formatoptions+=mBj
+se guicursor=a:blinkon0
+se helplang=Ja,En
+se history=1000
+se smartindent autoindent
+se keywordprg=:Man
+se lispwords-=if
+se list listchars=tab:»-,extends:»,precedes:«,nbsp:◦
+se showmatch matchtime=1 matchpairs+=（:）,｛:｝,＜:＞,［:］,「:」,『:』,【:】
+se modeline modelines=3
+se mouse=a mousemodel=extend nomousehide
+se number relativenumber
+se pastetoggle=<F10>
+se path+=include,arch/x86/include
+se pumheight=10
+se report=15
+se runtimepath+=/usr/share/vim/addons
+se scrolloff=3 sidescroll=1 sidescrolloff=10
+se incsearch hlsearch nowrapscan
 if has('win32') && !has('gui_win32')
-	set shell=pwsh
+	se shell=pwsh
 endif
-set shortmess=aoOtT
-set splitbelow splitright
-set suffixes=.bak,~,.swp,.o,.info,.aux,.log,.dvi,.bbl,.blg,.brf,.cb,.ind,.idx,.ilg,.inx,.out,.toc,.exe,.lock
-set suffixesadd=.tex
-set laststatus=2
+se shortmess=aoOtT
+se splitbelow splitright
+se suffixes=.bak,~,.swp,.o,.info,.aux,.log,.dvi,.bbl,.blg,.brf,.cb,.ind,.idx,.ilg,.inx,.out,.toc,.exe,.lock
+se suffixesadd=.tex
+se laststatus=2
 fu! g:Statusline()
 	return '%f%<%H'
 		\ .. (&modified ? ' +' : '')
@@ -59,8 +59,8 @@ fu! g:Statusline()
 		\ .. (wordcount().chars - line('$'))
 		\ .. 'C'
 endfu
-set statusline=%{%Statusline()%}
-set showtabline=2
+se statusline=%{%Statusline()%}
+se showtabline=2
 fu! s:Tablabel(tabpagenr)
 	let l:buflist = tabpagebuflist(a:tabpagenr)
 	let l:curbufnr = l:buflist[tabpagewinnr(a:tabpagenr) - 1]
@@ -77,15 +77,15 @@ fu! g:Cuitabline()
 	let l:info = '%#TabLine#%<' .. fnamemodify(getcwd(), ':~') .. ' '
 	return l:tablabels .. ' %T%=' .. l:info
 endfu
-set tabline=%!g:Cuitabline()
-set noexpandtab shiftwidth=0 tabstop=8
-set tagcase=match tags=./tags;./../../,tags;../../
-set ttimeoutlen=10
+se tabline=%!g:Cuitabline()
+se noexpandtab shiftwidth=0 tabstop=8
+se tagcase=match tags=./tags;./../../,tags;../../
+se ttimeoutlen=10
 let $MYVIM = fnamemodify($MYVIMRC, ':h')
-set viminfofile=$MYVIM/.viminfo directory=$MYVIM/swap
-set virtualedit=block
-set wildmenu wildignorecase wildmode=list:longest,full
-set wrap
+se viminfofile=$MYVIM/.viminfo directory=$MYVIM/swap
+se virtualedit=block
+se wildmenu wildignorecase wildmode=list:longest,full
+se wrap
 let g:c_comment_strings = 1
 let g:c_gnu = 1
 let g:c_syntax_for_h = 1
@@ -103,7 +103,7 @@ let g:vim_indent_cont = &tabstop
 let g:vim_json_conceal = 0
 
 if &term ==# 'xterm' || has('win32')
-	set t_Co=256
+	se t_Co=256
 endif
 
 fu! s:Passthrough(seq)
@@ -125,84 +125,84 @@ endfu
 " mapping
 map Y y$
 
-nnoremap <silent> mm <Cmd>noh<CR>
+nno <silent> mm <Cmd>noh<CR>
 
-nnoremap <silent> <C-W><C-E> <Cmd>tabe<CR>
-nnoremap <silent> <C-W><C-L> <Cmd>tabn<CR>
-nnoremap <silent> <C-W><C-H> <Cmd>tabp<CR>
-nnoremap <silent> <C-W><C-O> <Cmd>tabo<CR>
-tnoremap <silent> <C-W><C-E> <Cmd>tabe<CR>
-tnoremap <silent> <C-W><C-L> <Cmd>tabn<CR>
-tnoremap <silent> <C-W><C-H> <Cmd>tabp<CR>
-tnoremap <silent> <C-W><C-O> <Cmd>tabo<CR>
+nno <silent> <C-W><C-E> <Cmd>tabe<CR>
+nno <silent> <C-W><C-L> <Cmd>tabn<CR>
+nno <silent> <C-W><C-H> <Cmd>tabp<CR>
+nno <silent> <C-W><C-O> <Cmd>tabo<CR>
+tno <silent> <C-W><C-E> <Cmd>tabe<CR>
+tno <silent> <C-W><C-L> <Cmd>tabn<CR>
+tno <silent> <C-W><C-H> <Cmd>tabp<CR>
+tno <silent> <C-W><C-O> <Cmd>tabo<CR>
 
-nnoremap <silent> <Leader>o o<Esc>
+nno <silent> <Leader>o o<Esc>
 
-nnoremap Q gq
-nnoremap <Leader>w <Cmd>w<CR>
-nnoremap <Leader>n <Cmd>n<CR>
-nnoremap <Leader>p <Cmd>N<CR>
-nnoremap <Leader>c <Cmd>clo<CR>
+nno Q gq
+nno <Leader>w <Cmd>w<CR>
+nno <Leader>n <Cmd>n<CR>
+nno <Leader>p <Cmd>N<CR>
+nno <Leader>c <Cmd>clo<CR>
 
-nmap ysa' ys2i'
-nmap ysa" ys2i"
-nmap ysa` ys2i`
+nma ysa' ys2i'
+nma ysa" ys2i"
+nma ysa` ys2i`
 
-nnoremap <Esc>M <C-W>-
-nnoremap <Esc>P <C-W>+
+nno <Esc>M <C-W>-
+nno <Esc>P <C-W>+
 
-cnoremap <C-G> <C-\><C-N>
-inoremap <C-G> <C-\><C-N>
+cno <C-G> <C-\><C-N>
+ino <C-G> <C-\><C-N>
 
-nnoremap g/ /\<\><Left><Left>
+nno g/ /\<\><Left><Left>
 
 if has('win32')
-	silent! vunmap <C-X>
+	sil! vun <C-X>
 endif
 
-inoremap <C-U> <C-G>u<C-U>
+ino <C-U> <C-G>u<C-U>
 
-cnoremap <Left> <Space><BS><Left>
-cnoremap <Right> <Space><BS><Right>
-cnoremap <C-P> <Up>
-cnoremap <C-N> <Down>
-cnoremap <Up> <C-P>
-cnoremap <Down> <C-N>
-cnoremap <C-A> <Home>
-" cnoremap <C-O>
-" cnoremap <C-B>
+cno <Left> <Space><BS><Left>
+cno <Right> <Space><BS><Right>
+cno <C-P> <Up>
+cno <C-N> <Down>
+cno <Up> <C-P>
+cno <Down> <C-N>
+cno <C-A> <Home>
+" cno <C-O>
+" cno <C-B>
 
 fu! s:FixWhitespace(line1, line2)
 	let l:save_cursor = getcurpos()
-	silent! execute 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\\\@<!\s\+$//'
+	sil! exe 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\\\@<!\s\+$//'
 	call setpos('.', l:save_cursor)
 endfu
-command! -range=% FixWhitespace call <SID>FixWhitespace(<line1>, <line2>)
-nnoremap <silent> <Leader>f <Cmd>FixWhitespace<CR>
+com! -range=% FixWhitespace call <SID>FixWhitespace(<line1>, <line2>)
+nno <silent> <Leader>f <Cmd>FixWhitespace<CR>
 
-command! -nargs=0 Cdhere tcd %:p:h
-nnoremap <silent> <Leader>d <Cmd>Cdhere<CR>
+com! -nargs=0 Cdhere tcd %:p:h
+nno <silent> <Leader>d <Cmd>Cdhere<CR>
 fu! s:Cdcword()
 	let l:cword = expand('<cWORD>')
-	execute 'tcd ' .. l:cword
+	exe 'tcd ' .. l:cword
 endfu
-command! -nargs=0 Cdcword call <SID>Cdcword()
-nnoremap <silent> <Leader>D <Cmd>Cdcword<CR>
+com! -nargs=0 Cdcword call <SID>Cdcword()
+nno <silent> <Leader>D <Cmd>Cdcword<CR>
 
 fu! s:ResetSearchDirection(cmd)
 	let @/=@/
-	nunmap n
-	nunmap N
+	nun n
+	nun N
 	return a:cmd
 endfu
 fu! s:ConsistentSearch(cmd)
-	nnoremap <expr> n <SID>ResetSearchDirection('n')
-	nnoremap <expr> N <SID>ResetSearchDirection('N')
+	nno <expr> n <SID>ResetSearchDirection('n')
+	nno <expr> N <SID>ResetSearchDirection('N')
 	return a:cmd
 endfu
-nnoremap <expr> ?  <SID>ConsistentSearch('?')
-nnoremap <expr> #  <SID>ConsistentSearch('#')
-nnoremap <expr> g# <SID>ConsistentSearch('g#')
+nno <expr> ?  <SID>ConsistentSearch('?')
+nno <expr> #  <SID>ConsistentSearch('#')
+nno <expr> g# <SID>ConsistentSearch('g#')
 
 fu! s:Search(zero)
 	let l:cword = expand('<cword>')
@@ -216,32 +216,32 @@ fu! s:Search(zero)
 	call <SID>CopyOSC52([l:cword])
 	return "\"_yiw\<BS>\<C-\>\<C-N>n"
 endfu
-nnoremap <expr> *  <SID>Search(0)
-nnoremap <expr> g* <SID>Search(1)
+nno <expr> *  <SID>Search(0)
+nno <expr> g* <SID>Search(1)
 
 fu! g:RestoreRegister()
-	silent! let @* = s:restore_reg
-	silent! let @+ = s:restore_reg
+	sil! let @* = s:restore_reg
+	sil! let @+ = s:restore_reg
 	let @" = s:restore_reg
 	return ''
 endfu
 fu! s:Repl()
-	silent! let s:restore_reg = @*
-	silent! let s:restore_reg = @+
+	sil! let s:restore_reg = @*
+	sil! let s:restore_reg = @+
 	let s:restore_reg = @"
 	return "p@=g:RestoreRegister()\<CR>"
 endfu
-vnoremap <silent> <expr> p <SID>Repl()
+vno <silent> <expr> p <SID>Repl()
 
 fu! s:Getfname()
 	let l:fname = bufname() .. ':' .. getcurpos()[1]
-	silent! let @* = l:fname
-	silent! let @+ = l:fname
+	sil! let @* = l:fname
+	sil! let @+ = l:fname
 	call <SID>CopyOSC52([l:fname])
 	return l:fname
 endfu
-command! Getfname echo <SID>Getfname()
-nnoremap <silent> yd <Cmd>Getfname<CR>
+com! Getfname echo <SID>Getfname()
+nno <silent> yd <Cmd>Getfname<CR>
 
 fu! s:RegexRubout(re)
 	let l:right = strpart(getcmdline(), getcmdpos() - 1)
@@ -250,10 +250,10 @@ fu! s:RegexRubout(re)
 	call setcmdpos(strlen(l:left) + 1)
 	return l:left .. l:right
 endfu
-cnoremap <Esc>/     <C-\>e<SID>RegexRubout('\v[^/ ]*/? *$')<CR>
-cnoremap <C-W>      <C-\>e<SID>RegexRubout('\v([a-zA-Z0-9]+\|[^ a-zA-Z0-9]+) *$')<CR>
-cnoremap <Esc>h     <C-\>e<SID>RegexRubout('\v([a-zA-Z0-9]+\|[^ a-zA-Z0-9]+) *$')<CR>
-cnoremap <Esc><C-W> <C-\>e<SID>RegexRubout('\v[^ ]* *$')<CR>
+cno <Esc>/     <C-\>e<SID>RegexRubout('\v[^/ ]*/? *$')<CR>
+cno <C-W>      <C-\>e<SID>RegexRubout('\v([a-zA-Z0-9]+\|[^ a-zA-Z0-9]+) *$')<CR>
+cno <Esc>h     <C-\>e<SID>RegexRubout('\v([a-zA-Z0-9]+\|[^ a-zA-Z0-9]+) *$')<CR>
+cno <Esc><C-W> <C-\>e<SID>RegexRubout('\v[^ ]* *$')<CR>
 
 fu! s:MultiHlSetup()
 	hi Multihl1 ctermbg=14 ctermfg=8 guibg=#00ffff guifg=#808080
@@ -266,10 +266,10 @@ endfu
 fu! s:Hi(num, ...)
 	if a:num ==# 0
 		for l:num in range(1, 6)
-			silent! call matchdelete(l:num + 5)
+			sil! call matchdelete(l:num + 5)
 		endfor
 	else
-		silent! call matchdelete(a:num + 5)
+		sil! call matchdelete(a:num + 5)
 		if a:0 !=# 0
 			call matchadd('Multihl' .. a:num, a:1, 10, a:num + 5)
 			call histadd(':', 'Hi' .. a:num .. ' ' .. a:1)
@@ -278,20 +278,20 @@ fu! s:Hi(num, ...)
 	endif
 	call histadd(':', 'Hi' .. a:num)
 endfu
-command! -nargs=0 Hi0 call <SID>Hi(0)
-command! -nargs=? Hi1 call <SID>Hi(1, <f-args>)
-command! -nargs=? Hi2 call <SID>Hi(2, <f-args>)
-command! -nargs=? Hi3 call <SID>Hi(3, <f-args>)
-command! -nargs=? Hi4 call <SID>Hi(4, <f-args>)
-command! -nargs=? Hi5 call <SID>Hi(5, <f-args>)
-command! -nargs=? Hi6 call <SID>Hi(6, <f-args>)
-nnoremap <Leader>0 :<C-U>Hi0<CR>
-nnoremap <Leader>1 :<C-U>Hi1 <C-R><C-W><CR>
-nnoremap <Leader>2 :<C-U>Hi2 <C-R><C-W><CR>
-nnoremap <Leader>3 :<C-U>Hi3 <C-R><C-W><CR>
-nnoremap <Leader>4 :<C-U>Hi4 <C-R><C-W><CR>
-nnoremap <Leader>5 :<C-U>Hi5 <C-R><C-W><CR>
-nnoremap <Leader>6 :<C-U>Hi6 <C-R><C-W><CR>
+com! -nargs=0 Hi0 call <SID>Hi(0)
+com! -nargs=? Hi1 call <SID>Hi(1, <f-args>)
+com! -nargs=? Hi2 call <SID>Hi(2, <f-args>)
+com! -nargs=? Hi3 call <SID>Hi(3, <f-args>)
+com! -nargs=? Hi4 call <SID>Hi(4, <f-args>)
+com! -nargs=? Hi5 call <SID>Hi(5, <f-args>)
+com! -nargs=? Hi6 call <SID>Hi(6, <f-args>)
+nno <Leader>0 :<C-U>Hi0<CR>
+nno <Leader>1 :<C-U>Hi1 <C-R><C-W><CR>
+nno <Leader>2 :<C-U>Hi2 <C-R><C-W><CR>
+nno <Leader>3 :<C-U>Hi3 <C-R><C-W><CR>
+nno <Leader>4 :<C-U>Hi4 <C-R><C-W><CR>
+nno <Leader>5 :<C-U>Hi5 <C-R><C-W><CR>
+nno <Leader>6 :<C-U>Hi6 <C-R><C-W><CR>
 
 fu! s:FontSizeSet(amount)
 	call echoraw(s:Passthrough("\e]7770;" .. a:amount .. "\x7"))
@@ -308,13 +308,13 @@ fu! s:FontSizeGet()
 	endwhile
 	echo l:ret[7:-2]
 endfu
-command! FontSizeGet call <SID>FontSizeGet()
-command! FontSizeReset call <SID>FontSizeSet('')
-nnoremap <silent> <Esc>=              <Cmd>call <SID>FontSizeSet('')<CR>
-nnoremap <silent> <Esc>+              <Cmd>call <SID>FontSizeSet('+1')<CR>
-nnoremap <silent> <Esc>-              <Cmd>call <SID>FontSizeSet('-1')<CR>
-nnoremap <silent> <C-ScrollWheelUp>   <Cmd>call <SID>FontSizeSet('+1')<CR>
-nnoremap <silent> <C-ScrollWheelDown> <Cmd>call <SID>FontSizeSet('-1')<CR>
+com! FontSizeGet call <SID>FontSizeGet()
+com! FontSizeReset call <SID>FontSizeSet('')
+nno <silent> <Esc>=              <Cmd>call <SID>FontSizeSet('')<CR>
+nno <silent> <Esc>+              <Cmd>call <SID>FontSizeSet('+1')<CR>
+nno <silent> <Esc>-              <Cmd>call <SID>FontSizeSet('-1')<CR>
+nno <silent> <C-ScrollWheelUp>   <Cmd>call <SID>FontSizeSet('+1')<CR>
+nno <silent> <C-ScrollWheelDown> <Cmd>call <SID>FontSizeSet('-1')<CR>
 
 fu! s:TagfuncLinux(pattern, flags, info)
 	if !get(b:, 'guesstag', 1) | let b:guesstag = 1 | return v:null | endif
@@ -389,22 +389,22 @@ fu! s:Tjump(sp, guess)
 		return ":ALEGoToDefinition" .. (a:sp ? ' -split' : '') .. "\<CR>"
 	endif
 endfu
-nnoremap <expr> g<C-]>      <SID>Tjump(0, 0)
-vnoremap <expr> g<C-]>      <SID>Tjump(0, 0)
-nnoremap <expr> g]          <SID>Tjump(0, 0)
-vnoremap <expr> g]          <SID>Tjump(0, 0)
-nnoremap <expr> <C-]>       <SID>Tjump(0, 1)
-vnoremap <expr> <C-]>       <SID>Tjump(0, 1)
-nnoremap <expr> <C-W>g<C-]> <SID>Tjump(1, 0)
-vnoremap <expr> <C-W>g<C-]> <SID>Tjump(1, 0)
-nnoremap <expr> <C-W>g]     <SID>Tjump(1, 0)
-vnoremap <expr> <C-W>g]     <SID>Tjump(1, 0)
-nnoremap <expr> <C-W><C-]>  <SID>Tjump(1, 1)
-vnoremap <expr> <C-W><C-]>  <SID>Tjump(1, 1)
-nnoremap <expr> <C-W>]      <SID>Tjump(1, 1)
-vnoremap <expr> <C-W>]      <SID>Tjump(1, 1)
-command! -nargs=1 -bar Gtj  let b:guesstag = 0 | tj  <args>
-command! -nargs=1 -bar Gstj let b:guesstag = 0 | stj <args>
+nno <expr> g<C-]>      <SID>Tjump(0, 0)
+vno <expr> g<C-]>      <SID>Tjump(0, 0)
+nno <expr> g]          <SID>Tjump(0, 0)
+vno <expr> g]          <SID>Tjump(0, 0)
+nno <expr> <C-]>       <SID>Tjump(0, 1)
+vno <expr> <C-]>       <SID>Tjump(0, 1)
+nno <expr> <C-W>g<C-]> <SID>Tjump(1, 0)
+vno <expr> <C-W>g<C-]> <SID>Tjump(1, 0)
+nno <expr> <C-W>g]     <SID>Tjump(1, 0)
+vno <expr> <C-W>g]     <SID>Tjump(1, 0)
+nno <expr> <C-W><C-]>  <SID>Tjump(1, 1)
+vno <expr> <C-W><C-]>  <SID>Tjump(1, 1)
+nno <expr> <C-W>]      <SID>Tjump(1, 1)
+vno <expr> <C-W>]      <SID>Tjump(1, 1)
+com! -nargs=1 -bar Gtj  let b:guesstag = 0 | tj  <args>
+com! -nargs=1 -bar Gstj let b:guesstag = 0 | stj <args>
 
 fu! s:Spacing(line1, line2)
 	let l:a = '[[:graph:]]'
@@ -412,38 +412,38 @@ fu! s:Spacing(line1, line2)
 	let l:k = '[、。]'
 	let l:s = 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v'
 
-	silent! execute l:s..'('..l:a..'+) +\ze'..l:a..'/\1 /g'
-	silent! execute l:s..'('..l:a..'+) *\ze'..l:m..'/\1 /g'
-	silent! execute l:s..'('..l:m..'+) *\ze'..l:a..'/\1 /g'
+	sil! exe l:s..'('..l:a..'+) +\ze'..l:a..'/\1 /g'
+	sil! exe l:s..'('..l:a..'+) *\ze'..l:m..'/\1 /g'
+	sil! exe l:s..'('..l:m..'+) *\ze'..l:a..'/\1 /g'
 
-	silent! execute l:s..'('..l:m..'+) +\ze'..l:m..'/\1/g'
-	silent! execute l:s..'('..l:a..'+) +\ze'..l:k..'/\1/g'
-	silent! execute l:s..'('..l:k..'+) +\ze'..l:a..'/\1/g'
+	sil! exe l:s..'('..l:m..'+) +\ze'..l:m..'/\1/g'
+	sil! exe l:s..'('..l:a..'+) +\ze'..l:k..'/\1/g'
+	sil! exe l:s..'('..l:k..'+) +\ze'..l:a..'/\1/g'
 
-	silent! execute l:s..'('..l:m..'+) +\ze[)]/\1/g'
-	silent! execute l:s..'([(]) +\ze('..l:m..'+)/\1/g'
+	sil! exe l:s..'('..l:m..'+) +\ze[)]/\1/g'
+	sil! exe l:s..'([(]) +\ze('..l:m..'+)/\1/g'
 
-	silent! execute l:s..' +$//g'
+	sil! exe l:s..' +$//g'
 endfu
-command! -range=% Spacing call <SID>Spacing(<line1>, <line2>)
-nnoremap <silent> <Leader>s :call <SID>Spacing('.', '.')<CR>
-vnoremap <silent> <Leader>s :call <SID>Spacing('''<', '''>')<CR>
+com! -range=% Spacing call <SID>Spacing(<line1>, <line2>)
+nno <silent> <Leader>s :call <SID>Spacing('.', '.')<CR>
+vno <silent> <Leader>s :call <SID>Spacing('''<', '''>')<CR>
 
 fu! s:UnSpacing(line1, line2)
 	let l:a = '[[:graph:]]'
 	let l:m = '[^ [:graph:][:cntrl:]]'
 	let l:s = 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v'
 
-	silent! execute l:s..'('..l:a..'+) +\ze'..l:a..'/\1 /g'
+	sil! exe l:s..'('..l:a..'+) +\ze'..l:a..'/\1 /g'
 
-	silent! execute l:s..'('..l:a..'+) +\ze'..l:m..'/\1/g'
-	silent! execute l:s..'('..l:m..'+) +\ze/\1/g'
+	sil! exe l:s..'('..l:a..'+) +\ze'..l:m..'/\1/g'
+	sil! exe l:s..'('..l:m..'+) +\ze/\1/g'
 
-	silent! execute l:s..' +$//g'
+	sil! exe l:s..' +$//g'
 endfu
-command! -range=% Unspacing call <SID>UnSpacing(<line1>, <line2>)
-nnoremap <silent> <Leader>S :call <SID>UnSpacing('.', '.')<CR>
-vnoremap <silent> <Leader>S :call <SID>UnSpacing('''<', '''>')<CR>
+com! -range=% Unspacing call <SID>UnSpacing(<line1>, <line2>)
+nno <silent> <Leader>S :call <SID>UnSpacing('.', '.')<CR>
+vno <silent> <Leader>S :call <SID>UnSpacing('''<', '''>')<CR>
 
 fu! s:CopyMode()
 	if !exists('w:copymode')
@@ -454,8 +454,8 @@ fu! s:CopyMode()
 		setl list number relativenumber breakindent
 	endif
 endfu
-command! CopyMode call <SID>CopyMode()
-nnoremap <silent> <Leader>v <Cmd>call <SID>CopyMode()<CR>
+com! CopyMode call <SID>CopyMode()
+nno <silent> <Leader>v <Cmd>call <SID>CopyMode()<CR>
 
 fu! s:OpenEmpty()
 	if !get(b:, 'openempty_active', 0)
@@ -467,18 +467,18 @@ fu! s:OpenEmpty()
 		let b:openempty_active = 0
 	endif
 endfu
-nnoremap <silent> go <Cmd>call <SID>OpenEmpty()<CR>o<Cmd>call <SID>OpenEmpty()<CR>
+nno <silent> go <Cmd>call <SID>OpenEmpty()<CR>o<Cmd>call <SID>OpenEmpty()<CR>
 
 " excommand
-command! DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis | wincmd p | diffthis
-command! Hitest runtime syntax/hitest.vim
-command! Colortest runtime syntax/colortest.vim
+com! DiffOrig vert new | se bt=nofile | r ++edit # | 0d_ | difft | winc p | difft
+com! Hitest ru syntax/hitest.vim
+com! Colortest ru syntax/colortest.vim
 
 fu! s:XXD()
 	if !exists('b:save_ft_binary')
 		let b:save_ft_binary = [&filetype, &binary]
 		let &binary = 1
-		silent edit " for binary to take effect
+		sil e " for binary to take effect
 		let &ft = 'xxd'
 		%!xxd
 	else
@@ -487,7 +487,7 @@ fu! s:XXD()
 		%!xxd -r
 	endif
 endfu
-command! XXD call <SID>XXD()
+com! XXD call <SID>XXD()
 
 fu! s:Align(cmd, line1, line2, ...)
 	let l:save_cursor = getcurpos()
@@ -496,13 +496,13 @@ fu! s:Align(cmd, line1, line2, ...)
 	else
 		let l:char = a:1
 	endif
-	execute 'normal ' .. a:line1 .. 'GV' .. a:line2 .. 'G' .. a:cmd .. l:char
+	exe 'normal ' .. a:line1 .. 'GV' .. a:line2 .. 'G' .. a:cmd .. l:char
 	call setpos('.', l:save_cursor)
 endfu
-command! -range -nargs=? AlignRight call <SID>Align('gL', <line1>, <line2>, <f-args>)
-command! -range -nargs=? AlignLeft  call <SID>Align('gl', <line1>, <line2>, <f-args>)
+com! -range -nargs=? AlignRight call <SID>Align('gL', <line1>, <line2>, <f-args>)
+com! -range -nargs=? AlignLeft  call <SID>Align('gl', <line1>, <line2>, <f-args>)
 
-command! -nargs=0 Reload let s:undoreload = &undoreload | set undoreload=0 | edit | let &undoreload = s:undoreload
+com! -nargs=0 Reload let s:undoreload = &undoreload | se undoreload=0 | e | let &undoreload = s:undoreload
 
 fu! s:Nkf()
 	if executable('uchardet')
@@ -510,12 +510,12 @@ fu! s:Nkf()
 	elseif executable('nkf')
 		let l:cmd = 'nkf --guess=1 '
 	else
-		echoerr 'uchardet or nkf must be installed!'
+		echoe 'uchardet or nkf must be installed!'
 		return
 	endif
-	execute 'e ++enc=' .. system(l:cmd .. ' ' .. fnamemodify(expand('%'), ':p'))
+	exe 'e ++enc=' .. system(l:cmd .. ' ' .. fnamemodify(expand('%'), ':p'))
 endfu
-command! -nargs=0 Nkf call <SID>Nkf()
+com! -nargs=0 Nkf call <SID>Nkf()
 
 fu! s:Command(env, reuse, focus, close, arg)
 	let l:cmd = '/bin/bash -ic "' .. join(a:arg) .. '"'
@@ -526,12 +526,12 @@ fu! s:Command(env, reuse, focus, close, arg)
 	if a:reuse
 		let l:n = bufnr('!' .. l:cmd)
 		if l:n !=# -1
-			execute 'bdelete ' .. l:n
+			exe 'bdelete ' .. l:n
 		endif
 	endif
 	call term_start(l:cmd, l:opt)
 	if !a:focus
-		wincmd p
+		winc p
 	endif
 endfu
 fu! s:BashComp(ArgLead, CmdLine, CursorPos)
@@ -540,10 +540,10 @@ endfu
 fu! s:GitComp(ArgLead, CmdLine, CursorPos)
 	return g:bash#complete(substitute(strpart(a:CmdLine, 0, a:CursorPos), '^\s*\a\+ ', 'git ', ''))
 endfu
-command! -nargs=* -complete=customlist,<SID>BashComp S call <SID>Command({}, 0, 0, 0, [<f-args>])
-command! -nargs=* -complete=customlist,<SID>BashComp I call <SID>Command({}, 0, 1, 1, [<f-args>])
-command! -nargs=* -complete=customlist,<SID>GitComp Git call <SID>Command({'GIT_PAGER': ''}, 1, 1, 0, ['git', <f-args>])
-command! -nargs=* -complete=customlist,<SID>GitComp Gitpager call <SID>Command({}, 1, 1, 0, ['git', <f-args>])
+com! -nargs=* -complete=customlist,<SID>BashComp S call <SID>Command({}, 0, 0, 0, [<f-args>])
+com! -nargs=* -complete=customlist,<SID>BashComp I call <SID>Command({}, 0, 1, 1, [<f-args>])
+com! -nargs=* -complete=customlist,<SID>GitComp Git call <SID>Command({'GIT_PAGER': ''}, 1, 1, 0, ['git', <f-args>])
+com! -nargs=* -complete=customlist,<SID>GitComp Gitpager call <SID>Command({}, 1, 1, 0, ['git', <f-args>])
 
 let s:template = {
 	\ 'c'     : ['#include <stdio.h>', '', 'int main(void)', '{', '	printf("Hello\n");', '	return 0;', '}'],
@@ -561,23 +561,23 @@ fu! s:Template()
 	if !has_key(s:template, &ft) | return | endif
 	call append(0, s:template[&ft])
 	if getline('$') ==# ''
-		$delete _
+		$d _
 	endif
-	execute get(s:template_after, &ft, s:template_after['_'])
+	exe get(s:template_after, &ft, s:template_after['_'])
 	echon ' Template loaded'
 endfu
-command! -nargs=0 Template call <SID>Template()
+com! -nargs=0 Template call <SID>Template()
 
 fu! s:Sort(pat)
 	let l:save_reg = @a
-	normal! gv"ay
+	norm! gv"ay
 	let @a = join(sort(split(eval('@a'), a:pat)), a:pat)
-	normal! gv"ap
+	norm! gv"ap
 	let @a = l:save_reg
 endfu
-command! -range Sort call <SID>Sort(' ')
-command! -range SortComma call <SID>Sort(', ')
-command! -nargs=1 -range SortSep call <SID>Sort(<f-args>)
+com! -range Sort call <SID>Sort(' ')
+com! -range SortComma call <SID>Sort(', ')
+com! -nargs=1 -range SortSep call <SID>Sort(<f-args>)
 
 " autocommand
 let s:show_trailing_ws = 1
@@ -586,23 +586,23 @@ fu! s:HlTrailingWs(toggle, mode)
 	if a:toggle
 		let s:show_trailing_ws = !s:show_trailing_ws
 	endif
-	silent! call matchdelete(4)
+	sil! call matchdelete(4)
 	if !s:show_trailing_ws | return | endif
 	if !get(b:, 'show_trailing_ws', 1) | return | endif
-	silent! call matchadd('TrailingWhiteSpace', s:trailing_ws_pat[a:mode], 10, 4)
+	sil! call matchadd('TrailingWhiteSpace', s:trailing_ws_pat[a:mode], 10, 4)
 endfu
-command! Togglehltrailingwhitespaces call <SID>HlTrailingWs(1, 0)
+com! Togglehltrailingwhitespaces call <SID>HlTrailingWs(1, 0)
 
 let s:show_ideo_space = 1
 fu! s:HlIdeoSpace(toggle)
 	if a:toggle
 		let s:show_ideo_space = !s:show_ideo_space
 	endif
-	silent! call matchdelete(5)
+	sil! call matchdelete(5)
 	if !s:show_ideo_space | return | endif
-	silent! call matchadd('IdeographicSpace', '[\u3000]', 10, 5)
+	sil! call matchadd('IdeographicSpace', '[\u3000]', 10, 5)
 endfu
-command! Togglehlideographicspace call <SID>HlIdeoSpace(1)
+com! Togglehlideographicspace call <SID>HlIdeoSpace(1)
 
 fu! s:CopyUnnamed()
 	if v:event.regname ==# ''
@@ -613,14 +613,14 @@ endfu
 let s:ignore_lastline = {'gitcommit': '', 'hgcommit': '', 'cvs': '', 'svn': ''}
 fu! s:GoToLastLine()
 	if line('''"') <= line('$') && !has_key(s:ignore_lastline, &ft)
-		normal! g`"
+		norm! g`"
 	endif
 endfu
 
 " gui
 if has('gui_running') && has('win32')
-	set guifont=Consolas:h11
-	set lines=30 columns=86
+	se guifont=Consolas:h11
+	se lines=30 columns=86
 	let s:guifont_default_size = split(split(&guifont, '[^\\]\zs,')[0], '[^\\]\zs:')[1][1:]
 	fu! s:FontSizeSet(amount)
 		let l:font = split(split(&guifont, '[^\\]\zs,')[0], '[^\\]\zs:')
@@ -639,24 +639,24 @@ if has('gui_running') && has('win32')
 	fu! s:CopyOSC52(list)
 	endfu
 
-	nnoremap <silent> <M-Space> <Cmd>simalt ~<CR>
-	cnoremap <M-/> <C-\>e<SID>RegexRubout('\v[^/\\]*(/\|\\)? *$')<CR>
-	cnoremap <M-w> <C-\>e<SID>RegexRubout('\v[^ ]* *$')<CR>
-	nnoremap <M-m> <C-W>-
-	nnoremap <M-p> <C-W>+
-	nnoremap <silent> <M-=> <Cmd>call <SID>FontSizeSet('')<CR>
-	nnoremap <silent> <M-+> <Cmd>call <SID>FontSizeSet('+1')<CR>
-	nnoremap <silent> <M--> <Cmd>call <SID>FontSizeSet('-1')<CR>
-	nnoremap <silent> <C-=> <Cmd>call <SID>FontSizeSet('')<CR>
+	nno <silent> <M-Space> <Cmd>simalt ~<CR>
+	cno <M-/> <C-\>e<SID>RegexRubout('\v[^/\\]*(/\|\\)? *$')<CR>
+	cno <M-w> <C-\>e<SID>RegexRubout('\v[^ ]* *$')<CR>
+	nno <M-m> <C-W>-
+	nno <M-p> <C-W>+
+	nno <silent> <M-=> <Cmd>call <SID>FontSizeSet('')<CR>
+	nno <silent> <M-+> <Cmd>call <SID>FontSizeSet('+1')<CR>
+	nno <silent> <M--> <Cmd>call <SID>FontSizeSet('-1')<CR>
+	nno <silent> <C-=> <Cmd>call <SID>FontSizeSet('')<CR>
 endif
 
-packadd! matchit
-packadd! termdebug
-packadd! editorconfig
-runtime ftplugin/man.vim
+pa! matchit
+pa! termdebug
+pa! editorconfig
+ru ftplugin/man.vim
 
 " quickrun
-nmap <Leader>r <Plug>(quickrun)
+nma <Leader>r <Plug>(quickrun)
 let g:quickrun_config = {
 	\ 'python': {
 	\   'command': 'python3',
@@ -672,24 +672,24 @@ let g:quickrun_config = {
 	\ },
 	\ }
 " ale
-nmap <Leader>j <Plug>(ale_next)
-nmap <Leader>k <Plug>(ale_previous)
-nmap <Leader>h <Plug>(ale_detail)
+nma <Leader>j <Plug>(ale_next)
+nma <Leader>k <Plug>(ale_previous)
+nma <Leader>h <Plug>(ale_detail)
 fu! s:ALEFixOnSaveToggle(vartype, value)
 	let l:new = a:value ==# -1 ? '!' .. get(eval(a:vartype .. ':'), 'ale_fix_on_save', 0) : a:value
-	execute 'let ' .. a:vartype .. ':ale_fix_on_save = ' .. l:new
+	exe 'let ' .. a:vartype .. ':ale_fix_on_save = ' .. l:new
 endfu
-command! -bar ALEFixOnSaveToggle        call <SID>ALEFixOnSaveToggle('g', -1)
-command! -bar ALEFixOnSaveToggleBuffer  call <SID>ALEFixOnSaveToggle('b', -1)
-command! -bar ALEFixOnSaveEnable        call <SID>ALEFixOnSaveToggle('g', 1)
-command! -bar ALEFixOnSaveEnableBuffer  call <SID>ALEFixOnSaveToggle('b', 1)
-command! -bar ALEFixOnSaveDisable       call <SID>ALEFixOnSaveToggle('g', 0)
-command! -bar ALEFixOnSaveDisableBuffer call <SID>ALEFixOnSaveToggle('b', 0)
-command! -bar ALEEnableAll        ALEEnable | ALEFixOnSaveEnable
-command! -bar ALEEnableAllBuffer  ALEEnableBuffer | ALEFixOnSaveEnableBuffer
-command! -bar ALEDisableAll       ALEDisable | ALEFixOnSaveDisable
-command! -bar ALEDisableAllBuffer ALEDisableBuffer | ALEFixOnSaveDisableBuffer
-command! -bar WriteNoFix          ALEFixOnSaveDisableBuffer | w
+com! -bar ALEFixOnSaveToggle        call <SID>ALEFixOnSaveToggle('g', -1)
+com! -bar ALEFixOnSaveToggleBuffer  call <SID>ALEFixOnSaveToggle('b', -1)
+com! -bar ALEFixOnSaveEnable        call <SID>ALEFixOnSaveToggle('g', 1)
+com! -bar ALEFixOnSaveEnableBuffer  call <SID>ALEFixOnSaveToggle('b', 1)
+com! -bar ALEFixOnSaveDisable       call <SID>ALEFixOnSaveToggle('g', 0)
+com! -bar ALEFixOnSaveDisableBuffer call <SID>ALEFixOnSaveToggle('b', 0)
+com! -bar ALEEnableAll        ALEEnable | ALEFixOnSaveEnable
+com! -bar ALEEnableAllBuffer  ALEEnableBuffer | ALEFixOnSaveEnableBuffer
+com! -bar ALEDisableAll       ALEDisable | ALEFixOnSaveDisable
+com! -bar ALEDisableAllBuffer ALEDisableBuffer | ALEFixOnSaveDisableBuffer
+com! -bar WriteNoFix          ALEFixOnSaveDisableBuffer | w
 let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
 let g:ale_linters = {
 	\ 'asciidoc'  : ['vale'],
@@ -750,8 +750,8 @@ let g:rainbow_active = 1
 let g:gasCppComments = 1
 let g:lion_squeeze_spaces = 1
 
-filetype plugin indent on
-syntax enable
+filet plugin indent on
+syn enable
 aug vimrc
 	au!
 	au ColorScheme * hi Cursor guifg=fg guibg=Red
@@ -761,7 +761,7 @@ aug vimrc
 	au ColorScheme * hi IdeographicSpace term=underline ctermbg=DarkGreen guibg=DarkGreen
 	au ColorScheme * call <SID>MultiHlSetup()
 	au ColorScheme molokai hi Visual ctermfg=none
-	au VimEnter * silent! call textobj#user#plugin('surround', {
+	au VimEnter * sil! call textobj#user#plugin('surround', {
 		\ 'surround-mb': {'pattern': ['（', '）'], 'select-a': 'amb', 'select-i': 'imb'},
 		\ 'surround-mB': {'pattern': ['｛', '｝'], 'select-a': 'amB', 'select-i': 'imB'},
 		\ 'surround-ma': {'pattern': ['＜', '＞'], 'select-a': 'ama', 'select-i': 'ima'},
@@ -772,42 +772,42 @@ aug vimrc
 		\ })
 	au FileType c setl textwidth=80 cindent cinoptions=:0(s
 	au FileType git setl vartabstop=9,8 | let b:show_trailing_ws = 0
-	au FileType help nnoremap <buffer> <CR> <C-]>
+	au FileType help nno <buffer> <CR> <C-]>
 	au FileType html setl indentkeys=
-	au FileType info nmap <buffer> gu <Plug>(InfoUp)
-	au FileType info nmap <buffer> gn <Plug>(InfoNext)
-	au FileType info nmap <buffer> gp <Plug>(InfoPrev)
-	au FileType info nmap <buffer> gm <Plug>(InfoMenu)
-	au FileType info nmap <buffer> gf <Plug>(InfoFollow)
-	au FileType info nmap <buffer> go <Plug>(InfoGoto)
+	au FileType info nma <buffer> gu <Plug>(InfoUp)
+	au FileType info nma <buffer> gn <Plug>(InfoNext)
+	au FileType info nma <buffer> gp <Plug>(InfoPrev)
+	au FileType info nma <buffer> gm <Plug>(InfoMenu)
+	au FileType info nma <buffer> gf <Plug>(InfoFollow)
+	au FileType info nma <buffer> go <Plug>(InfoGoto)
 	au FileType java setl cindent cinoptions=(sJ1j1
-	au FileType man nnoremap <buffer> <silent> q :q<CR>
+	au FileType man nno <buffer> <silent> q :q<CR>
 	au FileType markdown setl tabstop=8
 	au FileType php setl matchpairs-=<:>
 	au FileType ps1 setl expandtab shiftwidth=2
 	au FileType rust setl softtabstop=0 textwidth=100
-	au FileType rust nnoremap <buffer> <Leader>t <Cmd>call <SID>Command({}, 1, 0, 0, ['cargo', 'test'])<CR>
-	au FileType rust nnoremap <buffer> <Leader>u <Cmd>call <SID>Command({}, 1, 0, 0, ['cargo', 'run'])<CR>
+	au FileType rust nno <buffer> <Leader>t <Cmd>call <SID>Command({}, 1, 0, 0, ['cargo', 'test'])<CR>
+	au FileType rust nno <buffer> <Leader>u <Cmd>call <SID>Command({}, 1, 0, 0, ['cargo', 'run'])<CR>
 	au FileType scheme setl expandtab shiftwidth=2 lispwords+=syntax-case,with-syntax
-	au FileType scheme inoremap <expr> <buffer> <C-F> empty(getline('.')) ? "<C-O>cc" : "<C-O>=="
+	au FileType scheme ino <expr> <buffer> <C-F> empty(getline('.')) ? "<C-O>cc" : "<C-O>=="
 	au FileType sh setl isfname-== | call autocmd_add([#{bufnr: bufnr(), cmd: 'setl indentkeys-=)', event: 'BufEnter', once: v:true}])
 	au BufNewFile *.go,*.pl,*.py,*.sh call <SID>Template()
-	au BufNewFile,BufRead * if &ft ==# 'asm' | set ft=gas | endif
-	au BufNewFile,BufRead * if &ft ==# 'diff' | set ft=git textwidth=0 | endif
-	au BufNewFile,BufRead */git/config,*.gitconfig set ft=gitconfig
-	au BufNewFile,BufRead */yapf/style set ft=cfg
-	au BufNewFile,BufRead dircolors set ft=dircolors
+	au BufNewFile,BufRead * if &ft ==# 'asm' | se ft=gas | endif
+	au BufNewFile,BufRead * if &ft ==# 'diff' | se ft=git textwidth=0 | endif
+	au BufNewFile,BufRead */git/config,*.gitconfig se ft=gitconfig
+	au BufNewFile,BufRead */yapf/style se ft=cfg
+	au BufNewFile,BufRead dircolors se ft=dircolors
 	au BufReadPost * call <SID>GoToLastLine()
-	au StdinReadPost * setl nomodified
+	au StdinReadPost * se nomodified
 	au BufWinEnter,InsertLeave * call <SID>HlTrailingWs(0, 0)
 	au InsertEnter * call <SID>HlTrailingWs(0, 1)
 	au BufWinEnter * call <SID>HlIdeoSpace(0)
 	au BufWinEnter * call <SID>SetTagfunc()
 	au BufWinEnter */linux/* ALEDisableAllBuffer
-	au CmdwinEnter * nnoremap <buffer> g<CR> <Cmd>let g:CmdwinLastLine = line('.')<CR><CR>q:<Cmd>exe g:CmdwinLastLine<CR>
+	au CmdwinEnter * nno <buffer> g<CR> <Cmd>let g:CmdwinLastLine = line('.')<CR><CR>q:<Cmd>exe g:CmdwinLastLine<CR>
 	au TextYankPost * call <SID>CopyUnnamed()
 aug END
-silent! colorscheme molokai
+sil! colo molokai
 if filereadable(expand('~/.localvimrc.vim'))
-	source ~/.localvimrc.vim
+	so ~/.localvimrc.vim
 endif
