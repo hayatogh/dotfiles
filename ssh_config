@@ -3,6 +3,9 @@ Include localssh.conf
 Host gh
 	User git
 	HostName github.com
+Host bb
+	User git
+	HostName bitbucket.org
 Host *
 	IdentityFile ~/.ssh/id_ed25519
 	IdentitiesOnly yes
