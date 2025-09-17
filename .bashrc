@@ -53,10 +53,6 @@ alias scheme='scheme ~/dotfiles/chezrc.ss'
 alias timespan='systemd-analyze --user timespan'
 alias tm='tmux new -ADX'
 alias vi='vim --clean'
-alias l. &>/dev/null && unalias l.
-l.() (
-	[[ $# -ne 0 ]] && cd "$1"; ls -dF .*
-)
 e() {
 	open &>/dev/null "${@:-.}"
 }
@@ -264,9 +260,13 @@ elif [[ $_distro =~ fedora|centos|rhel ]]; then
 	alias upgrade='sudo dnf upgrade'
 	alias which &>/dev/null && unalias which
 	unset -f which
+	alias l. &>/dev/null && unalias l.
 	_source_r /usr/share/git-core/contrib/completion/git-prompt.sh
 fi
 
+l.() (
+	[[ $# -ne 0 ]] && cd "$1"; ls -dF .*
+)
 type _completion_loader &>/dev/null && ! _completion_loader ssh
 complete -F _comp_cmd_ssh tryssh
 complete -c realwhich
