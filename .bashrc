@@ -54,9 +54,9 @@ alias timespan='systemd-analyze --user timespan'
 alias tm='tmux new -ADX'
 alias vi='vim --clean'
 alias l. &>/dev/null && unalias l.
-l.() {
-	([[ $# != 0 ]] && cd "$1"; ls -dF .*)
-}
+l.() (
+	[[ $# -ne 0 ]] && cd "$1"; ls -dF .*
+)
 e() {
 	open &>/dev/null "${@:-.}"
 }
@@ -104,10 +104,10 @@ mktags() {
 		make SRCARCH=$arch tags &>/dev/null
 		mv tags tags.$arch
 		ln -s tags.$arch tags
-	elif [[ $# != 0 ]]; then
-		ctags "$@" &>/dev/null
-	else
+	elif [[ $# -eq 0 ]]; then
 		ctags -R &>/dev/null
+	else
+		ctags "$@" &>/dev/null
 	fi
 }
 realwhich() {
@@ -208,9 +208,10 @@ dl() {
 	local url file pids files i=0
 	trap '
 	for ((i--; i >= 0; i--)); do
-		kill -9 ${pids[$i]} && rm -f "${files[$i]}"
+		kill -9 ${pids[$i]} &>/dev/null && rm -f "${files[$i]}"
 	done
 	trap - SIGINT
+	return
 	' SIGINT
 	while read -ep'URL: ' url && [[ -n $url ]]; do
 		file=$(sed -E 's:(\?|#).*::; s:.*/::' <<<"$url") || continue
