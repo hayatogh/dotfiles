@@ -675,6 +675,27 @@ let g:quickrun_config = {
 nma <Leader>j <Plug>(ale_next)
 nma <Leader>k <Plug>(ale_previous)
 nma <Leader>h <Plug>(ale_detail)
+nma <Leader>l <Plug>(ale_code_action)
+fu! s:ImplCAPat(pat, data, items)
+	if empty(a:items)
+		echo 'No code actions received from server'
+		return
+	endif
+	for [l:type, l:item] in a:items
+		if l:item.title =~# a:pat
+			call ale#codefix#ApplyLSPCodeAction(a:data, l:item)
+			return
+		endif
+	endfor
+	echo 'No "' .. a:pat .. '" code action'
+endfu
+fu! s:CAPat(pat)
+	call ale#codefix#Execute(mode() is# 'v' || mode() is# "\<C-V>", function('s:ImplCAPat', [a:pat]))
+endfu
+nno <Leader>i <Cmd>call <SID>CAPat('^Import')<CR>
+xma <Leader>i <Cmd>call <SID>CAPat('^Import')<CR>
+nno <Leader>q <Cmd>call <SID>CAPat('^Qualify')<CR>
+xma <Leader>q <Cmd>call <SID>CAPat('^Qualify')<CR>
 fu! s:ALEFixOnSaveToggle(vartype, value)
 	let l:new = a:value ==# -1 ? '!' .. get(eval(a:vartype .. ':'), 'ale_fix_on_save', 0) : a:value
 	exe 'let ' .. a:vartype .. ':ale_fix_on_save = ' .. l:new
