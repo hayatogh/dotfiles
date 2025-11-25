@@ -10,7 +10,7 @@ rpmt()
 
 rpmi()
 {
-	[[ $# -lt 3 ]] || return 1
+	[[ $# -eq 1 || $# -eq 2 ]] || return 1
 	local rpm=$1 base=${1##*/} pat tar
 	if [[ ${2:-} ]]; then
 		pat=$2

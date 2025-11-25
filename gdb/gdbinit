@@ -1,3 +1,7 @@
-set history save on
+set print pretty
+set print type hex
+set history save
+set history size 1024
+set history remove-duplicates 32
 set pagination off
-set print pretty on
+set output-radix 16
