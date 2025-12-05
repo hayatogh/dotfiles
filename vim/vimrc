@@ -149,7 +149,7 @@ nma ysa" ys2i"
 nma ysa` ys2i`
 
 nno <Esc>M <C-W>-
-nno <Esc>P <C-W>+
+nno <Esc>U <C-W>+
 
 cno <C-G> <C-\><C-N>
 ino <C-G> <C-\><C-N>

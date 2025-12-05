@@ -231,6 +231,22 @@ rm_rfchmod() {
 	find "$@" ! -perm -200 -type d -print0 | xargs -0 chmod 700
 	rm -rf "$@"
 }
+tcalc() {
+	# 1y == 365d 6h
+	# 1month == 30d 10h 30m
+	local rest="$*" tok exp_sec=
+	while [[ $rest ]]; do
+		[[ $rest =~ ([^-+*/]+|[-+*/] *) ]]
+		tok=${BASH_REMATCH[0]}
+		rest=${rest:${#BASH_REMATCH[0]}}
+		if [[ $tok =~ ^[-+*/] ]]; then
+			exp_sec="$exp_sec$tok "
+		else
+			exp_sec="$exp_sec$(timespan -- "$tok" | grep -Po '(?<=μs: )[0-9]+(?=000000)') "
+		fi
+	done
+	timespan -- $(($exp_sec)) | \grep -Po '(?<=(Original|Human): ).*'
+}
 
 if [[ $_uname == MSYS ]]; then
 	shopt -s completion_strip_exe
