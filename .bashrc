@@ -57,13 +57,14 @@ e() {
 	open &>/dev/null "${@:-.}"
 }
 tryssh() {
-	local sleeptime=5
-	[[ $# -eq 0 ]] && return 1
-	[[ $# -eq 2 ]] && sleeptime=$2
-	while printf .; do
-		ssh $1 true &>/dev/null && printf '\n' && break
-		sleep $sleeptime
+	[[ $# -eq 1 || $# -eq 2 ]] || return 1
+	local host=$1 interval=${2:-5} nl=''
+	while [[ ! $(ssh -o BatchMode=yes $host 2>&1) =~ 'Permission denied' ]]; do
+		nl='\n'
+		printf .
+		sleep $interval
 	done
+	printf "$nl"
 	ssh $1
 }
 mkcd() {
@@ -246,6 +247,13 @@ tcalc() {
 		fi
 	done
 	timespan -- $(($exp_sec)) | \grep -Po '(?<=(Original|Human): ).*'
+}
+loredl() {
+	[[ $# -eq 1 ]] || return 1
+	local link=$1 msgid url
+	msgid=$(grep -Po '[^/]+@[^/]+' <<<$link)
+	url=https://lore.kernel.org/all/$msgid/t.mbox.gz
+	curl -fsSLo "$msgid.mbox.gz" "$url"
 }
 
 if [[ $_uname == MSYS ]]; then

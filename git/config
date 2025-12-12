@@ -7,10 +7,11 @@
 	dc  = diff --word-diff-regex=.
 	dw  = diff --word-diff-regex='\\S+|[^\\S]'
 	ds  = diff --staged
-	dn  = !git -P diff --numstat
-	dt  = !git -P diff --stat
-	l   = log
-	lg  = log --graph --all --format=\"%x09%C(yellow nobold)%<(14,trunc)%H %C(cyan bold)%<(19,trunc)%an %Creset%s%C(magenta bold)%d\"
+	dn  = !git -P diff --numstat --stat
+	l   = log --abbrev-commit
+	lo  = log --abbrev-commit --pretty=oneline
+	lg  = log --graph --all --pretty=graphline
+	ft  = !git -P log -1 --pretty=fixes
 	g   = log -P --grep
 	g1  = log -P -n1 --grep
 	g2  = log -P -n2 --grep
@@ -20,11 +21,15 @@
 	cl  = !sh -c 'git clone $0 && cd $(basename $0 .git) && git status'
 	sc  = !sh -c 'git clone --depth 1 -- $0 && cd $(basename $0 .git) && git status'
 	scg = !sh -c 'git clone --depth 1 -- https://github.com/$0 && cd $(basename $0 .git) && git status'
-	b   = blame --abbrev=12
-	alias = "!git config --get-regexp 'alias\\..*' | awk '{ $1 = sprintf(\"%-7s =\", substr($1, 7)); print; }'"
+	b   = blame --abbrev=11
+	cp  = cherry-pick
+	r   = rebase
+	ri  = rebase -i
+	rc  = rebase --continue
+	rs  = rebase --skip
+	alias = "!git config --get-regexp 'alias\\..*' | awk '{ $1 = sprintf(\"%-7s =\", substr($1, 7)); print }'"
 	unstage = restore --staged
 	untrack = rm --cached
-	cp  = cherry-pick
 	implarhead = "!f() { d=$1; e=$2; f=$d.tar.$e; [ \"${3:-}\" = -f ] || [ ! -e $f ] && git archive -o $f --prefix=$d/ HEAD; }; f"
 	implarhash = "!git implarhead \"${PWD##*/}_$(git rev-parse HEAD | cut -b-12)\""
 	arz  = implarhash gz
@@ -35,6 +40,7 @@
 [checkout]
 	workers = 0
 [core]
+	abbrev = 12
 	autocrlf = false
 	safecrlf = false
 [diff]
@@ -52,6 +58,9 @@
 	keepBackup = false
 [pager]
 	diff = less -x9,17
+[pretty]
+	graphline = %x09%C(yellow nobold)%h %C(cyan bold)%<(19,trunc)%an %Creset%s%C(magenta bold)%d
+	fixes = Fixes: %h (\"%s\")
 [pull]
 	rebase = false
 [tar "tar.xz"]

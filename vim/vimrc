@@ -792,7 +792,8 @@ aug vimrc
 		\ 'surround-ms': {'pattern': ['【', '】'], 'select-a': 'ams', 'select-i': 'ims'},
 		\ })
 	au FileType c setl textwidth=80 cindent cinoptions=:0(s
-	au FileType git setl vartabstop=9,8 | let b:show_trailing_ws = 0
+	au FileType git setl vartabstop=9,8 textwidth=0 | let b:show_trailing_ws = 0
+	au FileType gitsendemail setl vartabstop=9,8 textwidth=75 | let b:show_trailing_ws = 0
 	au FileType help nno <buffer> <CR> <C-]>
 	au FileType html setl indentkeys=
 	au FileType info nma <buffer> gu <Plug>(InfoUp)
@@ -814,7 +815,8 @@ aug vimrc
 	au FileType sh setl isfname-== | call autocmd_add([#{bufnr: bufnr(), cmd: 'setl indentkeys-=)', event: 'BufEnter', once: v:true}])
 	au BufNewFile *.go,*.pl,*.py,*.sh call <SID>Template()
 	au BufNewFile,BufRead * if &ft ==# 'asm' | se ft=gas | endif
-	au BufNewFile,BufRead * if &ft ==# 'diff' | se ft=git textwidth=0 | endif
+	au BufNewFile,BufRead * if &ft ==# 'diff' | se ft=git | endif
+	au BufNewFile,BufRead * if &ft ==# 'mail' | se ft=gitsendemail | endif
 	au BufNewFile,BufRead */git/config,*.gitconfig se ft=gitconfig
 	au BufNewFile,BufRead */yapf/style se ft=cfg
 	au BufNewFile,BufRead dircolors se ft=dircolors
