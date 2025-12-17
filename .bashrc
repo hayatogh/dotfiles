@@ -255,6 +255,14 @@ loredl() {
 	url=https://lore.kernel.org/all/$msgid/t.mbox.gz
 	curl -fsSLo "$msgid.mbox.gz" "$url"
 }
+git_output() {
+	local cmd=${@:1:$#-1}
+	local hash=${@: -1}
+	if [[ ! " $cmd " =~ ' git ' ]]; then
+		cmd="git $cmd"
+	fi
+	$cmd show $hash >$hash.patch
+}
 
 if [[ $_uname == MSYS ]]; then
 	shopt -s completion_strip_exe
