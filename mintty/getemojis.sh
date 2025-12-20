@@ -9,4 +9,5 @@ mkdir emojis
 cd emojis
 
 curl -fsSLo getemojis https://github.com/mintty/mintty/raw/master/tools/getemojis
+chmod +x getemojis
 ./getemojis -d google

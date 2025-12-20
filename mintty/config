@@ -5,18 +5,18 @@ CursorBlinks=no
 # Text
 Font=Consolas
 FontHeight=12
-Emojis=windows
-#FontChoice=CJK:2
+Emojis=google
 #Font2=Noto Sans JP
+#FontChoice=CJK:2
 # Keys
 KeyAlphaMode=0
 # Mouse
 RightClickAction=extend
-MiddleClickAction=paste
 # Window
 Columns=106
 Rows=50
 RewrapOnResize=yes
+Scrollbar=None
 # Terminal
 Term=xterm-256color
 AllowSetSelection=true
