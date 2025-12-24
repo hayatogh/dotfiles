@@ -58,13 +58,17 @@ e() {
 }
 tryssh() {
 	[[ $# -eq 1 || $# -eq 2 ]] || return 1
-	local host=$1 interval=${2:-5} nl=''
-	while [[ ! $(ssh -o BatchMode=yes $host /bin/true 2>&1) =~ 'Permission denied' ]]; do
+	local host=$1 interval=${2:-5} m nl=''
+	while true; do
+		m=$(ssh -o BatchMode=yes $host /bin/true 2>&1)
+		if [[ $m == '' || $m =~ 'Permission denied' ]]; then
+			printf "$nl"
+			break
+		fi
 		nl='\n'
 		printf .
 		sleep $interval
 	done
-	printf "$nl"
 	ssh $1
 }
 mkcd() {
