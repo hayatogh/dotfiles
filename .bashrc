@@ -27,30 +27,18 @@ alias chgrp='chgrp --preserve-root'
 alias chmod='chmod --preserve-root'
 alias chown='chown --preserve-root'
 alias cp='cp -p'
-alias dus='du -chs'
 alias diff='diff --color=auto'
-alias diffr='git diff --no-index --histogram'
-alias diffl='diffr -U2147483647'
-alias diffc='diffl --word-diff-regex=.'
-alias diffw='diffl --word-diff-regex='\''\S+|[^\S]'\'''
 alias ee=exit
 alias fd='fd -HE.git/'
 alias fdall='fd -I'
-alias git_dotfiles_pull='git -C ~/dotfiles pull'
-alias git_empty_commit='git add -A && git commit -m '\''No commit message'\'' && git push'
 alias grep='grep --color=auto'
 alias info='info --init-file ~/dotfiles/infokey'
 alias ls='ls --color=auto'
-alias la='ls -AF'
-alias ll='ls -lhF'
-alias al='ls -alhF'
-alias lls='ls -alhFs'
-alias ltime='ls -alhrtF'
-alias lsize='ls -alhrFS'
+alias la='ls -A'
+alias ll='ls -alhF'
 alias manless='man -P less'
 alias rm='rm -i'
 alias scheme='scheme ~/dotfiles/chezrc.ss'
-alias timespan='systemd-analyze --user timespan'
 alias tm='tmux new -ADX'
 alias vi='vim --clean'
 e()
@@ -271,10 +259,10 @@ tcalc()
 		if [[ $tok =~ ^[-+*/] ]]; then
 			exp_sec="$exp_sec$tok "
 		else
-			exp_sec="$exp_sec$(timespan -- "$tok" | grep -Po '(?<=μs: )[0-9]+(?=000000)') "
+			exp_sec="$exp_sec$(systemd-analyze --user timespan -- "$tok" | grep -Po '(?<=μs: )[0-9]+(?=000000)') "
 		fi
 	done
-	timespan -- $(($exp_sec)) | \grep -Po '(?<=(Original|Human): ).*'
+	systemd-analyze --user timespan -- $(($exp_sec)) | \grep -Po '(?<=(Original|Human): ).*'
 }
 loredl()
 {
@@ -283,15 +271,6 @@ loredl()
 	msgid=$(grep -Po '[^/]+@[^/]+' <<<$link)
 	url=https://lore.kernel.org/all/$msgid/t.mbox.gz
 	curl -fsSLo "$msgid.mbox.gz" "$url"
-}
-git_output()
-{
-	local cmd=${@:1:$#-1}
-	local hash=${@: -1}
-	if [[ ! " $cmd " =~ ' git ' ]]; then
-		cmd="git $cmd"
-	fi
-	$cmd show $hash >$hash.patch
 }
 
 if [[ $_uname == MSYS ]]; then

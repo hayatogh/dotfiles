@@ -5,21 +5,37 @@
 	a   = add
 	c   = commit
 	d   = diff
-	dc  = diff --word-diff-regex=.
-	dw  = diff --word-diff-regex='\\S+|[^\\S]'
 	ds  = diff --staged
 	dn  = !git -P diff --numstat --stat
+	dc  = diff --word-diff-regex=.
+	dw  = diff --word-diff-regex='\\S+|[^\\S]'
+	impldiffnn = "!f() { git \"$@\" --no-index --no-prefix; }; f"
+	nd  = impldiffnn d
+	ndc = impldiffnn dc
+	ndw = impldiffnn dw
+	ndl = nd -U2147483647
 	l   = log --abbrev-commit
 	lo  = log --oneline
 	lg  = log --graph --all --pretty=graphline
-	ft  = !git -P log -1 --pretty=fixes
-	g   = log --abbrev-commit -P --grep
-	gw  = !sh -c 'git log --abbrev-commit -P --grep=\"\\b$0\\b\" \"$@\"'
-	gt  = "!f() { t=$(echo \"$*\" | sed -E 's/^ +//; s/ +$//'); git log --oneline | grep -P \"$t\"; }; f"
-	gf  = "!f() { t=$(echo \"$*\" | sed -E 's/^ +//; s/ +$//'); git log --oneline | grep -F \"$t\"; }; f"
-	cl  = !sh -c 'git clone $0 && cd $(basename $0 .git) && git status'
-	sc  = !sh -c 'git clone --depth 1 -- $0 && cd $(basename $0 .git) && git status'
-	scg = !sh -c 'git clone --depth 1 -- https://github.com/$0 && cd $(basename $0 .git) && git status'
+	l1  = !git -P l -1
+	ft  = l1 --pretty=fixes
+	g   = l -P --grep
+	gw  = "!f() { pat=$1; shift; git g \"\\b$pat\\b\" \"$@\"; }; f"
+	implgreptitle = !git lo | grep --color=auto
+	gt  = "!f() { git implgreptitle -P \"$*\"; }; f"
+	gti = "!f() { git implgreptitle -Pi \"$*\"; }; f"
+	implgreptrim = "!f() { \
+		opt=$1; shift; \
+		t=$*; \
+		t=${t#${t%%[![:space:]]*}}; \
+		t=${t%${t##*[![:space:]]}}; \
+		git implgreptitle \"$opt\" \"$t\"; \
+	}; f"
+	gf  = "!f() { git implgreptrim -F \"$*\"; }; f"
+	gfi = "!f() { git implgreptrim -Fi \"$*\"; }; f"
+	cl  = "!f() { git clone \"$@\" && cd $(basename $1 .git) && git status; }; f"
+	sc  = "!f() { git cl \"$@\" --depth 1; }; f"
+	scg = "!f() { path=$1; shift; git sc https://github.com/$path \"$@\"; }; f"
 	b   = blame --abbrev=11
 	cp  = cherry-pick
 	r   = rebase
@@ -29,13 +45,35 @@
 	alias = "!git config --get-regexp 'alias\\..*' | awk '{ $1 = sprintf(\"%-7s =\", substr($1, 7)); print }'"
 	unstage = restore --staged
 	untrack = rm --cached
-	implarhead = "!f() { d=$1; e=$2; f=$d.tar.$e; [ \"${3:-}\" = -f ] || [ ! -e $f ] && git archive -o $f --prefix=$d/ HEAD; }; f"
+	implarhead = "!f() { \
+		d=$1; e=$2; f=$d.tar.$e; \
+		if [ \"${3:-}\" = -f ] || [ ! -e $f ]; then \
+			git archive -o $f --prefix=$d/ HEAD; \
+		fi; \
+	}; f"
 	implarhash = "!git implarhead \"${PWD##*/}_$(git rev-parse HEAD | cut -b-12)\""
 	arz  = implarhash gz
 	arJ  = implarhash xz
 	implardate = "!git implarhead \"${PWD##*/}_$(date +%Y%m%d)\""
 	arzd = implardate gz
 	arJd = implardate xz
+	output = "!f() { \
+		cmd= hash=; \
+		for arg; do \
+			cmd=\"$cmd $hash\"; \
+			hash=$arg; \
+		done; \
+		case \" $cmd \" in \
+		*\" git \"*) ;; \
+		*) cmd=\"git $cmd\" ;; \
+		esac; \
+		$cmd show \"$hash\" >\"$hash.patch\"; \
+	}; f"
+	dotfilespull = !git -C ~/dotfiles pull
+	emptycommit = "!git add -A && git commit -m 'No commit message' \
+		&& if [ \"$(git rev-parse --show-toplevel)\" = ~/dotfiles ]; then \
+			git push; \
+		fi"
 [checkout]
 	workers = 0
 [core]

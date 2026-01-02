@@ -11,7 +11,7 @@ se clipboard=unnamed,unnamedplus
 se colorcolumn=+1
 se completeopt=menu,menuone,preview
 se cursorline
-se diffopt=filler,vertical,closeoff
+se diffopt=filler,vertical,closeoff,algorithm:histogram
 se display=lastline
 se fileencodings=ucs-bom,utf-8,default,euc-jp,cp932
 se fileformats=unix,dos
