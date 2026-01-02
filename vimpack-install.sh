@@ -25,13 +25,16 @@ plugs=(
 	# "gh:kchmck/vim-coffee-script"
 )
 
-to_url() {
+to_url()
+{
 	sed 's;^gh:;https://github.com/;' <<<$1
 }
-to_dir() {
+to_dir()
+{
 	echo $dest/${1##*/}
 }
-update() {
+update()
+{
 	local plug=$1 url dir ret
 	dir=$(to_dir $plug)
 
@@ -52,7 +55,8 @@ update() {
 		echo " Error($ret) $plug" >&2
 	fi
 }
-update_all() {
+update_all()
+{
 	local p
 
 	for p in "${plugs[@]:0:$njobs}"; do
@@ -64,7 +68,8 @@ update_all() {
 	done
 	wait
 }
-clean() {
+clean()
+{
 	local installed= p dir
 	for p in ${plugs[@]}; do
 		p=${p##*/}
@@ -80,11 +85,13 @@ clean() {
 		fi
 	done
 }
-helptags() {
+helptags()
+{
 	vim -i NONE --not-a-term '+helptags ALL' '+q' >/dev/null
 }
 
-main() {
+main()
+{
 	shopt -s nullglob
 	mkdir -p $dest
 	update_all

@@ -1,7 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
-_diffh() {
+_diffh()
+{
 	[[ $# -eq 3 ]] || return 1
 	local base='sed -E '\''s:.*/::'\'' <<<'
 	local root='sed -E '\''s:.*/::; s/(.+)\.[a-zA-Z0-9]+$/\1/'\'' <<<'
@@ -21,12 +22,14 @@ _diffh() {
 	_diffh_$backend
 }
 
-_diffh_d2hc() {
+_diffh_d2hc()
+{
 	[[ $l && $r && $title && $out ]] || return 255
 	git diff --no-index --histogram -U2147483647 -- "$l" "$r" \
 		| diff2html-cli -s side --su hidden -t "$title" -i stdin -o stdout | _d2hc_expand_links >"$out"
 }
-_d2hc_expand_links() {
+_d2hc_expand_links()
+{
 	local cachedir=~/.cache/diffh l href media cache
 	mkdir -p $cachedir
 	while read -r l; do
@@ -44,7 +47,8 @@ _d2hc_expand_links() {
 	done
 }
 
-_diffh_winmerge() {
+_diffh_winmerge()
+{
 	local winmerge='/mnt/c/Program Files/WinMerge/WinMergeU.exe'
 	[[ $bl && $br && $out && $l && $r ]] || return 255
 	"$winmerge" -noninteractive -dl "$bl" -dr "$br" -or "$out" "$(wslpath -w "$l")" "$(wslpath -w "$r")"

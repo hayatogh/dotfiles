@@ -53,10 +53,12 @@ alias scheme='scheme ~/dotfiles/chezrc.ss'
 alias timespan='systemd-analyze --user timespan'
 alias tm='tmux new -ADX'
 alias vi='vim --clean'
-e() {
+e()
+{
 	open &>/dev/null "${@:-.}"
 }
-tryssh() {
+tryssh()
+{
 	[[ $# -eq 1 || $# -eq 2 ]] || return 1
 	local host=$1 interval=${2:-5} m nl=''
 	while true; do
@@ -71,11 +73,13 @@ tryssh() {
 	done
 	ssh $1
 }
-mkcd() {
+mkcd()
+{
 	mkdir "$1"
 	cd "$1"
 }
-_regex_rubout() {
+_regex_rubout()
+{
 	local right=${READLINE_LINE:$READLINE_POINT}
 	local left=${READLINE_LINE::$READLINE_POINT}
 	[[ $left =~ $1 ]]
@@ -83,19 +87,23 @@ _regex_rubout() {
 	READLINE_LINE=$left$right
 	READLINE_POINT=${#left}
 }
-_cw() {
+_cw()
+{
 	_regex_rubout '([a-zA-Z0-9]+|[^ a-zA-Z0-9]+) *$'
 }
 bind -x '"\C-w": _cw'
 bind -x '"\eh": _cw'
-_mbackslash() {
+_mbackslash()
+{
 	_regex_rubout '([^ ;&|<>] *)*(;|&&|\|\||\||\|&|<|>|<<|>>|&>|>&)? *$'
 }
 bind -x '"\e\\": _mbackslash'
-cdd() {
+cdd()
+{
 	cd "$(dirname "$1")"
 }
-mktags() {
+mktags()
+{
 	if [[ -f Kbuild ]]; then
 		local arch=x86
 		if [[ ${1:-} =~ arm ]]; then
@@ -111,43 +119,55 @@ mktags() {
 		ctags "$@" &>/dev/null
 	fi
 }
-realwhich() {
+realwhich()
+{
 	realpath "$(which "$1")"
 }
-clean_history() {
+clean_history()
+{
 	[[ $# -eq 1 ]] || return 1
 	local pat=$1
 	perl -0777 -i -pe 's/^#\d+\n('"$pat"') *\n//gm' $HISTFILE
 }
-fix_history() {
+fix_history()
+{
 	perl -i -ne 'BEGIN { $sawtime = 0 } if (/^#/) { $sawtime = 1 } if ($sawtime) { print }' $HISTFILE
 }
-fixmod() {
+fixmod()
+{
 	find "$@" -maxdepth 0 -type d -print0 | xargs -0 chmod 755
 	find "$@" -maxdepth 0 -type f -print0 | xargs -0 chmod 644
 }
-rgall() {
+rgall()
+{
 	command rg --no-messages --hidden --no-ignore -g!tags -g!tags.x86 -g!tags.arm64 -g!.git/ "$@"
 }
-rg() {
+rg()
+{
 	rgall --ignore -g!/po/*.po -g!/Documentation/translations "$@"
 }
-_rg_arch() {
+_rg_arch()
+{
 	rg $(find arch/ -mindepth 1 -maxdepth 1 -type d -printf '-g!%f/ ' | sed -E 's:-g!('"$1"')/ ::') "${@:2}"
 }
-rgx() {
+rgx()
+{
 	_rg_arch x86 "$@"
 }
-rgarm() {
+rgarm()
+{
 	_rg_arch 'arm|arm64' "$@"
 }
-vl() {
+vl()
+{
 	vim $($1 -l "${@:2}")
 }
-vll() {
+vll()
+{
 	vim $("$@")
 }
-calc() {
+calc()
+{
 	perl -e '
 use strict;
 use bignum;
@@ -200,7 +220,8 @@ EOT
 }
 ' -- "$*"
 }
-dl() {
+dl()
+{
 	if (($#)); then
 		local IFS=$'\n'
 		dl <<<"$*"
@@ -227,16 +248,19 @@ dl() {
 	done
 	trap - SIGINT
 }
-sush() {
+sush()
+{
 	sudo -E --preserve-env=PATH,HOME $BASH --rcfile ~/.bash_profile
 }
 . ~/dotfiles/rpm-commands.sh
 alias diffh='~/dotfiles/diffh.sh d2hc'
-rm_rfchmod() {
+rm_rfchmod()
+{
 	find "$@" ! -perm -200 -type d -print0 | xargs -0 chmod 700
 	rm -rf "$@"
 }
-tcalc() {
+tcalc()
+{
 	# 1y == 365d 6h
 	# 1month == 30d 10h 30m
 	local rest="$*" tok exp_sec=
@@ -252,14 +276,16 @@ tcalc() {
 	done
 	timespan -- $(($exp_sec)) | \grep -Po '(?<=(Original|Human): ).*'
 }
-loredl() {
+loredl()
+{
 	[[ $# -eq 1 ]] || return 1
 	local link=$1 msgid url
 	msgid=$(grep -Po '[^/]+@[^/]+' <<<$link)
 	url=https://lore.kernel.org/all/$msgid/t.mbox.gz
 	curl -fsSLo "$msgid.mbox.gz" "$url"
 }
-git_output() {
+git_output()
+{
 	local cmd=${@:1:$#-1}
 	local hash=${@: -1}
 	if [[ ! " $cmd " =~ ' git ' ]]; then
@@ -272,10 +298,12 @@ if [[ $_uname == MSYS ]]; then
 	shopt -s completion_strip_exe
 	_pc2=$(sed -E 's/\$\(|\)/`/g' <<<$_pc2)
 	alias open=start
-	rg() {
+	rg()
+	{
 		command rg --hidden --path-separator // "$@"
 	}
-	upgrade() {
+	upgrade()
+	{
 		pacman -Syu --noconfirm
 		pacman -Qtdq | pacman -Rns --noconfirm - 2>/dev/null
 	}
@@ -286,7 +314,8 @@ elif [[ $_uname == WSL ]]; then
 fi
 if [[ $_distro == debian ]]; then
 	_pc2='${debian_chroot:+($debian_chroot)}'$_pc2
-	upgrade() {
+	upgrade()
+	{
 		sudo apt-get -qq update
 		sudo apt-get -y upgrade
 		sudo apt-get -qq autoremove
@@ -300,7 +329,8 @@ elif [[ $_distro =~ fedora|centos|rhel ]]; then
 	_source_r /usr/share/git-core/contrib/completion/git-prompt.sh
 fi
 
-l.() (
+l.()
+(
 	[[ $# -ne 0 ]] && cd "$1"; ls -dF .*
 )
 type _completion_loader &>/dev/null && ! _completion_loader ssh

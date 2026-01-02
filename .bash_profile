@@ -1,4 +1,5 @@
-pathadd() {
+pathadd()
+{
 	if [[ -d $1 && ! :$PATH: =~ :$1: ]]; then
 		PATH=$1:$PATH
 	fi
@@ -59,7 +60,8 @@ if [[ $_distro == debian ]]; then
 	export LESSCLOSE='/usr/bin/lesspipe %s %s'
 fi
 unset pathadd
-_source_r() {
+_source_r()
+{
 	[[ -r $1 ]] && . "$1"
 }
 export -f _source_r
