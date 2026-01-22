@@ -39,16 +39,7 @@ set visible-stats on
 "\eF": vi-char-search
 "\e;": vi-char-search
 "\e,": vi-char-search
-"\ec":
-"\ecc": insert-comment
-"\ec1": "\C-a\e1\eW\C-b\e\C-w"
-"\ec2": "\C-a\e2\eW\C-b\e\C-w"
-"\ec3": "\C-a\e3\eW\C-b\e\C-w"
-"\ec4": "\C-a\e4\eW\C-b\e\C-w"
-"\ec5": "\C-a\e5\eW\C-b\e\C-w"
-"\ec6": "\C-a\e6\eW\C-b\e\C-w"
-"\ec7": "\C-a\e7\eW\C-b\e\C-w"
-"\ec8": "\C-a\e8\eW\C-b\e\C-w"
+"\ec": insert-comment
 $if Bash
 	"\C-x\C-n": shell-expand-line
 	"\C-x\C-i": history-expand-line

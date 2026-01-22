@@ -26,15 +26,15 @@
 # 39 default background
 # 49 default foreground
 
-colors_and_formatting()
+colors_and_formattings()
 {
 	local clbg clfg attr
 	for clbg in {40..47} {100..107} 49; do
 		for clfg in {30..37} {90..97} 39; do
 			for attr in 0 1 2 3 4 5 7 9; do
-				printf "\e[${attr};${clbg};${clfg}m ^[${attr};${clbg};${clfg}m \e[0m"
+				printf "\e[$attr;$clbg;${clfg}m ^[$attr;$clbg;${clfg}m \e[0m"
 			done
-			printf "\n"
+			printf '\n'
 		done
 	done
 }
@@ -44,18 +44,18 @@ colors256()
 	local fgbg color
 	for fgbg in 38 48; do
 		for color in {0..255}; do
-			printf "\e[${fgbg};5;%sm  %3s  \e[0m" $color $color
+			printf "\e[$fgbg;5;${color}m  %3s  \e[0m" $color
 			if [[ $((($color + 1) % 6)) -eq 4 ]]; then
-				printf "\n"
+				printf '\n'
 			fi
 		done
-		printf "\n"
+		printf '\n'
 	done
 }
 
 if [[ $0 == ${BASH_SOURCE[0]} ]]; then
 	if [[ ${1:-} == format ]]; then
-		colors_and_formatting
+		colors_and_formattings
 	else
 		colors256
 	fi

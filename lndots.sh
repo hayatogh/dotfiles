@@ -10,7 +10,7 @@ case $(uname -sr) in
 esac
 
 tohome=".bash_profile .bashrc"
-toconfig="gdb git gitui gtk-3.0/gtk.css lessfilter tmux vim/vimrc yapf"
+toconfig="gdb git gitui gtk-3.0/gtk.css lessfilter tmux vim/vimrc"
 
 mkdir -p ~/.ssh ~/.config/vim/swap
 chmod 700 ~/.ssh ~/.config/vim/swap

@@ -36,10 +36,10 @@ fi
 
 export _uname
 case $(uname -sr) in
-	*icrosoft*) _uname=WSL;;
-	*Linux*) _uname=Linux;;
-	*_NT*) _uname=MSYS;;
-	*) _uname=Other;;
+*icrosoft*) _uname=WSL;;
+*Linux*) _uname=Linux;;
+*_NT*) _uname=MSYS;;
+*) _uname=Other;;
 esac
 export _distro=$(grep -Po '(?<=^ID=).*$' /etc/os-release 2>/dev/null || true)
 

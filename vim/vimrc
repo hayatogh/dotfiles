@@ -722,7 +722,7 @@ let g:ale_linters = {
 	\ 'mail'      : ['vale'],
 	\ 'markdown'  : ['vale'],
 	\ 'ocaml'     : ['ocamllsp'],
-	\ 'python'    : ['pylsp'],
+	\ 'python'    : ['ruff'],
 	\ 'rst'       : ['vale'],
 	\ 'rust'      : ['analyzer', 'cargo'],
 	\ 'sh'        : [],
@@ -735,13 +735,14 @@ let g:ale_fixers = {
 	"\ 'cpp'       : ['clang-format'],
 	\ 'go'        : ['gofmt', 'goimports'],
 	\ 'ocaml'     : ['ocamlformat'],
-	\ 'python'    : ['isort', 'yapf'],
+	\ 'python'    : ['ruff_format'],
 	\ 'rust'      : ['rustfmt'],
 	\ 'typescript': [],
 	\ }
 let g:ale_c_clangformat_style_option = '-n'
 let g:ale_c_clangformat_use_local_file = 1
 let g:ale_rust_cargo_use_clippy = executable('cargo-clippy')
+let g:ale_python_ruff_format_options = '--config "format.quote-style = \"single\""'
 let g:ale_completion_enabled = 1
 let g:ale_fix_on_save = 1
 let g:ale_hover_cursor = 0
@@ -818,7 +819,6 @@ aug vimrc
 	au BufNewFile,BufRead * if &ft ==# 'diff' | se ft=git | endif
 	au BufNewFile,BufRead * if &ft ==# 'mail' | se ft=gitsendemail | endif
 	au BufNewFile,BufRead */git/config,*.gitconfig se ft=gitconfig
-	au BufNewFile,BufRead */yapf/style se ft=cfg
 	au BufNewFile,BufRead dircolors se ft=dircolors
 	au BufReadPost * call <SID>GoToLastLine()
 	au StdinReadPost * se nomodified

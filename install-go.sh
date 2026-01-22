@@ -2,16 +2,9 @@
 set -euo pipefail
 
 case $(uname -m) in
-x86_64)
-	arch=amd64
-	;;
-aarch64)
-	arch=arm64
-	;;
-*)
-	echo 'Unknown arch.'
-	exit 1
-	;;
+x86_64) arch=amd64;;
+aarch64) arch=arm64;;
+*) echo 'Unknown arch.'; exit 1;;
 esac
 ver=$(curl -fsS https://go.dev/dl/ | grep -Po '(?<=/dl/go)[0-9.]+(?=\.linux-'$arch'\.tar\.gz)' | head -n1)
 url=https://golang.org/dl/go$ver.linux-$arch.tar.gz
