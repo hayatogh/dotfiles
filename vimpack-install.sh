@@ -14,7 +14,7 @@ plugs=(
 	"gh:HiPhish/info.vim"
 	"gh:thinca/vim-quickrun"
 	# libraries
-	"gh:kana/vim-operator-user"
+	# "gh:kana/vim-operator-user"
 	"gh:kana/vim-textobj-indent"
 	"gh:kana/vim-textobj-user"
 	"gh:hayatogh/vim-bash-completion"
@@ -79,8 +79,9 @@ clean()
 	installed=${installed%|}
 
 	for dir in $dest/*; do
-		dir=${dir##*/}
-		if [[ ! $dir =~ $installed ]]; then
+		p=${dir##*/}
+		if [[ ! $p =~ $installed ]]; then
+			echo "Clean $p" >&2
 			rm -rf $dir
 		fi
 	done
