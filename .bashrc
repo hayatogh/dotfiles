@@ -212,7 +212,7 @@ dl()
 {
 	if (($#)); then
 		local IFS=$'\n'
-		dl <<<"$*"
+		$FUNCNAME <<<"$*"
 		return
 	fi
 	local url file pids files i=0
@@ -247,22 +247,28 @@ rm_rfchmod()
 	find "$@" ! -perm -200 -type d -print0 | xargs -0 chmod 700
 	rm -rf "$@"
 }
-tcalc()
+timesp()
 {
+	if (($#)); then
+		$FUNCNAME <<<"$*"
+		return
+	fi
 	# 1y == 365d 6h
 	# 1month == 30d 10h 30m
-	local rest="$*" tok exp_sec=
-	while [[ $rest ]]; do
-		[[ $rest =~ ([^-+*/]+|[-+*/] *) ]]
-		tok=${BASH_REMATCH[0]}
-		rest=${rest:${#BASH_REMATCH[0]}}
-		if [[ $tok =~ ^[-+*/] ]]; then
-			exp_sec="$exp_sec$tok "
-		else
-			exp_sec="$exp_sec$(systemd-analyze --user timespan -- "$tok" | grep -Po '(?<=μs: )[0-9]+(?=000000)') "
-		fi
+	local rest tok exp_sec=
+	while read -e rest && [[ -n $rest ]]; do
+		while [[ $rest ]]; do
+			[[ $rest =~ ([^-+*/]+|[-+*/] *) ]]
+			tok=${BASH_REMATCH[0]}
+			rest=${rest:${#BASH_REMATCH[0]}}
+			if [[ $tok =~ ^[-+*/] ]]; then
+				exp_sec="$exp_sec$tok "
+			else
+				exp_sec="$exp_sec$(systemd-analyze --user timespan -- "$tok" | grep -Po '(?<=μs: )[0-9]+(?=000000)') "
+			fi
+		done
+		systemd-analyze --user timespan -- $(($exp_sec)) | \grep -Po '(?<=(Original|Human): ).*'
 	done
-	systemd-analyze --user timespan -- $(($exp_sec)) | \grep -Po '(?<=(Original|Human): ).*'
 }
 loredl()
 {

@@ -3,10 +3,10 @@ set -euo pipefail
 
 dotfiles=$(cd $(dirname $0); pwd -P)
 case $(uname -sr) in
-	*icrosoft*) _uname=WSL;;
-	*Linux*) _uname=Linux;;
-	*_NT*) _uname=MSYS;;
-	*) _uname=Other;;
+*icrosoft*) _uname=WSL;;
+*Linux*) _uname=Linux;;
+*_NT*) _uname=MSYS;;
+*) _uname=Other;;
 esac
 
 tohome=".bash_profile .bashrc"
