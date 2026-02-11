@@ -21,7 +21,7 @@ se formatoptions+=mBj
 se guicursor=a:blinkon0
 se helplang=Ja,En
 se history=1000
-se smartindent autoindent
+se autoindent
 se keywordprg=:Man
 se lispwords-=if
 se list listchars=tab:»-,extends:»,precedes:«,nbsp:◦
@@ -469,6 +469,55 @@ fu! s:OpenEmpty()
 endfu
 nno <silent> go <Cmd>call <SID>OpenEmpty()<CR>o<Cmd>call <SID>OpenEmpty()<CR>
 
+fu! s:Command(env, reuse, focus, close, exit_cb, arg)
+	let l:cmd = '/bin/bash -ic "' .. join(a:arg) .. '"'
+	let l:opt = {'term_rows': &lines / 4, 'term_cols': &columns - 7, 'term_kill': 'term', 'env': a:env}
+	if a:close
+		let l:opt['term_finish'] = 'close'
+	endif
+	if !empty(a:exit_cb)
+		let l:opt['exit_cb'] = a:exit_cb
+	endif
+	if a:reuse
+		let l:n = bufnr('!' .. l:cmd)
+		if l:n !=# -1
+			exe 'bdelete ' .. l:n
+		endif
+	endif
+	call term_start(l:cmd, l:opt)
+	if !a:focus
+		winc p
+	endif
+endfu
+fu! s:BashComp(ArgLead, CmdLine, CursorPos)
+	return g:bash#complete(substitute(strpart(a:CmdLine, 0, a:CursorPos), '^\s*\a\+ ', '', ''))
+endfu
+fu! s:GitComp(ArgLead, CmdLine, CursorPos)
+	return g:bash#complete(substitute(strpart(a:CmdLine, 0, a:CursorPos), '^\s*\a\+ ', 'git ', ''))
+endfu
+fu! s:MakeComp(ArgLead, CmdLine, CursorPos)
+	return g:bash#complete(substitute(strpart(a:CmdLine, 0, a:CursorPos), '^\s*\a\+ ', 'make ', ''))
+endfu
+com! -nargs=* -complete=customlist,<SID>BashComp S call <SID>Command({}, 0, 0, 0, '', [<f-args>])
+com! -nargs=* -complete=customlist,<SID>BashComp I call <SID>Command({}, 0, 1, 1, '', [<f-args>])
+com! -nargs=* -complete=customlist,<SID>GitComp Git call <SID>Command({'GIT_PAGER': ''}, 1, 1, 0, '', ['git', <f-args>])
+com! -nargs=* -complete=customlist,<SID>GitComp Gitpager call <SID>Command({}, 1, 1, 0, '', ['git', <f-args>])
+com! -nargs=* -complete=customlist,<SID>MakeComp Make call <SID>Command({}, 1, 0, 0, '', ['make', <f-args>])
+nno <Leader>m <Cmd>Make<CR>
+
+fu! s:TempExecute(env, arg)
+	let l:tempbuf = tempname()
+	call writefile(getline(1, line('$')), l:tempbuf)
+	call map(a:arg, 'substitute(v:val, ''TEMPBUF'', ''' .. l:tempbuf .. ''', ''g'')')
+	let l:cleanup = 'call delete(''' .. l:tempbuf .. ''')'
+	if join(a:arg) =~# 'TEMPOUT'
+		let l:tempout = tempname()
+		call map(a:arg, 'substitute(v:val, ''TEMPOUT'', ''' .. l:tempout .. ''', ''g'')')
+		let l:cleanup ..= ' | call delete(''' .. l:tempout .. ''')'
+	endif
+	call <SID>Command(a:env, 1, 0, 0, {-> execute(l:cleanup)}, a:arg)
+endfu
+
 " excommand
 com! DiffOrig vert new | se bt=nofile | r ++edit # | 0d_ | difft | winc p | difft
 com! Hitest ru syntax/hitest.vim
@@ -517,40 +566,12 @@ fu! s:Nkf()
 endfu
 com! -nargs=0 Nkf call <SID>Nkf()
 
-fu! s:Command(env, reuse, focus, close, arg)
-	let l:cmd = '/bin/bash -ic "' .. join(a:arg) .. '"'
-	let l:opt = {'term_rows': &lines / 4, 'term_cols': &columns - 7, 'term_kill': 'term', 'env': a:env}
-	if a:close
-		let l:opt['term_finish'] = 'close'
-	endif
-	if a:reuse
-		let l:n = bufnr('!' .. l:cmd)
-		if l:n !=# -1
-			exe 'bdelete ' .. l:n
-		endif
-	endif
-	call term_start(l:cmd, l:opt)
-	if !a:focus
-		winc p
-	endif
-endfu
-fu! s:BashComp(ArgLead, CmdLine, CursorPos)
-	return g:bash#complete(substitute(strpart(a:CmdLine, 0, a:CursorPos), '^\s*\a\+ ', '', ''))
-endfu
-fu! s:GitComp(ArgLead, CmdLine, CursorPos)
-	return g:bash#complete(substitute(strpart(a:CmdLine, 0, a:CursorPos), '^\s*\a\+ ', 'git ', ''))
-endfu
-com! -nargs=* -complete=customlist,<SID>BashComp S call <SID>Command({}, 0, 0, 0, [<f-args>])
-com! -nargs=* -complete=customlist,<SID>BashComp I call <SID>Command({}, 0, 1, 1, [<f-args>])
-com! -nargs=* -complete=customlist,<SID>GitComp Git call <SID>Command({'GIT_PAGER': ''}, 1, 1, 0, ['git', <f-args>])
-com! -nargs=* -complete=customlist,<SID>GitComp Gitpager call <SID>Command({}, 1, 1, 0, ['git', <f-args>])
-
 let s:template = {
 	\ 'c'     : ['#include <stdio.h>', '', 'int main(void)', '{', '	printf("Hello\n");', '	return 0;', '}'],
 	\ 'go'    : ['package main', '', 'import "fmt"', '', 'func main() {', '	fmt.Println("Hello")', '}'],
 	\ 'perl'  : ['#!/usr/bin/perl', 'use strict;', 'use warnings;'],
 	\ 'python': '#!/usr/bin/env python3',
-	\ 'sh'    : ['#!/bin/bash', 'set -euxo pipefail'],
+	\ 'sh'    : ['#!/bin/bash', 'set -euxo pipefail', 'shopt -s inherit_errexit'],
 	\ }
 let s:template_after = {
 	\ 'c' : 'call cursor(5, 2)',
@@ -655,22 +676,6 @@ pa! termdebug
 pa! editorconfig
 ru ftplugin/man.vim
 
-" quickrun
-nma <Leader>r <Plug>(quickrun)
-let g:quickrun_config = {
-	\ 'python': {
-	\   'command': 'python3',
-	\ },
-	\ 'scheme': {
-	\   'command': 'chezscheme',
-	\   'exec': '%c --script %s',
-	\ },
-	\ '_': {
-	\   'outputter/buffer/opener': 'botright new',
-	\   'outputter/buffer/close_on_empty': 1,
-	\   'runner': 'terminal',
-	\ },
-	\ }
 " ale
 nma <Leader>j <Plug>(ale_next)
 nma <Leader>k <Plug>(ale_previous)
@@ -793,10 +798,13 @@ aug vimrc
 		\ 'surround-ms': {'pattern': ['【', '】'], 'select-a': 'ams', 'select-i': 'ims'},
 		\ })
 	au FileType c setl textwidth=80 cindent cinoptions=:0(s
+	au FileType c nno <buffer> <Leader>r <Cmd>call <SID>TempExecute({}, ['cc', '-oTEMPOUT', '-xc', 'TEMPBUF', '&&', 'TEMPOUT'])<CR>
+	au FileType dune setl lispoptions=expr:1 indentexpr=lispindent('.')
 	au FileType git setl vartabstop=9,8 textwidth=0 | let b:show_trailing_ws = 0
 	au FileType gitsendemail setl vartabstop=9,8 textwidth=75 | let b:show_trailing_ws = 0
 	au FileType help nno <buffer> <CR> <C-]>
-	au FileType html setl indentkeys=
+	au FileType html setl expandtab shiftwidth=2
+	au FileType html ino <buffer> <Tab> <C-V><Tab>
 	au FileType info nma <buffer> gu <Plug>(InfoUp)
 	au FileType info nma <buffer> gn <Plug>(InfoNext)
 	au FileType info nma <buffer> gp <Plug>(InfoPrev)
@@ -804,16 +812,26 @@ aug vimrc
 	au FileType info nma <buffer> gf <Plug>(InfoFollow)
 	au FileType info nma <buffer> go <Plug>(InfoGoto)
 	au FileType java setl cindent cinoptions=(sJ1j1
+	au FileType lisp setl lispoptions=expr:1 indentexpr=lispindent('.')
 	au FileType man nno <buffer> <silent> q :q<CR>
-	au FileType markdown setl tabstop=8
+	au FileType man nma <buffer> <silent> <CR> <C-]>
+	au FileType markdown setl softtabstop=0 tabstop=8
+	au FileType markdown ino <buffer> <Tab> <C-V><Tab>
 	au FileType php setl matchpairs-=<:>
 	au FileType ps1 setl expandtab shiftwidth=2
-	au FileType rust setl softtabstop=0 textwidth=100
+	au FileType python let b:tempexecute_cmd = executable('uv') ? 'uv run -s' : 'python3'
+	au FileType python nno <buffer> <Leader>r <Cmd>call <SID>TempExecute({}, [b:tempexecute_cmd, 'TEMPBUF'])<CR>
+	au FileType rust setl textwidth=100
 	au FileType rust nno <buffer> <Leader>t <Cmd>call <SID>Command({}, 1, 0, 0, ['cargo', 'test'])<CR>
-	au FileType rust nno <buffer> <Leader>u <Cmd>call <SID>Command({}, 1, 0, 0, ['cargo', 'run'])<CR>
-	au FileType scheme setl expandtab shiftwidth=2 lispwords+=syntax-case,with-syntax
-	au FileType scheme ino <expr> <buffer> <C-F> empty(getline('.')) ? "<C-O>cc" : "<C-O>=="
-	au FileType sh setl isfname-== | call autocmd_add([#{bufnr: bufnr(), cmd: 'setl indentkeys-=)', event: 'BufEnter', once: v:true}])
+	au FileType rust nno <buffer> <Leader>r <Cmd>call <SID>Command({}, 1, 0, 0, ['cargo', 'run'])<CR>
+	au FileType scheme setl expandtab shiftwidth=2 lispwords+=syntax-case,with-syntax lispoptions=expr:1 indentexpr=lispindent('.')
+	au FileType scheme nno <buffer> <Leader>r <Cmd>call <SID>TempExecute({}, ['chezscheme', '--script', 'TEMPBUF'])<CR>
+	au FileType sh setl isfname-== | let b:sh_indent_options = {'case-labels': 0}
+	au FileType sh nno <buffer> <Leader>r <Cmd>call <SID>TempExecute({}, ['bash', 'TEMPBUF'])<CR>
+	au FileType text setl expandtab
+	au FileType text ino <buffer> <Tab> <C-V><Tab>
+	au FileType xml setl expandtab shiftwidth=2
+	au FileType xml ino <buffer> <Tab> <C-V><Tab>
 	au BufNewFile *.go,*.pl,*.py,*.sh call <SID>Template()
 	au BufNewFile,BufRead * if &ft ==# 'asm' | se ft=gas | endif
 	au BufNewFile,BufRead * if &ft ==# 'diff' | se ft=git | endif

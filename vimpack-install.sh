@@ -12,7 +12,6 @@ plugs=(
 	# external commands
 	"gh:dense-analysis/ale"
 	"gh:HiPhish/info.vim"
-	"gh:thinca/vim-quickrun"
 	# libraries
 	# "gh:kana/vim-operator-user"
 	"gh:kana/vim-textobj-indent"
