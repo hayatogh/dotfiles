@@ -15,7 +15,6 @@ cd $prefix/src
 rm -rf vim
 git clone --depth 1 -- https://github.com/vim/vim &>/dev/null
 cd vim/src
-./configure --prefix=$prefix &>/dev/null
-sed -Ei 's/install-languages|install-tool-languages//' auto/config.mk
-make -j4 &>/dev/null
+./configure --prefix=$prefix --disable-nls &>/dev/null
+make -j$(nproc) &>/dev/null
 make install &>/dev/null

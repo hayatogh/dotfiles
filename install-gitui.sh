@@ -1,15 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-prefix=/usr/local
-if [[ ${1:-} == -l ]]; then
-	prefix=~/.local
-fi
-
-if [[ ${1:-} != -n && $EUID != 0 && $prefix == /usr/local ]]; then
-	exec sudo "$0" "$@"
-fi
-
+prefix=~/.local
 arch=$(uname -m)
 ver=$(curl -fsSL https://api.github.com/repos/extrawurst/gitui/releases/latest | grep -Po '(?<="tag_name": "v)([0-9.]+)(?=",)' | head -n1)
 fname=gitui-linux-$arch.tar.gz

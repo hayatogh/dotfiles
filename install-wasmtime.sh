@@ -1,15 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-prefix=/usr/local
-if [[ ${1:-} == -l ]]; then
-	prefix=~/.local
-fi
-
-if [[ ${1:-} != -n && $EUID != 0 && $prefix == /usr/local ]]; then
-	exec sudo "$0" "$@"
-fi
-
+prefix=~/.local
 arch=$(uname -m)
 dir=wasmtime-dev-$arch-linux
 fname=$dir.tar.xz

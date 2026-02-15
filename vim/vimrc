@@ -63,19 +63,23 @@ se statusline=%{%Statusline()%}
 se showtabline=2
 fu! s:Tablabel(tabpagenr)
 	let l:buflist = tabpagebuflist(a:tabpagenr)
-	let l:curbufnr = l:buflist[tabpagewinnr(a:tabpagenr) - 1]
-	let l:hi = a:tabpagenr ==# tabpagenr() ? '%#TabLineSel#' : '%#TabLine#'
 	let l:no = len(l:buflist) ==# 1 ? '' : len(l:buflist)
 	let l:mod = len(filter(copy(l:buflist), 'getbufvar(v:val, "&modified")')) ? '+' : ''
-	let l:sp = (l:no .. l:mod) ==# '' ? '' : ' '
-	let l:fname = fnamemodify(bufname(l:curbufnr), ':t')
-	let l:fname = l:fname ==# '' ? '_' : l:fname
-	return '%' .. a:tabpagenr .. 'T%#Title#' .. l:no .. l:hi .. l:mod .. l:sp .. l:fname .. '%#TabLineFill#'
+	return '%'
+		\ .. a:tabpagenr
+		\ .. 'T%#Title#'
+		\ .. l:no
+		\ .. (a:tabpagenr ==# tabpagenr() ? '%#TabLineSel#' : '%#TabLine#')
+		\ .. l:mod
+		\ .. ((l:no .. l:mod) ==# '' ? '' : ' ')
+		\ .. (fnamemodify(bufname(l:buflist[tabpagewinnr(a:tabpagenr) - 1]), ':t') ?? '_')
+		\ .. '%#TabLineFill#'
 endfu
 fu! g:Cuitabline()
-	let l:tablabels = join(map(range(1, tabpagenr('$')), '<SID>Tablabel(v:val)'), ' ')
-	let l:info = '%#TabLine#%<' .. fnamemodify(getcwd(), ':~') .. ' '
-	return l:tablabels .. ' %T%=' .. l:info
+	return join(map(range(1, tabpagenr('$')), '<SID>Tablabel(v:val)'), ' ')
+		\ .. ' %T%=%#TabLine#%<'
+		\ .. fnamemodify(getcwd(), ':~')
+		\ .. ' '
 endfu
 se tabline=%!g:Cuitabline()
 se noexpandtab shiftwidth=0 tabstop=8

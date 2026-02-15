@@ -40,7 +40,7 @@ update()
 	if [[ -d $dir ]]; then
 		echo "Fetch $plug" >&2
 		timeout 10 git -C $dir fetch --depth 1 &>/dev/null \
-			&& git -C $dir reset --hard &>/dev/null
+			&& git -C $dir reset --hard origin &>/dev/null
 		ret=$?
 	else
 		echo "Clone $plug" >&2
