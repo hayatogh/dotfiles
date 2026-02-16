@@ -178,7 +178,7 @@ cno <C-A> <Home>
 
 fu! s:FixWhitespace(line1, line2)
 	let l:save_cursor = getcurpos()
-	sil! exe 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\\\@<!\s\+$//'
+	sil! exe 'keepp ' .. a:line1 .. ',' .. a:line2 .. 's/\\\@<!\s\+$//'
 	call setpos('.', l:save_cursor)
 endfu
 com! -range=% FixWhitespace call <SID>FixWhitespace(<line1>, <line2>)
@@ -414,7 +414,7 @@ fu! s:Spacing(line1, line2)
 	let l:a = '[[:graph:]]'
 	let l:m = '[^ [:graph:][:cntrl:]]'
 	let l:k = '[、。]'
-	let l:s = 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v'
+	let l:s = 'keepp ' .. a:line1 .. ',' .. a:line2 .. 's/\v'
 
 	sil! exe l:s..'('..l:a..'+) +\ze'..l:a..'/\1 /g'
 	sil! exe l:s..'('..l:a..'+) *\ze'..l:m..'/\1 /g'
@@ -436,7 +436,7 @@ vno <silent> <Leader>s :call <SID>Spacing('''<', '''>')<CR>
 fu! s:UnSpacing(line1, line2)
 	let l:a = '[[:graph:]]'
 	let l:m = '[^ [:graph:][:cntrl:]]'
-	let l:s = 'keeppatterns ' .. a:line1 .. ',' .. a:line2 .. 's/\v'
+	let l:s = 'keepp ' .. a:line1 .. ',' .. a:line2 .. 's/\v'
 
 	sil! exe l:s..'('..l:a..'+) +\ze'..l:a..'/\1 /g'
 
@@ -603,6 +603,22 @@ endfu
 com! -range Sort call <SID>Sort(' ')
 com! -range SortComma call <SID>Sort(', ')
 com! -nargs=1 -range SortSep call <SID>Sort(<f-args>)
+
+fu! s:Manbuiltin(arg)
+	let g:A = '--' .. a:arg .. '--'
+	if a:arg =~# '\v^(alias|bg|bind|break|builtin|case|cd|command|compgen|complete|continue|declare|dirs|disown|echo|enable|eval|exec|exit|export|fc|fg|getopts|hash|help|history|if|jobs|kill|let|local|logout|popd|printf|pushd|pwd|read|readonly|return|set|shift|shopt|source|suspend|test|times|trap|type|typeset|ulimit|umask|unalias|unset|until|wait|while)$'
+		exe 'Man builtins'
+		setl modifiable
+		keepj %d _
+		sil! exe 'r !help ' .. a:arg
+		keepj 1d _
+		FixWhitespace
+		setl nomodifiable
+	else
+		exe 'Man ' .. a:arg
+	endif
+endfu
+com! -nargs=1 Manbuiltin call <SID>Manbuiltin(trim(<f-args>))
 
 " autocommand
 let s:show_trailing_ws = 1
@@ -830,7 +846,7 @@ aug vimrc
 	au FileType rust nno <buffer> <Leader>r <Cmd>call <SID>Command({}, 1, 0, 0, ['cargo', 'run'])<CR>
 	au FileType scheme setl expandtab shiftwidth=2 lispwords+=syntax-case,with-syntax lispoptions=expr:1 indentexpr=lispindent('.')
 	au FileType scheme nno <buffer> <Leader>r <Cmd>call <SID>TempExecute({}, ['chezscheme', '--script', 'TEMPBUF'])<CR>
-	au FileType sh setl isfname-== | let b:sh_indent_options = {'case-labels': 0}
+	au FileType sh setl isfname-== keywordprg=:Manbuiltin | let b:sh_indent_options = {'case-labels': 0}
 	au FileType sh nno <buffer> <Leader>r <Cmd>call <SID>TempExecute({}, ['bash', 'TEMPBUF'])<CR>
 	au FileType text setl expandtab
 	au FileType text ino <buffer> <Tab> <C-V><Tab>

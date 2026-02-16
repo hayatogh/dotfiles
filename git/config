@@ -18,7 +18,7 @@
 	lo  = log --oneline
 	lg  = log --graph --all --pretty=graphline
 	l1  = !git -P l -1
-	ft  = l1 --pretty=fixes
+	fixestag = l1 --pretty=fixes
 	g   = l -P --grep
 	gw  = "!f() { pat=$1; shift; git g \"\\b$pat\\b\" \"$@\"; }; f"
 	implgreptitle = !git lo | grep --color=auto
@@ -37,6 +37,8 @@
 	sc  = "!f() { git cl \"$@\" --depth 1; }; f"
 	scg = "!f() { path=$1; shift; git sc https://github.com/$path \"$@\"; }; f"
 	b   = blame --abbrev=11
+	bm  = b -M
+	bc  = b -C
 	cp  = cherry-pick
 	r   = rebase
 	ri  = rebase -i
