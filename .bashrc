@@ -316,10 +316,13 @@ fi
 
 l.()
 (
-	[[ $# -ne 0 ]] && cd "$1"; ls -dF .*
+	[[ $# -ne 0 ]] && cd "$1"
+	ls -dF .*
 )
-type _completion_loader &>/dev/null && ! _completion_loader ssh
-complete -F _comp_cmd_ssh tryssh
+if type _comp_load &>/dev/null; then
+	_comp_load -D -- ssh
+	complete -F _comp_cmd_ssh tryssh
+fi
 complete -c realwhich
 PROMPT_COMMAND=$_pc0"; __git_ps1 '"$_pc1$_pc2"' '"$_pc3"'"
 if ! type __git_ps1 &>/dev/null; then

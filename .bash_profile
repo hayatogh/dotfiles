@@ -1,22 +1,23 @@
-pathadd()
+_pathadd()
 {
 	if [[ -d $1 && ! :$PATH: =~ :$1: ]]; then
 		PATH=$1:$PATH
 	fi
 }
-pathadd /usr/sbin
-pathadd /usr/local/sbin
-pathadd ~/.local/bin
-pathadd ~/.cargo/bin
+export -f _pathadd
+_pathadd /usr/sbin
+_pathadd /usr/local/sbin
+_pathadd ~/.local/bin
+_pathadd ~/.cargo/bin
 export GOROOT=~/.goroot
 export GOPATH=~/.gopath
-pathadd $GOROOT/bin
-pathadd $GOPATH/bin
+_pathadd $GOROOT/bin
+_pathadd $GOPATH/bin
 export WASMTIME_HOME=~/.wasmtime
-pathadd $WASMTIME_HOME/bin
-pathadd ~/.npm/bin
+_pathadd $WASMTIME_HOME/bin
+_pathadd ~/.npm/bin
 export DENO_INSTALL=~/.deno
-pathadd $DENO_INSTALL/bin
+_pathadd $DENO_INSTALL/bin
 export DISPLAY
 # export FZF_DEFAULT_COMMAND='fd -tf -HILE.git'
 # export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --color='\''hl:9,hl+:9,spinner:16'\'
@@ -45,12 +46,12 @@ export _distro=$(grep -Po '(?<=^ID=).*$' /etc/os-release 2>/dev/null || true)
 
 if [[ $_uname == MSYS ]]; then
 	export LANG=$(locale -uU)
-	pathadd /c/Users/$USER/AppData/Local/Microsoft/WinGet/Links
-	pathadd /c/Users/$USER/.cargo/bin
+	_pathadd /c/Users/$USER/AppData/Local/Microsoft/WinGet/Links
+	_pathadd /c/Users/$USER/.cargo/bin
 	GOROOT=/c/Go
 	GOPATH=/c/Users/$USER/go
-	pathadd $GOROOT/bin
-	pathadd $GOPATH/bin
+	_pathadd $GOROOT/bin
+	_pathadd $GOPATH/bin
 	export MSYS=winsymlinks:nativestrict
 elif [[ $_uname == WSL ]]; then
 	LC_CTYPE=en_US.UTF-8
@@ -59,7 +60,6 @@ if [[ $_distro == debian ]]; then
 	export LESSOPEN='| /usr/bin/lesspipe %s'
 	export LESSCLOSE='/usr/bin/lesspipe %s %s'
 fi
-unset pathadd
 _source_r()
 {
 	[[ -r $1 ]] && . "$1"
