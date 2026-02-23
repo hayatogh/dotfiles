@@ -1,4 +1,8 @@
 #!/bin/bash
+shopt -s nullglob
+export GIT_TERMINAL_PROMPT=0
+export GIT_HTTP_LOW_SPEED_LIMIT=1000
+export GIT_HTTP_LOW_SPEED_TIME=30
 
 dest=~/.config/vim/pack/remote/start
 njobs=4
@@ -26,74 +30,69 @@ plugs=(
 
 to_url()
 {
-	sed 's;^gh:;https://github.com/;' <<<$1
+	sed 's|^gh:|https://github.com/|' <<<$1
 }
 to_dir()
 {
-	echo $dest/${1##*/}
+	echo "$dest/${1##*/}"
 }
+
 update()
 {
 	local plug=$1 url dir ret
-	dir=$(to_dir $plug)
+	dir=$(to_dir "$plug")
 
-	if [[ -d $dir ]]; then
-		echo "Fetch $plug" >&2
-		timeout 10 git -C $dir fetch --depth 1 &>/dev/null \
-			&& git -C $dir reset --hard origin &>/dev/null
+	if [[ -d "$dir" ]]; then
+		echo >&2 "Fetch $plug"
+		git -C "$dir" fetch --depth 1 &>/dev/null </dev/null \
+			&& git -C "$dir" reset --hard FETCH_HEAD &>/dev/null </dev/null
 		ret=$?
 	else
-		echo "Clone $plug" >&2
-		url=$(to_url $plug)
-		timeout 10 git clone --depth 1 -- $url $dir &>/dev/null
+		echo >&2 "Clone $plug"
+		url=$(to_url "$plug")
+		git clone --depth 1 -- "$url" "$dir" &>/dev/null </dev/null
 		ret=$?
 	fi
 	if [[ $ret -eq 0 ]]; then
-		echo " Done $plug" >&2
+		echo >&2 " Done $plug"
 	else
-		echo " Error($ret) $plug" >&2
+		echo >&2 " Error($ret) $plug"
 	fi
 }
 update_all()
 {
-	local p
-
-	for p in "${plugs[@]:0:$njobs}"; do
-		update $p &
-	done
-	for p in "${plugs[@]:$njobs:${#plugs[@]}-$njobs}"; do
-		wait -n
-		update $p &
+	local i
+	for i in "${!plugs[@]}"; do
+		(( i >= njobs )) && wait -n
+		update "${plugs[i]}" &
 	done
 	wait
 }
 clean()
 {
-	local installed= p dir
-	for p in ${plugs[@]}; do
-		p=${p##*/}
-		p=${p//./\\.}
-		installed=$installed$p'|'
+	local -A expected
+	local p
+	for p in "${plugs[@]}"; do
+		expected[${p##*/}]=1
 	done
-	installed=${installed%|}
 
-	for dir in $dest/*; do
+	local dir
+	for dir in "$dest"/*; do
 		p=${dir##*/}
-		if [[ ! $p =~ $installed ]]; then
-			echo "Clean $p" >&2
-			rm -rf $dir
+		if [[ -z ${expected[$p]} ]]; then
+			echo >&2 "Clean $p"
+			rm -rf "$dir"
 		fi
 	done
 }
 helptags()
 {
-	vim -i NONE --not-a-term '+helptags ALL' '+q' >/dev/null
+	vim -Nesi NONE '+helptags ALL' '+q'
 }
 
 main()
 {
-	shopt -s nullglob
-	mkdir -p $dest
+	mkdir -p "$dest"
 	update_all
 	clean
 	helptags
