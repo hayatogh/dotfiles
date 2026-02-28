@@ -1,12 +1,9 @@
-#!/bin/bash
-
-binoffset()
-{
-	[[ $# -eq 3 ]] || return 1
-	perl -e '
+#!/usr/bin/perl
 use strict;
 use autodie;
 use bignum;
+
+@ARGV == 3 or die "Usage: $0 FILE OFFSET LENGTH\n";
 
 my $file = $ARGV[0];
 my $offset = $ARGV[1];
@@ -31,9 +28,3 @@ reversed:        %s
   as int:        %s
   as hex:        %s
 EOT
-' -- "$@"
-}
-
-if [[ $0 == ${BASH_SOURCE[0]} ]]; then
-	binoffset "$@"
-fi

@@ -1,9 +1,10 @@
 [[ ! $- =~ i ]] && return
 shopt -s autocd cdspell checkhash checkjobs checkwinsize dotglob execfail globstar histreedit lithist no_empty_cmd_completion nocaseglob
 
-_pc0='history -a; history -c; history -r'
+_nj='\j'
+_pc0='history -a; history -c; history -r; _pj=${_nj@P}; _pj=${_pj#0}'
 _pc1='\[\e[0m\]\n'
-_pc2='$PSM\[\e[32m\]\u@\h \[\e[33m\]\w \[\e[38;5;93m\]$PSSHLVL \[\e[38;5;166m\]$([[ \j -gt 0 ]] && echo \j)\[\e[0m\]'
+_pc2='$PSM\[\e[32m\]\u@\h \[\e[33m\]\w \[\e[38;5;93m\]$PSSHLVL \[\e[38;5;166m\]$_pj\[\e[0m\]'
 _pc3=' \[\e[38;5;245m\]\t ${PIPESTATUS[@]}\[\e[0m\]\n\[\ek\e\\\]\$ '
 GIT_PS1_SHOWDIRTYSTATE=1
 GIT_PS1_SHOWSTASHSTATE=1
@@ -19,7 +20,7 @@ if [[ ${SUDO_USER:-} ]]; then
 fi
 
 PSSHLVL=$((SHLVL ${TMUX:+- 1}))
-if [[ $PSSHLVL -eq 1 ]]; then
+if ((PSSHLVL == 1)); then
 	PSSHLVL=
 fi
 PSM=${PSM:-}
@@ -47,7 +48,7 @@ e()
 }
 tryssh()
 {
-	[[ $# -eq 1 || $# -eq 2 ]] || return 1
+	(($# == 1 || $# == 2)) || return 1
 	local host=$1 interval=${2:-5} m nl=''
 	while true; do
 		m=$(ssh -o BatchMode=yes $host /bin/true 2>&1)
@@ -101,7 +102,7 @@ mktags()
 		make SRCARCH=$arch tags &>/dev/null
 		mv tags tags.$arch
 		ln -s tags.$arch tags
-	elif [[ $# -eq 0 ]]; then
+	elif (($# == 0)); then
 		ctags -R &>/dev/null
 	else
 		ctags "$@" &>/dev/null
@@ -113,7 +114,7 @@ realwhich()
 }
 clean_history()
 {
-	[[ $# -eq 1 ]] || return 1
+	(($# == 1)) || return 1
 	local pat=$1
 	perl -0777 -i -pe 's/^#\d+\n('"$pat"') *\n//gm' $HISTFILE
 }
@@ -240,7 +241,7 @@ sush()
 {
 	sudo -E --preserve-env=PATH,HOME $BASH --rcfile ~/.bash_profile
 }
-. ~/dotfiles/rpm-commands.sh
+_source_r ~/dotfiles/rpm-commands.sh
 alias diffh='~/dotfiles/diffh.sh d2hc'
 rm_rfchmod()
 {
@@ -272,27 +273,36 @@ timesp()
 }
 loredl()
 {
-	[[ $# -eq 1 ]] || return 1
+	(($# == 1)) || return 1
 	local link=$1 msgid url
 	msgid=$(grep -Po '[^/]+@[^/]+' <<<$link)
 	url=https://lore.kernel.org/all/$msgid/t.mbox.gz
 	curl -fsSLo "$msgid.mbox.gz" "$url"
 }
 
-if [[ $_uname == MSYS ]]; then
+if [[ $_uname == MSYS || $_uname == GITBASH ]]; then
 	shopt -s completion_strip_exe
-	_pc2=$(sed -E 's/\$\(|\)/`/g' <<<$_pc2)
+	# _pc2=$(sed -E 's/\$\(|\)/`/g' <<<$_pc2)
+	_pc2=$(sed -E 's/@\\h/& \\[\\e[35m\\]$MSYSTEM/' <<<$_pc2)
 	alias open=start
 	rg()
 	{
 		command rg --hidden --path-separator // "$@"
 	}
-	upgrade()
-	{
-		pacman -Syu --noconfirm
-		pacman -Qtdq | pacman -Rns --noconfirm - 2>/dev/null
-	}
-	_source_r /usr/share/git/git-prompt.sh
+	if [[ $_uname == MSYS ]]; then
+		upgrade()
+		{
+			pacman -Syu --noconfirm
+			pacman -Qtdq | pacman -Rns --noconfirm - 2>/dev/null
+		}
+		_source_r /usr/share/git/git-prompt.sh
+	else
+		upgrade()
+		{
+			git update-git-for-windows -y
+		}
+		# _source_r /mingw64/share/git/completion/git-prompt.sh
+	fi
 elif [[ $_uname == WSL ]]; then
 	alias shutdown='wsl.exe --shutdown'
 	alias diffhw='~/dotfiles/diffh.sh winmerge'
@@ -307,7 +317,10 @@ if [[ $_distro == debian ]]; then
 	}
 	# _source_r /usr/lib/git-core/git-sh-prompt
 elif [[ $_distro =~ fedora|centos|rhel ]]; then
-	alias upgrade='sudo dnf upgrade'
+	upgrade()
+	{
+		sudo dnf upgrade
+	}
 	alias which &>/dev/null && unalias which
 	unset -f which
 	alias l. &>/dev/null && unalias l.
@@ -316,7 +329,7 @@ fi
 
 l.()
 (
-	[[ $# -ne 0 ]] && cd "$1"
+	(($#)) && cd "$1"
 	ls -dF .*
 )
 if type _comp_load &>/dev/null; then

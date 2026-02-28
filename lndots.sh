@@ -3,10 +3,18 @@ set -euo pipefail
 
 dotfiles=$(cd $(dirname $0); pwd -P)
 case $(uname -sr) in
-*icrosoft*) _uname=WSL;;
-*Linux*) _uname=Linux;;
-*_NT*) _uname=MSYS;;
-*) _uname=Other;;
+*icrosoft*)
+	_uname=WSL;;
+*Linux*)
+	_uname=Linux;;
+*_NT*)
+	if [[ -x /usr/bin/pacman ]]; then
+		_uname=MSYS
+	else
+		_uname=GITBASH
+	fi;;
+*)
+	_uname=Other;;
 esac
 
 tohome=".bash_profile .bashrc"
@@ -19,7 +27,7 @@ chmod 600 ~/.ssh/authorized_keys
 
 rm_ln()
 {
-	[[ $# -eq 2 && $1 && $2 ]] || return 1
+	(($# == 2)) || return 1
 	local target=$1 linkname=$2
 	rm -rf "$linkname"
 	mkdir -p "$(dirname "$linkname")"
@@ -31,14 +39,21 @@ case $_uname in
 MSYS|WSL)
 	nt()
 	{
-		[[ ${winhome:-} && ${wincloud:-} ]] || return 1
+		[[ ${winhome:-} ]] || return 1
 		rm_ln "$winhome" ~/WinHome
 		rm_ln "$winhome/Downloads" ~/Downloads
-		rm_ln "$wincloud" ~/Drive
 	}
 	platformcmd="nt ;"
 	;;&
-MSYS)
+GITBASH|MSYS|WSL)
+	ntcloud()
+	{
+		[[ ${wincloud:-} ]] || return 1
+		rm_ln "$wincloud" ~/Drive
+	}
+	platformcmd="$platformcmd ntcloud ;"
+	;;&
+GITBASH|MSYS)
 	export MSYS=winsymlinks:nativestrict
 	winhome=$(cygpath "$(powershell.exe -NoProfile 'Get-Content Env:USERPROFILE')")
 	wincloud=/g/マイドライブ

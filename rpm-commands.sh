@@ -4,13 +4,13 @@ alias rpmc='rpm -qp --changelog'
 
 rpmt()
 {
-	[[ $# -eq 1 ]] || return 1
+	(($# == 1)) || return 1
 	rpm2cpio $1 | cpio -t --quiet
 }
 
 rpmi()
 {
-	[[ $# -eq 1 || $# -eq 2 ]] || return 1
+	(($# == 1 || $# == 2)) || return 1
 	local rpm=$1 base=${1##*/} pat tar
 	if [[ ${2:-} ]]; then
 		pat=$2
@@ -28,7 +28,7 @@ rpmi()
 
 rpmia()
 {
-	[[ $# -eq 1 ]] || return 1
+	(($# == 1)) || return 1
 	local rpm=$(readlink -f $1) dir=$(basename $1 .rpm)
 	mkdir $dir || return 1
 	cd $dir

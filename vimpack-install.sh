@@ -53,10 +53,10 @@ update()
 		git clone --depth 1 -- "$url" "$dir" &>/dev/null </dev/null
 		ret=$?
 	fi
-	if [[ $ret -eq 0 ]]; then
-		echo >&2 " Done $plug"
-	else
+	if (($ret)); then
 		echo >&2 " Error($ret) $plug"
+	else
+		echo >&2 " Done $plug"
 	fi
 }
 update_all()

@@ -23,10 +23,7 @@ cp_vim()
 	rsync -rtz --exclude=.git/ --exclude=/.netrwhist --exclude=/.viminfo --exclude=/swap --delete ~/.config/vim/ "$winhome/vimfiles"
 }
 
-arg=(powershell)
-if [[ $# -ne 0 ]]; then
-	arg=("$@")
-fi
+arg=("$@")
 for x in ${arg[@]}; do
 	cp_${x}
 done

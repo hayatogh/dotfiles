@@ -37,14 +37,22 @@ fi
 
 export _uname
 case $(uname -sr) in
-*icrosoft*) _uname=WSL;;
-*Linux*) _uname=Linux;;
-*_NT*) _uname=MSYS;;
-*) _uname=Other;;
+*icrosoft*)
+	_uname=WSL;;
+*Linux*)
+	_uname=Linux;;
+*_NT*)
+	if [[ -x /usr/bin/pacman ]]; then
+		_uname=MSYS
+	else
+		_uname=GITBASH
+	fi;;
+*)
+	_uname=Other;;
 esac
 export _distro=$(grep -Po '(?<=^ID=).*$' /etc/os-release 2>/dev/null || true)
 
-if [[ $_uname == MSYS ]]; then
+if [[ $_uname == MSYS || $_uname == GITBASH ]]; then
 	export LANG=$(locale -uU)
 	_pathadd /c/Users/$USER/AppData/Local/Microsoft/WinGet/Links
 	_pathadd /c/Users/$USER/.cargo/bin
