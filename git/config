@@ -6,10 +6,14 @@
 	c   = commit
 	d   = diff
 	ds  = diff --staged
-	dn  = !git -P diff --numstat --stat
+	dn  = "!cd \"${GIT_PREFIX:-.}\" && git -P diff --numstat --stat"
 	dc  = diff --word-diff-regex=.
 	dw  = diff --word-diff-regex='\\S+|[^\\S]'
-	impldiffnn = "!f() { git \"$@\" --no-index --no-prefix; }; f"
+	impldiffnn = "!f() { \
+		cmd=$1; shift; \
+		cd \"${GIT_PREFIX:-.}\" && \
+		git \"$cmd\" --no-index --no-prefix \"$@\"; \
+	}; f"
 	nd  = impldiffnn d
 	ndc = impldiffnn dc
 	ndw = impldiffnn dw
@@ -17,22 +21,27 @@
 	l   = log --abbrev-commit
 	lo  = log --oneline
 	lg  = log --graph --all --pretty=graphline
-	l1  = !git -P l -1
+	l1  = "!cd \"${GIT_PREFIX:-.}\" && git -P l -1"
 	fixestag = l1 --pretty=fixes
 	g   = l -P --grep
-	gw  = "!f() { pat=$1; shift; git g \"\\b$pat\\b\" \"$@\"; }; f"
-	implgreptitle = !git lo | grep --color=auto
-	gt  = "!f() { git implgreptitle -P \"$*\"; }; f"
-	gti = "!f() { git implgreptitle -Pi \"$*\"; }; f"
-	implgreptrim = "!f() { \
-		opt=$1; shift; \
-		t=$*; \
-		t=${t#${t%%[![:space:]]*}}; \
-		t=${t%${t##*[![:space:]]}}; \
-		git implgreptitle \"$opt\" \"$t\"; \
+	gw  = "!f() { \
+		pat=$1; shift; \
+		cd \"${GIT_PREFIX:-.}\" && \
+		git g \"\\b$pat\\b\" \"$@\"; \
 	}; f"
-	gf  = "!f() { git implgreptrim -F \"$*\"; }; f"
-	gfi = "!f() { git implgreptrim -Fi \"$*\"; }; f"
+	implgreptitle = "!f() { \
+		opt=$1; trim=$2; shift 2; \
+		t=$*; \
+		if [ $trim -eq 1 ]; then \
+			t=${t#${t%%[![:space:]]*}}; \
+			t=${t%${t##*[![:space:]]}}; \
+		fi; \
+		git lo | grep --color=auto \"$opt\" \"$t\"; \
+	}; f"
+	gt  = implgreptitle -P 0
+	gti = implgreptitle -Pi 0
+	gf  = implgreptitle -F 1
+	gfi = implgreptitle -Fi 1
 	cl  = "!f() { git clone \"$@\" && cd $(basename $1 .git) && git status; }; f"
 	sc  = "!f() { git cl \"$@\" --depth 1; }; f"
 	scg = "!f() { path=$1; shift; git sc https://github.com/$path \"$@\"; }; f"
@@ -48,32 +57,103 @@
 	unstage = restore --staged
 	untrack = rm --cached
 	implarhead = "!f() { \
-		d=$1; e=$2; f=$d.tar.$e; \
-		if [ \"${3:-}\" = -f ] || [ ! -e $f ]; then \
-			git archive -o $f --prefix=$d/ HEAD; \
+		show_help() { \
+			printf \"%s\n\" \
+				\"Usage:\" \
+				\"  git { arz | arJ | arzd | arJd } [-C ~/src/repo | -c GIT_CMD] [-f]\"; \
+		}; \
+		\
+		stamp=$1; ext=$2; shift 2; \
+		cmd=git; wd=$PWD; force=0; \
+		while [ $# -gt 0 ]; do \
+			case $1 in \
+			-C) \
+				wd=${2%/}; \
+				cmd=\"git -C \\\"$wd\\\"\"; \
+				shift 2;; \
+			-c) \
+				cmd=$2; \
+				shift 2;; \
+			-f) \
+				force=1; \
+				shift;; \
+			-h|help) \
+				show_help; \
+				return 0;; \
+			*) \
+				printf \"Unknown opt '$1'\n\"; \
+				show_help; \
+				return 2;; \
+			esac; \
+		done; \
+		\
+		dir=${wd##*/}_; \
+		if [ $stamp = hash ]; then \
+			dir=$dir$(eval \"$cmd rev-parse HEAD\" | cut -b-12); \
+		elif [ $stamp = date ]; then \
+			dir=$dir$(date +%Y%m%d); \
+		fi; \
+		output=$(cd \"${GIT_PREFIX:-.}\"; pwd -P)/$dir.tar.$ext; \
+		\
+		if [ ! -e \"$output\" -o $force -eq 1 ]; then \
+			eval \"$cmd archive -o \\\"$output\\\" --prefix=\\\"$dir/\\\" HEAD\"; \
+		else \
+			printf \"File $output exists! '-f' to overwrite it.\n\"; \
+			return 1; \
 		fi; \
 	}; f"
-	implarhash = "!git implarhead \"${PWD##*/}_$(git rev-parse HEAD | cut -b-12)\""
-	arz  = implarhash gz
-	arJ  = implarhash xz
-	implardate = "!git implarhead \"${PWD##*/}_$(date +%Y%m%d)\""
-	arzd = implardate gz
-	arJd = implardate xz
+	arz  = implarhead hash gz
+	arJ  = implarhead hash xz
+	arzd = implarhead date gz
+	arJd = implarhead date xz
 	output = "!f() { \
-		cmd= hash=; \
-		for arg; do \
-			cmd=\"$cmd $hash\"; \
-			hash=$arg; \
+		show_help() { \
+			printf \"%s\n\" \
+				\"Usage:\" \
+				\"  git output [-C ~/src/repo | -c GIT_CMD] [-f] HASH\" \
+				\"Example:\" \
+				\"  git output -c 'ssh server \\\"git -C ~/src/repo\\\"' [-f] HASH\"; \
+		}; \
+		\
+		cmd=git; wd=$PWD; force=0; \
+		while [ $# -gt 0 ]; do \
+			case $1 in \
+			-C) \
+				wd=${2%/}; \
+				cmd=\"git -C \\\"$wd\\\"\"; \
+				shift 2;; \
+			-c) \
+				cmd=$2; \
+				shift 2;; \
+			-f) \
+				force=1; \
+				shift;; \
+			-h|help) \
+				show_help; \
+				return 0;; \
+			-*) \
+				printf \"Unknown opt '$1'\n\"; \
+				show_help; \
+				return 2;; \
+			*) \
+				hash=$1; \
+				shift;; \
+			esac; \
 		done; \
-		case \" $cmd \" in \
-		*\" git \"*) ;; \
-		*) cmd=\"git $cmd\" ;; \
-		esac; \
-		$cmd show \"$hash\" >\"$hash.patch\"; \
+		\
+		output=$(cd \"${GIT_PREFIX:-.}\"; pwd -P)/$hash.patch; \
+		\
+		if [ ! -e \"$output\" -o $force -eq 1 ]; then \
+			eval \"$cmd show \\\"$hash\\\"\" >\"$output\"; \
+		else \
+			printf \"File $output exists! '-f' to overwrite it.\n\"; \
+			return 1; \
+		fi; \
 	}; f"
 	dotfilespull = !git -C ~/dotfiles pull
-	emptycommit = "!git add -A && git commit -m 'No commit message' \
-		&& if [ \"$(git rev-parse --show-toplevel)\" = ~/dotfiles ]; then \
+	emptycommit = "!git add -A && \
+		git commit -m 'No commit message' && \
+		if [ \"$(git rev-parse --show-toplevel)\" = ~/dotfiles ]; then \
 			git push; \
 		fi"
 [checkout]
