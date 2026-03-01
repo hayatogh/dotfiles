@@ -56,66 +56,26 @@
 	alias = "!git config --get-regexp 'alias\\..*' | awk '{ $1 = sprintf(\"%-7s =\", substr($1, 7)); print }'"
 	unstage = restore --staged
 	untrack = rm --cached
-	implarhead = "!f() { \
-		show_help() { \
+	imploutput = "!f() { \
+		show_help_ar() { \
 			printf \"%s\n\" \
 				\"Usage:\" \
-				\"  git { arz | arJ | arzd | arJd } [-C ~/src/repo | -c GIT_CMD] [-f]\"; \
-		}; \
-		\
-		stamp=$1; ext=$2; shift 2; \
-		cmd=git; wd=$PWD; force=0; \
-		while [ $# -gt 0 ]; do \
-			case $1 in \
-			-C) \
-				wd=${2%/}; \
-				cmd=\"git -C \\\"$wd\\\"\"; \
-				shift 2;; \
-			-c) \
-				cmd=$2; \
-				shift 2;; \
-			-f) \
-				force=1; \
-				shift;; \
-			-h|help) \
-				show_help; \
-				return 0;; \
-			*) \
-				printf \"Unknown opt '$1'\n\"; \
-				show_help; \
-				return 2;; \
-			esac; \
-		done; \
-		\
-		dir=${wd##*/}_; \
-		if [ $stamp = hash ]; then \
-			dir=$dir$(eval \"$cmd rev-parse HEAD\" | cut -b-12); \
-		elif [ $stamp = date ]; then \
-			dir=$dir$(date +%Y%m%d); \
-		fi; \
-		output=$(cd \"${GIT_PREFIX:-.}\"; pwd -P)/$dir.tar.$ext; \
-		\
-		if [ ! -e \"$output\" -o $force -eq 1 ]; then \
-			eval \"$cmd archive -o \\\"$output\\\" --prefix=\\\"$dir/\\\" HEAD\"; \
-		else \
-			printf \"File $output exists! '-f' to overwrite it.\n\"; \
-			return 1; \
-		fi; \
-	}; f"
-	arz  = implarhead hash gz
-	arJ  = implarhead hash xz
-	arzd = implarhead date gz
-	arJd = implarhead date xz
-	output = "!f() { \
-		show_help() { \
-			printf \"%s\n\" \
-				\"Usage:\" \
-				\"  git output [-C ~/src/repo | -c GIT_CMD] [-f] HASH\" \
+				\"  git { arz | arJ | arzd | arJd } [-C <path> | -c <git_cmd>] [-f] [<rev>]\" \
 				\"Example:\" \
-				\"  git output -c 'ssh server \\\"git -C ~/src/repo\\\"' [-f] HASH\"; \
+				\"  git arz\" \
+				\"  git arzd -C ~/src/repo\"; \
+		}; \
+		show_help_patch() { \
+			printf \"%s\n\" \
+				\"Usage:\" \
+				\"  git outp [-C <path> | -c <git_cmd>] [-f] [<rev>]\" \
+				\"Example:\" \
+				\"  git outp -C ~/src/repo a12bc34de56f\" \
+				\"  git outp -c 'ssh server \\\"git -C ~/src/repo\\\"' a12bc34de56f\"; \
 		}; \
 		\
-		cmd=git; wd=$PWD; force=0; \
+		type=$1; stamp=$2; ext=$3; shift 3; \
+		cmd=git; wd=$PWD; force=0; commit=HEAD; \
 		while [ $# -gt 0 ]; do \
 			case $1 in \
 			-C) \
@@ -129,27 +89,47 @@
 				force=1; \
 				shift;; \
 			-h|help) \
-				show_help; \
+				show_help_$type; \
 				return 0;; \
 			-*) \
 				printf \"Unknown opt '$1'\n\"; \
-				show_help; \
+				show_help_$type; \
 				return 2;; \
 			*) \
-				hash=$1; \
+				commit=$1; \
 				shift;; \
 			esac; \
 		done; \
 		\
-		output=$(cd \"${GIT_PREFIX:-.}\"; pwd -P)/$hash.patch; \
+		output=$(cd \"${GIT_PREFIX:-.}\"; pwd -P)/; \
+		setup_ar() { \
+			dir=${wd##*/}_; \
+			if [ $stamp = hash ]; then \
+				dir=$dir$(eval \"$cmd rev-parse \\\"$commit\\\"\" | cut -b-12); \
+			elif [ $stamp = date ]; then \
+				dir=$dir$(date +%Y%m%d); \
+			fi; \
+			output=$output$dir.tar.$ext; \
+			cmd=\"$cmd archive --format=tar.$ext --prefix=\\\"$dir/\\\" \\\"$commit\\\"\"; \
+		}; \
+		setup_patch() { \
+			output=$output$commit.patch; \
+			cmd=\"$cmd show \\\"$commit\\\"\"; \
+		}; \
+		setup_$type; \
 		\
 		if [ ! -e \"$output\" -o $force -eq 1 ]; then \
-			eval \"$cmd show \\\"$hash\\\"\" >\"$output\"; \
+			eval \"$cmd\" >\"$output\"; \
 		else \
 			printf \"File $output exists! '-f' to overwrite it.\n\"; \
 			return 1; \
 		fi; \
 	}; f"
+	arz  = imploutput ar hash gz
+	arJ  = imploutput ar hash xz
+	arzd = imploutput ar date gz
+	arJd = imploutput ar date xz
+	outp = imploutput patch _ _
 	dotfilespull = !git -C ~/dotfiles pull
 	emptycommit = "!git add -A && \
 		git commit -m 'No commit message' && \
