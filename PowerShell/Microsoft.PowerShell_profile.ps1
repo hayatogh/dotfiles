@@ -10,9 +10,6 @@ Set-PSReadlineKeyHandler Ctrl+d ViAcceptLineOrExit
 Set-PSReadlineKeyHandler Ctrl+n HistorySearchForward
 Set-PSReadlineKeyHandler Ctrl+p HistorySearchBackward
 Set-PSReadlineKeyHandler Tab MenuComplete
-Set-PSReadlineKeyHandler Ctrl+Alt+w { _regex_rubout('[^ ]* *$') }
-Set-PSReadlineKeyHandler Alt+/ { _regex_rubout('[^/\\ ]*(/|\\)? *$') }
-
 function _regex_rubout {
   param($re)
   $line = $null
@@ -20,11 +17,18 @@ function _regex_rubout {
   [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$line, [ref]$cursor)
   [Microsoft.PowerShell.PSConsoleReadLine]::Replace(0, $cursor, ($line.SubString(0, $cursor) -replace $re, ''))
 }
+Set-PSReadlineKeyHandler Ctrl+Alt+w { _regex_rubout('[^ ]* *$') }
+Set-PSReadlineKeyHandler Alt+/ { _regex_rubout('[^/\\ ]*(/|\\)? *$') }
+
+function prompt {
+  $(if (Test-Path variable:/PSDebugContext) { '[DBG]: ' }) + "$env:USERNAME@$env:COMPUTERNAME " + $(Get-Location) + $(if ($NestedPromptLevel -ge 1) { '>>' }) + '> '
+}
 
 function ee {
   exit
 }
-function which {
+Remove-Alias type
+function type {
   param ([switch]$a)
   $params = @{}
   if ($a) {
@@ -34,12 +38,9 @@ function which {
     $_ | Format-Table Name, CommandType, Definition -AutoSize -Wrap | Out-String -Width 512
   }
 }
-Set-Alias ll Get-ChildItem
-function _ls_all {
+function ll {
   Get-ChildItem -Force @args
 }
-Set-Alias la _ls_all
-Set-Alias al _ls_all
 function open {
   param ([string[]]$a)
   if ($a.Length -eq 0) {
@@ -53,54 +54,19 @@ function su {
   Start-Process -Verb RunAs wt
 }
 
-function prompt {
-  $(if (Test-Path variable:/PSDebugContext) { '[DBG]: ' } else { '' }) +
-    "$env:USERNAME@$env:COMPUTERNAME " + $(Get-Location) +
-    $(if ($NestedPromptLevel -ge 1) { '>>' }) + '> '
-}
-
-function register_vimmize {
-  if (!(is_admin)) {
-    Write-Output "Permission denied"
-    return
-  }
-  $name     = "vimmizekbd"
-  $action   = New-ScheduledTaskAction -Execute "`"C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe`"" -Argument "`"C:\Users\$env:USERNAME\Documents\F13.ahk`""
-  $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopOnIdleEnd -ExecutionTimeLimit 0 -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1)
-  $trigger  = New-ScheduledTaskTrigger -AtLogon -User "$env:COMPUTERNAME\$env:USERNAME"
-
-  Unregister-ScheduledTask -TaskName $name -Confirm:$false -ErrorAction SilentlyContinue
-  Register-ScheduledTask -TaskName $name -Action $action -Settings $settings -Trigger $trigger -RunLevel Highest
-}
-
-function fontlink {
-  if (!(is_admin)) {
-    Write-Output "Permission denied"
-    return
-  }
-  New-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\FontLink\SystemLink\" -Name Consolas -Value 'HGRGM.TTC,HGRGM' -PropertyType MultiString -Force
-}
-function fontlink1 {
-  if (!(is_admin)) {
-    Write-Output "Permission denied"
-    return
-  }
-  New-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\FontLink\SystemLink\" -Name Consolas -Value 'BIZ-UDGOTHICR.TTC,BIZ UDGothic R' -PropertyType MultiString -Force
-}
-
 function create_shortcuts {
   $document = [Environment]::GetFolderPath("MyDocuments")
   $shortcuts = @(
     @{
-      name   = $document + "\firefox - 2.lnk";
-      target = "C:\Program Files\Firefox Developer Edition\firefox.exe";
-      args   = "-P X";
-    };
+      name   = $document + "\firefox - 2.lnk"
+      target = "C:\Program Files\Mozilla Firefox ESR\firefox.exe"
+      args   = "-P X"
+    }
     @{
-      name   = $document + "\WSL.lnk";
+      name   = $document + "\WSL.lnk"
       target = $env:LOCALAPPDATA + "\wsltty\bin\mintty.exe"
-      args   = "--WSL -~ -";
-    };
+      args   = "--WSL -~ -"
+    }
   )
 
   $shell = New-Object -ComObject "WScript.Shell"
@@ -120,12 +86,28 @@ function create_shortcuts {
   }
 }
 
-function is_admin {
-  (New-Object Security.Principal.WindowsPrincipal ([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+if ((New-Object Security.Principal.WindowsPrincipal ([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+  function register_ahk {
+    $name     = "ahk"
+    $action   = New-ScheduledTaskAction -Execute "`"C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe`"" -Argument ("`"" + [Environment]::GetFolderPath("MyDocuments") + "\base.ahk`"")
+    $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopOnIdleEnd -ExecutionTimeLimit 0 -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1)
+    $trigger  = New-ScheduledTaskTrigger -AtLogon -User "$env:COMPUTERNAME\$env:USERNAME"
+
+    Unregister-ScheduledTask -TaskName $name -Confirm:$false -ErrorAction SilentlyContinue
+    Register-ScheduledTask -TaskName $name -Action $action -Settings $settings -Trigger $trigger -RunLevel Highest
+  }
+
+  function fontlink {
+    New-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\FontLink\SystemLink\" -Name Consolas -Value 'HGRGM.TTC,HGRGM' -PropertyType MultiString -Force
+  }
+  function fontlink1 {
+    New-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\FontLink\SystemLink\" -Name Consolas -Value 'BIZ-UDGOTHICR.TTC,BIZ UDGothic R' -PropertyType MultiString -Force
+  }
 }
 
+Set-ExecutionPolicy Bypass -Scope Process
 Invoke-Command -ScriptBlock {
-  $local_profile = Join-Path $([System.Environment]::GetFolderPath("MyDocuments")) "\PowerShell\local_profile.psm1"
+  $local_profile = [System.Environment]::GetFolderPath("MyDocuments") + "\PowerShell\local_profile.psm1"
   if (Test-Path $local_profile) {
     Import-Module $local_profile
   }
