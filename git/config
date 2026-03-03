@@ -102,10 +102,13 @@
 		done; \
 		\
 		output=$(cd \"${GIT_PREFIX:-.}\"; pwd -P)/; \
+		get_hash() { \
+			eval \"$cmd rev-parse --short=12 \\\"$commit\\\"\"; \
+		}; \
 		setup_ar() { \
 			dir=${wd##*/}_; \
 			if [ $stamp = hash ]; then \
-				dir=$dir$(eval \"$cmd rev-parse \\\"$commit\\\"\" | cut -b-12); \
+				dir=$dir$(get_hash); \
 			elif [ $stamp = date ]; then \
 				dir=$dir$(date +%Y%m%d); \
 			fi; \
@@ -113,6 +116,7 @@
 			cmd=\"$cmd archive --format=tar.$ext --prefix=\\\"$dir/\\\" \\\"$commit\\\"\"; \
 		}; \
 		setup_patch() { \
+			commit=$(get_hash); \
 			output=$output$commit.patch; \
 			cmd=\"$cmd show \\\"$commit\\\"\"; \
 		}; \
