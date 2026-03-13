@@ -7,6 +7,7 @@ se belloff=backspace,cursor,error,showmatch,esc visualbell
 se showbreak= breakindent breakindentopt=shift:2 cpoptions+=n
 se ignorecase smartcase
 se casemap=keepascii
+se clipboard=
 se colorcolumn=+1
 se completeopt=menu,menuone,preview
 se cursorline
