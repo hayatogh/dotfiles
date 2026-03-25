@@ -280,7 +280,7 @@ loredl()
 	curl -fsSLo "$msgid.mbox.gz" "$url"
 }
 
-if [[ $_uname == MSYS || $_uname == GITBASH ]]; then
+if [[ $_uname == MSYS || $_uname == GitBash ]]; then
 	shopt -s completion_strip_exe
 	# _pc2=$(sed -E 's/\$\(|\)/`/g' <<<$_pc2)
 	_pc2=$(sed -E 's/@\\h/& \\[\\e[35m\\]$MSYSTEM/' <<<$_pc2)

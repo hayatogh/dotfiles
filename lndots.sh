@@ -11,7 +11,7 @@ case $(uname -sr) in
 	if [[ -x /usr/bin/pacman ]]; then
 		_uname=MSYS
 	else
-		_uname=GITBASH
+		_uname=GitBash
 	fi;;
 *)
 	_uname=Other;;
@@ -45,7 +45,7 @@ MSYS|WSL)
 	}
 	platformcmd="nt ;"
 	;;&
-GITBASH|MSYS|WSL)
+GitBash|MSYS|WSL)
 	ntcloud()
 	{
 		[[ ${wincloud:-} ]] || return 1
@@ -53,7 +53,7 @@ GITBASH|MSYS|WSL)
 	}
 	platformcmd="$platformcmd ntcloud ;"
 	;;&
-GITBASH|MSYS)
+GitBash|MSYS)
 	export MSYS=winsymlinks:nativestrict
 	winhome=$(cygpath "$(powershell.exe -NoProfile 'Get-Content Env:USERPROFILE')")
 	wincloud=/g/マイドライブ
