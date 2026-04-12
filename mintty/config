@@ -14,7 +14,7 @@ KeyAlphaMode=0
 RightClickAction=extend
 # Window
 Columns=106
-Rows=50
+Rows=68
 RewrapOnResize=yes
 Scrollbar=None
 # Terminal
@@ -26,10 +26,12 @@ BellTaskbar=no
 DisplaySpeedup=0
 IMECursorColour=0,0,255
 
+# 3840x2160
+X=1911
+Y=0
 # 2560x1440
-X=910
-Y=189
-
+# X=910
+# Y=189
 # 1920x1080
 # X=938
 # Y=48

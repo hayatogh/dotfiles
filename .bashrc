@@ -265,17 +265,17 @@ timesp()
 			if [[ $tok =~ ^[-+*/] ]]; then
 				exp_sec="$exp_sec$tok "
 			else
-				exp_sec="$exp_sec$(systemd-analyze --user timespan -- "$tok" | grep -Po '(?<=μs: )[0-9]+(?=000000)') "
+				exp_sec="$exp_sec$(systemd-analyze --user timespan -- "$tok" | sed -En '/μs/s/(.*: |000000$)//gp') "
 			fi
 		done
-		systemd-analyze --user timespan -- $(($exp_sec)) | \grep -Po '(?<=(Original|Human): ).*'
+		systemd-analyze --user timespan -- $(($exp_sec)) | sed -En '/Original|Human/s/.*: //p'
 	done
 }
 loredl()
 {
 	(($# == 1)) || return 1
 	local link=$1 msgid url
-	msgid=$(grep -Po '[^/]+@[^/]+' <<<$link)
+	msgid=$(grep -Eo '[^/]+@[^/]+' <<<$link)
 	url=https://lore.kernel.org/all/$msgid/t.mbox.gz
 	curl -fsSLo "$msgid.mbox.gz" "$url"
 }

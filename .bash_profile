@@ -53,7 +53,7 @@ case $(uname -sr) in
 *)
 	_uname=Other;;
 esac
-export _distro=$(grep -Po '(?<=^ID=).*$' /etc/os-release 2>/dev/null || true)
+export _distro=$(sed -En 's/^ID=//p' /etc/os-release 2>/dev/null || true)
 
 if [[ $_uname == MSYS || $_uname == GitBash ]]; then
 	export LANG=$(locale -uU)

@@ -3,7 +3,7 @@ set -euo pipefail
 
 prefix=~/.local
 arch=$(uname -m)
-ver=$(curl -fsSL https://api.github.com/repos/extrawurst/gitui/releases/latest | grep -Po '(?<="tag_name": "v)([0-9.]+)(?=",)' | head -n1)
+ver=$(curl -fsSL https://api.github.com/repos/extrawurst/gitui/releases/latest | grep -Po '(?<="tag_name": "v)[0-9.]+(?=",)' | head -n1)
 fname=gitui-linux-$arch.tar.gz
 url=https://github.com/extrawurst/gitui/releases/download/v$ver/$fname
 
