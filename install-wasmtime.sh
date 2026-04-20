@@ -9,7 +9,6 @@ url=https://github.com/bytecodealliance/wasmtime/releases/download/dev/$fname
 
 mkdir -p $prefix/src
 cd $prefix/src
-curl -fsSLo $fname $url
+curl -fsSLO $url
 tar -xf $fname
-mkdir -p $prefix/bin
-cp $dir/wasmtime $prefix/bin/wasmtime
+install -Dt $prefix/bin $dir/wasmtime

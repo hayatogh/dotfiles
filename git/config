@@ -6,7 +6,7 @@
 	c   = commit
 	d   = diff
 	ds  = diff --staged
-	dn  = "!cd \"${GIT_PREFIX:-.}\" && git -P diff --numstat --stat"
+	dt  = "!cd \"${GIT_PREFIX:-.}\" && git -P diff --numstat --stat"
 	dc  = diff --word-diff-regex=.
 	dw  = diff --word-diff-regex='\\S+|[^\\S]'
 	impldiffnn = "!f() { \
