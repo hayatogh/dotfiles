@@ -2,28 +2,23 @@
 set -euo pipefail
 
 dotfiles=$(cd $(dirname $0); pwd -P)
-case $(uname -sr) in
-*icrosoft*)
-	_uname=WSL;;
-*Linux*)
-	_uname=Linux;;
-*_NT*)
-	if [[ -x /usr/bin/pacman ]]; then
-		_uname=MSYS
-	else
-		_uname=GitBash
-	fi;;
-*)
-	_uname=Other;;
-esac
 
-tohome=".bash_profile .bashrc"
-toconfig="gdb git gitui gtk-3.0/gtk.css lessfilter tmux vim/vimrc"
+tohome=.bashrc
+toconfig='gdb git gitui gtk-3.0/gtk.css lessfilter tmux vim/vimrc'
 
 mkdir -p ~/.ssh ~/.config/vim/swap
 chmod 700 ~/.ssh ~/.config/vim/swap
 touch ~/.ssh/authorized_keys
 chmod 600 ~/.ssh/authorized_keys
+if [[ ! -e ~/.ssh/config ]]; then
+	cp $dotfiles/ssh_config ~/.ssh/config
+fi
+if [[ -d ~/ダウンロード && ! -e ~/Downloads ]]; then
+	ln -s ~/ダウンロード ~/Downloads
+fi
+if [[ -f ~/.profile ]]; then
+	printf '1{/return/!i\\\nif [ "$BASH_VERSION" ]; then . ~/.bashrc; return; fi\n}' | sed -i -f - ~/.profile
+fi
 
 rm_ln()
 {
@@ -34,43 +29,6 @@ rm_ln()
 	ln -s "$target" "$linkname"
 }
 
-platformcmd=
-case $_uname in
-MSYS|WSL)
-	nt()
-	{
-		[[ ${winhome:-} ]] || return 1
-		rm_ln "$winhome" ~/WinHome
-		rm_ln "$winhome/Downloads" ~/Downloads
-	}
-	platformcmd="nt ;"
-	;;&
-GitBash|MSYS|WSL)
-	ntcloud()
-	{
-		[[ ${wincloud:-} ]] || return 1
-		rm_ln "$wincloud" ~/Drive
-	}
-	platformcmd="$platformcmd ntcloud ;"
-	;;&
-GitBash|MSYS)
-	export MSYS=winsymlinks:nativestrict
-	winhome=$(cygpath "$(powershell.exe -NoProfile 'Get-Content Env:USERPROFILE')")
-	wincloud=/g/マイドライブ
-	;;
-WSL)
-	winhome=$(wslpath "$(powershell.exe -NoProfile 'Get-Content Env:USERPROFILE' | tr -d '\r')")
-	wincloud=/mnt/g/マイドライブ
-	wsl()
-	{
-		sudo cp $dotfiles/wsl/wsl.conf /etc/wsl.conf
-		sudo cp $dotfiles/wsl/fstab /etc/fstab
-	}
-	platformcmd="$platformcmd wsl"
-	;;
-esac
-
-eval "$platformcmd"
 for fname in $tohome; do
 	rm_ln $dotfiles/$fname ~/$fname
 done

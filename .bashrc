@@ -1,4 +1,57 @@
-[[ ! $- =~ i ]] && return
+_pathadd()
+{
+	if [[ :$PATH: != *:$1:* ]]; then
+		PATH=$1:$PATH
+	fi
+}
+_pathadd /usr/sbin
+_pathadd /usr/local/sbin
+_pathadd ~/.local/bin
+_pathadd ~/.cargo/bin
+export GOROOT=~/.goroot
+export GOPATH=~/.gopath
+_pathadd $GOROOT/bin
+_pathadd $GOPATH/bin
+_pathadd ~/.wasmtime/bin
+_pathadd ~/.npm/bin
+_pathadd ~/.deno/bin
+_load_if_missing()
+{
+	if [[ -r $2 && :$PATH: != *$1* ]]; then
+		. "$2"
+	fi
+}
+_load_if_missing .opam ~/.opam/opam-init/init.sh
+_load_if_missing .ghcup ~/.ghcup/env
+
+export DISPLAY
+if [[ -r ~/dotfiles/inputrc ]]; then
+	export INPUTRC=~/dotfiles/inputrc
+fi
+export LESS=-RiWM
+if [[ -r ~/dotfiles/dircolors ]]; then
+	eval "$(dircolors -b ~/dotfiles/dircolors)"
+fi
+export MANOPT='--nh --nj'
+export MANPAGER='vim +MANPAGER --not-a-term -'
+export NPM_CONFIG_USERCONFIG=~/dotfiles/npmrc
+export RLWRAP_HOME=~/.local/state/rlwrap
+export RUST_BACKTRACE=1
+export VISUAL=vim
+export XDG_CONFIG_HOME=~/.config
+if [[ ${SUDO_USER:-} ]]; then
+	export LESSHISTFILE=~/.root_lesshst
+fi
+
+_distro=$(sed -En 's/^ID=//p' /etc/os-release 2>/dev/null || true)
+if [[ $_distro == debian ]]; then
+	export LESSOPEN='| /usr/bin/lesspipe %s'
+	export LESSCLOSE='/usr/bin/lesspipe %s %s'
+fi
+
+
+[[ $- != *i* ]] && return
+
 shopt -s autocd cdspell checkhash checkjobs checkwinsize dotglob execfail globstar histreedit lithist no_empty_cmd_completion nocaseglob
 
 _nj='\j'
@@ -127,26 +180,14 @@ fixmod()
 	find "$@" -maxdepth 0 -type d -print0 | xargs -0 chmod 755
 	find "$@" -maxdepth 0 -type f -print0 | xargs -0 chmod 644
 }
-rgall()
-{
-	command rg --no-messages --hidden --no-ignore -g!tags -g!tags.x86 -g!tags.arm64 -g!.git/ "$@"
-}
-rg()
-{
-	rgall --ignore -g!/po/*.po -g!/Documentation/translations "$@"
-}
+alias rgall='command rg --no-messages --hidden --no-ignore -g!tags -g!tags.x86 -g!tags.arm64 -g!.git/'
+alias rg='rgall --ignore -g!/po/*.po -g!/Documentation/translations'
 _rg_arch()
 {
 	rg $(find arch/ -mindepth 1 -maxdepth 1 -type d -printf '-g!%f/ ' | sed -E 's:-g!('"$1"')/ ::') "${@:2}"
 }
-rgx()
-{
-	_rg_arch x86 "$@"
-}
-rgarm()
-{
-	_rg_arch 'arm|arm64' "$@"
-}
+alias rgx='_rg_arch x86'
+alias rgarm='_rg_arch '\''arm|arm64'\'
 vl()
 {
 	vim $($1 -l "${@:2}")
@@ -237,15 +278,17 @@ dl()
 	done
 	trap - SIGINT
 }
-sush()
+alias sush='sudo --preserve-env=HOME $BASH --rcfile ~/.bashrc'
+_load_if_readable()
 {
-	sudo -E --preserve-env=PATH,HOME $BASH --rcfile ~/.bash_profile
+	if [[ -r $1 ]]; then
+		. "$1"
+	fi
 }
-_source_r ~/dotfiles/rpm-commands.sh
-alias diffh='~/dotfiles/diffh.sh d2hc'
+_load_if_readable ~/dotfiles/rpm-commands.sh
 rm_rfchmod()
 {
-	find "$@" ! -perm -200 -type d -print0 | xargs -0 chmod 700
+	find "$@" ! -perm -700 -type d -print0 | xargs -0 chmod 700
 	rm -rf "$@"
 }
 timesp()
@@ -280,42 +323,15 @@ loredl()
 	curl -fsSLo "$msgid.mbox.gz" "$url"
 }
 
-if [[ $_uname == MSYS || $_uname == GitBash ]]; then
-	shopt -s completion_strip_exe
-	# _pc2=$(sed -E 's/\$\(|\)/`/g' <<<$_pc2)
-	_pc2=$(sed -E 's/@\\h/& \\[\\e[35m\\]$MSYSTEM/' <<<$_pc2)
-	alias open=start
-	rg()
-	{
-		command rg --hidden --path-separator // "$@"
-	}
-	if [[ $_uname == MSYS ]]; then
-		upgrade()
-		{
-			pacman -Syu --noconfirm
-			pacman -Qtdq | pacman -Rns --noconfirm - 2>/dev/null
-		}
-		_source_r /usr/share/git/git-prompt.sh
-	else
-		upgrade()
-		{
-			git update-git-for-windows -y
-		}
-		# _source_r /mingw64/share/git/completion/git-prompt.sh
-	fi
-elif [[ $_uname == WSL ]]; then
-	alias shutdown='wsl.exe --shutdown'
-	alias diffhw='~/dotfiles/diffh.sh winmerge'
-fi
 if [[ $_distro == debian ]]; then
 	_pc2='${debian_chroot:+($debian_chroot)}'$_pc2
 	upgrade()
 	{
 		sudo apt-get -qq update
-		sudo apt-get -y upgrade
+		sudo apt-get -y dist-upgrade
 		sudo apt-get -qq autoremove
 	}
-	# _source_r /usr/lib/git-core/git-sh-prompt
+	# _load_if_readable /usr/lib/git-core/git-sh-prompt
 elif [[ $_distro =~ fedora|centos|rhel ]]; then
 	upgrade()
 	{
@@ -324,7 +340,7 @@ elif [[ $_distro =~ fedora|centos|rhel ]]; then
 	alias which &>/dev/null && unalias which
 	unset -f which
 	alias l. &>/dev/null && unalias l.
-	_source_r /usr/share/git-core/contrib/completion/git-prompt.sh
+	_load_if_readable /usr/share/git-core/contrib/completion/git-prompt.sh
 fi
 
 l.()
@@ -332,6 +348,7 @@ l.()
 	(($#)) && cd "$1"
 	ls -dF .*
 )
+_load_if_readable /etc/profile.d/bash_completion.sh
 if type _comp_load &>/dev/null; then
 	_comp_load -D -- ssh
 	complete -F _comp_cmd_ssh tryssh
@@ -343,5 +360,5 @@ if ! type __git_ps1 &>/dev/null; then
 	PS1=$_pc1$_pc2$_pc3
 fi
 
-_source_r ~/.localbashrc.bash
+_load_if_readable ~/.localbashrc.bash
 true

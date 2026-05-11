@@ -22,9 +22,11 @@ for f in /etc/apt/sources.list /etc/apt/sources.list.d/debian.sources; do
 done
 
 sudo apt-get update
-sudo apt-get -y upgrade
-sudo apt-get -y install 7zip automake bash-completion bc bison chezscheme clang-format clangd command-not-found curl fd-find flex gcc gdb git-delta gnutls-dev htop info lftp libelf-dev libc-dev libncurses-dev libpam-dev libpng-dev libssl-dev libtool lshw lsof make man-db moreutils nasm perl-doc pkg-config pmount ripgrep rlwrap rsync texinfo tree uchardet universal-ctags vim wget wl-clipboard xfsprogs zip \
-	gdb-doc
+sudo apt-get -y dist-upgrade
+sudo apt-get -y purge manpages-ja manpages-ja-dev
+sudo apt-get -y install 7zip automake bash-completion bc bison chezscheme clang-format clangd command-not-found curl fd-find flex gcc gdb git-delta gnutls-dev htop info lftp libelf-dev libc-dev libncurses-dev libpam-dev libpng-dev libssl-dev libtool lshw lsof make man-db moreutils nasm perl-doc pkg-config pmount ripgrep rlwrap rsync texinfo tmux tree uchardet universal-ctags vim wget wl-clipboard xfsprogs zip \
+	gdb-doc \
+	evtest flatpak gnome-boxes gvfs-backends gvfs-fuse libvirt-daemon-system pipewire-audio rclone virt-install virt-manager
 
 sudo mkdir -p /usr/local/bin
 sudo ln -sf /usr/bin/fdfind /usr/local/bin/fd
