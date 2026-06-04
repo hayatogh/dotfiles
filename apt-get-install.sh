@@ -24,9 +24,10 @@ done
 sudo apt-get update
 sudo apt-get -y dist-upgrade
 sudo apt-get -y purge manpages-ja manpages-ja-dev
-sudo apt-get -y install 7zip automake bash-completion bc bison chezscheme clang-format clangd command-not-found curl fd-find flex gcc gdb git-delta gnutls-dev htop info lftp libelf-dev libc-dev libncurses-dev libpam-dev libpng-dev libssl-dev libtool lshw lsof make man-db moreutils nasm perl-doc pkg-config pmount ripgrep rlwrap rsync texinfo tmux tree uchardet universal-ctags vim wget wl-clipboard xfsprogs zip \
+sudo apt-get -y install 7zip automake bash-completion bc bison chezscheme clang-format clangd cmake command-not-found curl debuginfod fd-find flex gcc g++ gdb git-delta gnutls-dev htop info lftp libelf-dev libc-dev libgmp3-dev liblzo2-dev libmpfr-dev libncurses-dev libpam-dev libpng-dev libreadline-dev libsnappy-dev libssl-dev libsystemd-dev libtool lshw lsof make man-db moreutils nasm perl-doc pkg-config pmount ripgrep rlwrap rsync texinfo tmux tree uchardet universal-ctags vim wget wl-clipboard xfsprogs zip \
 	gdb-doc \
 	evtest flatpak gnome-boxes gvfs-backends gvfs-fuse libvirt-daemon-system pipewire-audio rclone virt-install virt-manager
 
 sudo mkdir -p /usr/local/bin
 sudo ln -sf /usr/bin/fdfind /usr/local/bin/fd
+sudo ln -sf /usr/bin/rename.ul /usr/local/bin/rename

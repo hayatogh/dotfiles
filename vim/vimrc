@@ -16,10 +16,7 @@ se display=lastline
 se fileencodings=ucs-bom,utf-8,default,euc-jp,cp932
 se fileformats=unix,dos
 se fillchars=vert:│,fold:-
-se guioptions=!Mr
 se formatoptions+=mBj
-se guicursor=a:blinkon0
-se helplang=Ja,En
 se history=1000
 se autoindent
 se keywordprg=:Man
@@ -27,7 +24,7 @@ se lispwords-=if
 se list listchars=tab:»-,extends:»,precedes:«,nbsp:◦
 se showmatch matchtime=1 matchpairs+=（:）,｛:｝,＜:＞,［:］,「:」,『:』,【:】
 se modeline modelines=3
-se mouse=a mousemodel=extend nomousehide
+se mouse=a mousemodel=extend ttymouse=sgr
 se number relativenumber
 se pastetoggle=<F10>
 se path+=include,arch/x86/include
@@ -36,9 +33,6 @@ se report=15
 se runtimepath+=/usr/share/vim/addons
 se scrolloff=3 sidescroll=1 sidescrolloff=10
 se incsearch hlsearch nowrapscan
-if has('win32') && !has('gui_win32')
-	se shell=pwsh
-endif
 se shortmess=aoOtT
 se splitbelow splitright
 se suffixes=.bak,~,.swp,.o,.info,.aux,.log,.dvi,.bbl,.blg,.brf,.cb,.ind,.idx,.ilg,.inx,.out,.toc,.exe,.lock
@@ -85,8 +79,7 @@ se tabline=%!g:Cuitabline()
 se noexpandtab shiftwidth=0 tabstop=8
 se tagcase=match tags=./tags;./../../,tags;../../
 se ttimeoutlen=10
-let $MYVIM = fnamemodify($MYVIMRC, ':h')
-se viminfofile=$MYVIM/.viminfo directory=$MYVIM/swap
+se viminfofile=$MYVIMDIR/.viminfo directory=$MYVIMDIR/swap
 se virtualedit=block
 se wildmenu wildignorecase wildmode=list:longest,full
 se wrap
@@ -106,21 +99,14 @@ let g:tex_flavor = 'latex'
 let g:vim_indent_cont = &tabstop
 let g:vim_json_conceal = 0
 
-if &term ==# 'xterm' || has('win32')
-	se t_Co=256
-endif
-
-fu! s:Passthrough(seq)
+fu! g:Passthrough(seq)
 	return "\ePtmux;" .. substitute(a:seq, "\e", "\e\e", 'g') .. "\e\\"
 endfu
 if !exists('$TMUX')
-	fu! s:Passthrough(seq)
+	fu! g:Passthrough(seq)
 		return a:seq
 	endfu
 endif
-let &t_SI ..= s:Passthrough("\e[<r")
-let &t_EI ..= s:Passthrough("\e[<s\e[<0t")
-let &t_te ..= s:Passthrough("\e[<0t\e[<s")
 
 fu! s:CopyOSC52(list)
 	call echoraw("\e]52;c;" .. base64_encode(str2blob(a:list)) .. "\x7")
@@ -159,10 +145,6 @@ cno <C-G> <C-\><C-N>
 ino <C-G> <C-\><C-N>
 
 nno g/ /\<\><Left><Left>
-
-if has('win32')
-	sil! vun <C-X>
-endif
 
 ino <C-U> <C-G>u<C-U>
 
@@ -296,29 +278,6 @@ nno <Leader>3 :<C-U>Hi3 <C-R><C-W><CR>
 nno <Leader>4 :<C-U>Hi4 <C-R><C-W><CR>
 nno <Leader>5 :<C-U>Hi5 <C-R><C-W><CR>
 nno <Leader>6 :<C-U>Hi6 <C-R><C-W><CR>
-
-fu! s:FontSizeSet(amount)
-	call echoraw(s:Passthrough("\e]7770;" .. a:amount .. "\x7"))
-endfu
-fu! s:FontSizeGet()
-	let l:ret = ""
-	call <SID>FontSizeSet('?')
-	while 1
-		let l:c = getcharstr()
-		let l:ret ..= l:c
-		if l:c ==# "\x7"
-			break
-		endif
-	endwhile
-	echo l:ret[7:-2]
-endfu
-com! FontSizeGet call <SID>FontSizeGet()
-com! FontSizeReset call <SID>FontSizeSet('')
-nno <silent> <Esc>=              <Cmd>call <SID>FontSizeSet('')<CR>
-nno <silent> <Esc>+              <Cmd>call <SID>FontSizeSet('+1')<CR>
-nno <silent> <Esc>-              <Cmd>call <SID>FontSizeSet('-1')<CR>
-nno <silent> <C-ScrollWheelUp>   <Cmd>call <SID>FontSizeSet('+1')<CR>
-nno <silent> <C-ScrollWheelDown> <Cmd>call <SID>FontSizeSet('-1')<CR>
 
 fu! s:TagfuncLinux(pattern, flags, info)
 	if !get(b:, 'guesstag', 1) | let b:guesstag = 1 | return v:null | endif
@@ -544,40 +503,23 @@ fu! s:XXD()
 endfu
 com! XXD call <SID>XXD()
 
-fu! s:Align(cmd, line1, line2, ...)
-	let l:save_cursor = getcurpos()
-	if a:0 ==# 0
-		let l:char = input('')
-	else
-		let l:char = a:1
-	endif
-	exe 'normal ' .. a:line1 .. 'GV' .. a:line2 .. 'G' .. a:cmd .. l:char
-	call setpos('.', l:save_cursor)
-endfu
-com! -range -nargs=? AlignRight call <SID>Align('gL', <line1>, <line2>, <f-args>)
-com! -range -nargs=? AlignLeft  call <SID>Align('gl', <line1>, <line2>, <f-args>)
-
 com! -nargs=0 Reload let s:undoreload = &undoreload | se undoreload=0 | e | let &undoreload = s:undoreload
 
-fu! s:Nkf()
-	if executable('uchardet')
-		let l:cmd = 'uchardet'
-	elseif executable('nkf')
-		let l:cmd = 'nkf --guess=1 '
-	else
-		echoe 'uchardet or nkf must be installed!'
+fu! s:Uchardet()
+	if !executable('uchardet')
+		echoe 'Executable uchardet not found!'
 		return
 	endif
-	exe 'e ++enc=' .. system(l:cmd .. ' ' .. fnamemodify(expand('%'), ':p'))
+	exe 'e ++enc=' .. system('uchardet ' .. fnamemodify(expand('%'), ':p'))
 endfu
-com! -nargs=0 Nkf call <SID>Nkf()
+com! -nargs=0 Uchardet call <SID>Uchardet()
 
 let s:template = {
 	\ 'c'     : ['#include <stdio.h>', '', 'int main(void)', '{', '	printf("Hello\n");', '	return 0;', '}'],
 	\ 'go'    : ['package main', '', 'import "fmt"', '', 'func main() {', '	fmt.Println("Hello")', '}'],
 	\ 'perl'  : ['#!/usr/bin/perl', 'use strict;', 'use warnings;'],
 	\ 'python': '#!/usr/bin/env python3',
-	\ 'sh'    : ['#!/bin/bash', 'set -euxo pipefail', 'shopt -s inherit_errexit'],
+	\ 'sh'    : ['#!/bin/bash', 'set -euxEo pipefail', 'shopt -s inherit_errexit failglob'],
 	\ }
 let s:template_after = {
 	\ 'c' : 'call cursor(5, 2)',
@@ -659,39 +601,6 @@ fu! s:GoToLastLine()
 		norm! g`"
 	endif
 endfu
-
-" gui
-if has('gui_running') && has('win32')
-	se guifont=Consolas:h11
-	se lines=30 columns=86
-	let s:guifont_default_size = split(split(&guifont, '[^\\]\zs,')[0], '[^\\]\zs:')[1][1:]
-	fu! s:FontSizeSet(amount)
-		let l:font = split(split(&guifont, '[^\\]\zs,')[0], '[^\\]\zs:')
-		let l:size = l:font[1][1:]
-		if a:amount ==# ""
-			let l:size = s:guifont_default_size
-		else
-			let l:size = eval(l:size .. a:amount)
-			if l:size == 0
-				let l:size = 1
-			endif
-		endif
-		let l:font[1] = l:font[1][0] .. l:size
-		let &guifont = join(l:font, ':')
-	endfu
-	fu! s:CopyOSC52(list)
-	endfu
-
-	nno <silent> <M-Space> <Cmd>simalt ~<CR>
-	cno <M-/> <C-\>e<SID>RegexRubout('\v[^/\\]*(/\|\\)? *$')<CR>
-	cno <M-w> <C-\>e<SID>RegexRubout('\v[^ ]* *$')<CR>
-	nno <M-m> <C-W>-
-	nno <M-p> <C-W>+
-	nno <silent> <M-=> <Cmd>call <SID>FontSizeSet('')<CR>
-	nno <silent> <M-+> <Cmd>call <SID>FontSizeSet('+1')<CR>
-	nno <silent> <M--> <Cmd>call <SID>FontSizeSet('-1')<CR>
-	nno <silent> <C-=> <Cmd>call <SID>FontSizeSet('')<CR>
-endif
 
 pa! matchit
 pa! termdebug
@@ -776,9 +685,6 @@ let g:ale_hover_cursor = 0
 let g:ale_lint_on_text_changed = 0
 let g:ale_lint_on_insert_leave = 0
 let g:ale_virtualtext_cursor = 0
-if has('win32unix')
-	let g:ale_enabled = 0
-endif
 " vim-surround
 let g:surround_dict = {
 	\ 'mb': '（\r）', 'm(': '（ \r ）', 'm)': '（\r）',
@@ -803,11 +709,8 @@ filet plugin indent on
 syn enable
 aug vimrc
 	au!
-	au ColorScheme * hi Cursor guifg=fg guibg=Red
-	au ColorScheme * hi CursorIM guifg=Black guibg=Blue
-	au ColorScheme * hi TabLineFill guibg=#808080
-	au ColorScheme * hi TrailingWhiteSpace ctermbg=darkred guibg=darkred
-	au ColorScheme * hi IdeographicSpace term=underline ctermbg=DarkGreen guibg=DarkGreen
+	au ColorScheme * hi TrailingWhiteSpace ctermbg=darkred
+	au ColorScheme * hi IdeographicSpace term=underline ctermbg=DarkGreen
 	au ColorScheme * call <SID>MultiHlSetup()
 	au ColorScheme molokai hi Visual ctermfg=none
 	au VimEnter * sil! call textobj#user#plugin('surround', {
