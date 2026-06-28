@@ -28,6 +28,9 @@ export DISPLAY
 if [[ -r ~/dotfiles/inputrc ]]; then
 	export INPUTRC=~/dotfiles/inputrc
 fi
+if [[ $LANG =~ ^ja_JP\.(utf|UTF-)8$ ]]; then
+	LANG=C.utf8
+fi
 export LESS=-RiWM
 if [[ -r ~/dotfiles/dircolors ]]; then
 	eval "$(dircolors -b ~/dotfiles/dircolors)"
@@ -58,7 +61,7 @@ _nj='\j'
 _pc0='history -a; history -c; history -r; _pj=${_nj@P}; _pj=${_pj#0}'
 _pc1='\[\e[0m\]\n'
 _pc2='$PSM\[\e[32m\]\u@\h \[\e[33m\]\w \[\e[38;5;93m\]$PSSHLVL \[\e[38;5;166m\]$_pj\[\e[0m\]'
-_pc3=' \[\e[38;5;245m\]\t ${PIPESTATUS[@]}\[\e[0m\]\n\[\ek\e\\\]\$ '
+_pc3=' \[\e[38;5;245m\]\t ${PIPESTATUS[@]}\[\e[0m\]\n\$ '
 GIT_PS1_SHOWDIRTYSTATE=1
 GIT_PS1_SHOWSTASHSTATE=1
 GIT_PS1_SHOWUNTRACKEDFILES=1
@@ -80,7 +83,6 @@ PSM=${PSM:-}
 alias chgrp='chgrp --preserve-root'
 alias chmod='chmod --preserve-root'
 alias chown='chown --preserve-root'
-alias cp='cp -p'
 alias diff='diff --color=auto'
 alias ee=exit
 alias fd='fd -HE.git/'

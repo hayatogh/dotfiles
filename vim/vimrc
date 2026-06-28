@@ -724,6 +724,8 @@ aug vimrc
 		\ })
 	au FileType c setl textwidth=80 cindent cinoptions=:0(s
 	au FileType c nno <buffer> <Leader>r <Cmd>call <SID>Command(1, 0, 0, 1, ['cc', '-oTEMPOUT', '-xc', 'TEMPBUF', '&&', 'TEMPOUT'])<CR>
+	au FileType c syn match cFormat display '%p\%([eKxRgVC]\|\%(SR\?\|[sB]\)b\?\|[ku]s\|ra\?\|a[pd]\?\|[Ii]\%(4[hnbl]\?\|6c\?\|S[pfschnbl]*\)\|U[bBlL]\|[dD][234]\?\|MF\|[Mm]R\?\|OF[fnpPcCF]*\|fw[fP]\|t[RST][dtrsp]\?\|G[pgv]\|NF\|4c\%(hR\|[chlb]\)\)' contained
+	au FileType c syn match cFormat display '%\*p\%(E[achnops]\?\|h[CDN]\?\|bl\?\)' contained
 	au FileType dune setl lispoptions=expr:1 indentexpr=lispindent('.')
 	au FileType git setl vartabstop=9,8 textwidth=0 | let b:show_trailing_ws = 0
 	au FileType gitsendemail setl vartabstop=9,8 textwidth=75 | let b:show_trailing_ws = 0
