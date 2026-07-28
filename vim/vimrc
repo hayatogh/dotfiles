@@ -744,6 +744,7 @@ aug vimrc
 	au FileType man nma <buffer> <silent> <CR> <C-]>
 	au FileType markdown setl softtabstop=0 tabstop=8
 	au FileType markdown ino <buffer> <Tab> <C-V><Tab>
+	au FileType markdown syn clear markdownError
 	au FileType php setl matchpairs-=<:>
 	au FileType ps1 setl expandtab shiftwidth=2
 	au FileType python let b:tempexecute_cmd = executable('uv') ? 'uv run -s'  : 'python3'

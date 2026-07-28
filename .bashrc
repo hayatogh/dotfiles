@@ -43,7 +43,7 @@ export RUST_BACKTRACE=1
 export VISUAL=vim
 export XDG_CONFIG_HOME=~/.config
 if [[ ${SUDO_USER:-} ]]; then
-	export LESSHISTFILE=~/.root_lesshst
+	export LESSHISTFILE=~/.local/state/root_lesshst
 fi
 
 _distro=$(sed -En 's/^ID=//p' /etc/os-release 2>/dev/null || true)
@@ -55,46 +55,90 @@ fi
 
 [[ $- != *i* ]] && return
 
+_load_if_readable()
+{
+	if [[ -r $1 ]]; then
+		. "$1"
+	fi
+}
+_load_if_readable /etc/profile.d/bash_completion.sh
+
 shopt -s autocd cdspell checkhash checkjobs checkwinsize dotglob execfail globstar histreedit lithist no_empty_cmd_completion nocaseglob
 
-_nj='\j'
-_pc0='history -a; history -c; history -r; _pj=${_nj@P}; _pj=${_pj#0}'
-_pc1='\[\e[0m\]\n'
-_pc2='$PSM\[\e[32m\]\u@\h \[\e[33m\]\w \[\e[38;5;93m\]$PSSHLVL \[\e[38;5;166m\]$_pj\[\e[0m\]'
-_pc3=' \[\e[38;5;245m\]\t ${PIPESTATUS[@]}\[\e[0m\]\n\$ '
-GIT_PS1_SHOWDIRTYSTATE=1
-GIT_PS1_SHOWSTASHSTATE=1
-GIT_PS1_SHOWUNTRACKEDFILES=1
-GIT_PS1_SHOWUPSTREAM=auto
-GIT_PS1_SHOWCOLORHINTS=1
-GIT_PS1_HIDE_IF_PWD_IGNORED=1
 HISTCONTROL=ignoreboth:erasedups
 HISTSIZE=2000
 HISTTIMEFORMAT='%c : '
 if [[ ${SUDO_USER:-} ]]; then
 	HISTFILE=~/.root_history
 fi
-
-PSSHLVL=$((SHLVL ${TMUX:+- 1}))
-if ((PSSHLVL == 1)); then
-	PSSHLVL=
+GIT_PS1_SHOWDIRTYSTATE=1
+GIT_PS1_SHOWSTASHSTATE=1
+GIT_PS1_SHOWUNTRACKEDFILES=1
+GIT_PS1_SHOWUPSTREAM=auto
+GIT_PS1_SHOWCONFLICTSTATE=yes
+GIT_PS1_SHOWCOLORHINTS=1
+GIT_PS1_HIDE_IF_PWD_IGNORED=1
+GIT_PS1_NOSKIP=
+GIT_PS1_SKIP=
+GIT_PS1_SKIPSEC=3
+: ${PSM:=}
+_psl=$((SHLVL ${TMUX:+- 1}))
+if ((_psl == 1)); then
+	_psl=
 fi
-PSM=${PSM:-}
+_nj='\j'
+_pc0='history -a; history -c; history -r; _pj=${_nj@P}; _pj=${_pj#0}'
+_pc1='\[\e[0m\]\n'
+_pc2='$PSM\[\e[32m\]\u@\h \[\e[33m\]\w \[\e[38;5;93m\]$_psl \[\e[38;5;166m\]$_pj\[\e[0m\]'
+_pc3=' \[\e[38;5;245m\]\t ${PIPESTATUS[@]}\[\e[0m\]\n\$ '
+_pc()
+{
+	local gitdir start took
+
+	eval "$_pc0"
+
+	if [[ -z ${GIT_PS1_NOSKIP:-} ]]; then
+		gitdir=$(git rev-parse --git-dir 2>/dev/null)
+		if [[ $gitdir ]]; then
+			gitdir=$(realpath "$gitdir")
+			if [[ :${GIT_PS1_SKIP:-}: == *:$gitdir:* ]]; then
+				PS1=$_pc1$_pc2-$_pc3
+				return
+			fi
+		fi
+	fi
+
+	start=$EPOCHSECONDS
+	__git_ps1 "$_pc1$_pc2" "$_pc3"
+	took=$(($EPOCHSECONDS - $start))
+	if [[ -z ${GIT_PS1_NOSKIP:-} && $gitdir && $took -ge $GIT_PS1_SKIPSEC ]]; then
+		echo "Git prompt took $took secs.  Added $gitdir to GIT_PS1_SKIP"
+		GIT_PS1_SKIP=${GIT_PS1_SKIP:+$GIT_PS1_SKIP:}$gitdir
+	fi
+}
+_pca()
+{
+	eval "$_pc0"
+	PS1=$_pc1$_pc2$_pc3
+}
+PROMPT_COMMAND=_pc
+
 alias chgrp='chgrp --preserve-root'
 alias chmod='chmod --preserve-root'
 alias chown='chown --preserve-root'
-alias diff='diff --color=auto'
+alias diff='diff --color'
+alias diffr='diff -Nurp -xtags'
 alias ee=exit
 alias fd='fd -HE.git/'
 alias fdall='fd -I'
-alias grep='grep --color=auto'
+alias grep='grep --color'
 alias info='info --init-file ~/dotfiles/infokey'
 alias ls='ls --color=auto'
 alias la='ls -A'
 alias ll='ls -alhF'
 alias manless='man -P less'
 alias rm='rm -i'
-alias scheme='scheme ~/dotfiles/chezrc.ss'
+alias scheme='scheme --eehistory ~/.local/state/chez_history ~/dotfiles/chezrc.ss'
 alias tm='tmux new -ADX'
 alias vi='vim --clean'
 e()
@@ -281,16 +325,10 @@ dl()
 	trap - SIGINT
 }
 alias sush='sudo --preserve-env=HOME $BASH --rcfile ~/.bashrc'
-_load_if_readable()
-{
-	if [[ -r $1 ]]; then
-		. "$1"
-	fi
-}
 _load_if_readable ~/dotfiles/rpm-commands.sh
 rm_rfchmod()
 {
-	find "$@" ! -perm -700 -type d -print0 | xargs -0 chmod 700
+	chmod -R 700 "$@"
 	rm -rf "$@"
 }
 timesp()
@@ -325,6 +363,17 @@ loredl()
 	curl -fsSLo "$msgid.mbox.gz" "$url"
 }
 
+_comp_tryssh_load()
+{
+	local f
+	$(complete -pD | cut -d\  -f3) ssh
+	f=$(complete -p ssh | cut -d\  -f3)
+	complete -F $f tryssh
+	$f
+}
+complete -F _comp_tryssh_load tryssh
+complete -c realwhich
+
 if [[ $_distro == debian ]]; then
 	_pc2='${debian_chroot:+($debian_chroot)}'$_pc2
 	upgrade()
@@ -347,19 +396,11 @@ fi
 
 l.()
 (
-	(($#)) && cd "$1"
+	cd "${1:-.}"
 	ls -dF .*
 )
-_load_if_readable /etc/profile.d/bash_completion.sh
-if type _comp_load &>/dev/null; then
-	_comp_load -D -- ssh
-	complete -F _comp_cmd_ssh tryssh
-fi
-complete -c realwhich
-PROMPT_COMMAND=$_pc0"; __git_ps1 '"$_pc1$_pc2"' '"$_pc3"'"
 if ! type __git_ps1 &>/dev/null; then
-	PROMPT_COMMAND=$_pc0
-	PS1=$_pc1$_pc2$_pc3
+	PROMPT_COMMAND=$_pca
 fi
 
 _load_if_readable ~/.localbashrc.bash

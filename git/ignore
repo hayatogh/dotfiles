@@ -1,2 +1,6 @@
 *.swp
 *.swo
+tags
+!tags/
+tags.x86
+tags.arm64
