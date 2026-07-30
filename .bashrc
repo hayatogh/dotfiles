@@ -400,7 +400,7 @@ l.()
 	ls -dF .*
 )
 if ! type __git_ps1 &>/dev/null; then
-	PROMPT_COMMAND=$_pca
+	PROMPT_COMMAND=_pca
 fi
 
 _load_if_readable ~/.localbashrc.bash

@@ -8,7 +8,7 @@ xfconf-query -c xfce4-appfinder -p /close-on-focus-lost -s true -nt bool
 # Hide desktop icons
 xfconf-query -c xfce4-desktop -p /desktop-icons/style -s 0 -nt int
 
-xfconf-query -c xfce4-keyboard-shortcuts -p '/commands/custom/<Primary><Alt>g' -s 'exo-open --launch WebBrowser' -nt string
+xfconf-query -c xfce4-keyboard-shortcuts -p '/commands/custom/<Primary><Alt>b' -s 'exo-open --launch WebBrowser' -nt string
 xfconf-query -c xfce4-keyboard-shortcuts -p '/commands/custom/<Primary><Alt>v' -s 'xfce4-clipman-history' -nt string
 
 xfconf-query -c xfce4-notifyd -p /do-slideout -s true -nt bool
