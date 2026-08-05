@@ -78,8 +78,7 @@ GIT_PS1_SHOWUPSTREAM=auto
 GIT_PS1_SHOWCONFLICTSTATE=yes
 GIT_PS1_SHOWCOLORHINTS=1
 GIT_PS1_HIDE_IF_PWD_IGNORED=1
-GIT_PS1_NOSKIP=
-GIT_PS1_SKIP=
+GIT_PS1_SKIPDIRS=
 GIT_PS1_SKIPSEC=3
 : ${PSM:=}
 _psl=$((SHLVL ${TMUX:+- 1}))
@@ -94,26 +93,18 @@ _pc3=' \[\e[38;5;245m\]\t ${PIPESTATUS[@]}\[\e[0m\]\n\$ '
 _pc()
 {
 	local gitdir start took
-
 	eval "$_pc0"
-
-	if [[ -z ${GIT_PS1_NOSKIP:-} ]]; then
-		gitdir=$(git rev-parse --git-dir 2>/dev/null)
-		if [[ $gitdir ]]; then
-			gitdir=$(realpath "$gitdir")
-			if [[ :${GIT_PS1_SKIP:-}: == *:$gitdir:* ]]; then
-				PS1=$_pc1$_pc2-$_pc3
-				return
-			fi
-		fi
+	gitdir=$(git rev-parse --show-toplevel 2>/dev/null)
+	if [[ $gitdir && :${GIT_PS1_SKIPDIRS:-}: == *:$gitdir:* ]]; then
+		PS1=$_pc1$_pc2-$_pc3
+		return
 	fi
-
 	start=$EPOCHSECONDS
 	__git_ps1 "$_pc1$_pc2" "$_pc3"
 	took=$(($EPOCHSECONDS - $start))
-	if [[ -z ${GIT_PS1_NOSKIP:-} && $gitdir && $took -ge $GIT_PS1_SKIPSEC ]]; then
-		echo "Git prompt took $took secs.  Added $gitdir to GIT_PS1_SKIP"
-		GIT_PS1_SKIP=${GIT_PS1_SKIP:+$GIT_PS1_SKIP:}$gitdir
+	if [[ $gitdir && $took -ge $GIT_PS1_SKIPSEC ]]; then
+		echo "Git prompt took $took >=GIT_PS1_SKIPSEC.  Added to GIT_PS1_SKIPDIRS."
+		GIT_PS1_SKIPDIRS=${GIT_PS1_SKIPDIRS:+$GIT_PS1_SKIPDIRS:}$gitdir
 	fi
 }
 _pca()
