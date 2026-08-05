@@ -32,6 +32,7 @@ if [[ $LANG =~ ^ja_JP\.(utf|UTF-)8$ ]]; then
 	LANG=C.utf8
 fi
 export LESS=-RiWM
+export LIBVIRT_DEFAULT_URI=qemu:///system
 if [[ -r ~/dotfiles/dircolors ]]; then
 	eval "$(dircolors -b ~/dotfiles/dircolors)"
 fi
@@ -119,6 +120,7 @@ alias chmod='chmod --preserve-root'
 alias chown='chown --preserve-root'
 alias diff='diff --color'
 alias diffr='diff -Nurp -xtags'
+alias drive='rclone mount drive: ~/Drive --vfs-cache-mode full -vv'
 alias ee=exit
 alias fd='fd -HE.git/'
 alias fdall='fd -I'
@@ -384,15 +386,18 @@ elif [[ $_distro =~ fedora|centos|rhel ]]; then
 	alias l. &>/dev/null && unalias l.
 	_load_if_readable /usr/share/git-core/contrib/completion/git-prompt.sh
 fi
-
 l.()
 (
 	cd "${1:-.}"
 	ls -dF .*
 )
+
+_load_if_readable ~/.localbashrc.bash
+
 if ! type __git_ps1 &>/dev/null; then
 	PROMPT_COMMAND=_pca
 fi
-
-_load_if_readable ~/.localbashrc.bash
+if [[ -z ${_nomx:-} && -z ${TMUX:-} && -z ${SUDO_USER:-} && -z $(tmux lsc 2>/dev/null) ]]; then
+	tmux new -A
+fi
 true
