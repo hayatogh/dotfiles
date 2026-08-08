@@ -4,6 +4,12 @@ _pathadd()
 		PATH=$1:$PATH
 	fi
 }
+_load_if_missing()
+{
+	if [[ -r $2 && :$PATH: != *$1* ]]; then
+		. "$2"
+	fi
+}
 _pathadd /usr/sbin
 _pathadd /usr/local/sbin
 _pathadd ~/.local/bin
@@ -15,12 +21,6 @@ _pathadd $GOPATH/bin
 _pathadd ~/.wasmtime/bin
 _pathadd ~/.npm/bin
 _pathadd ~/.deno/bin
-_load_if_missing()
-{
-	if [[ -r $2 && :$PATH: != *$1* ]]; then
-		. "$2"
-	fi
-}
 _load_if_missing .opam ~/.opam/opam-init/init.sh
 _load_if_missing .ghcup ~/.ghcup/env
 
@@ -32,6 +32,9 @@ if [[ $LANG =~ ^ja_JP\.(utf|UTF-)8$ ]]; then
 	LANG=C.utf8
 fi
 export LESS=-RiWM
+if [[ -z ${LESSOPEN:-} ]] && type lesspipe &>/dev/null; then
+	eval "$(lesspipe)"
+fi
 export LIBVIRT_DEFAULT_URI=qemu:///system
 if [[ -r ~/dotfiles/dircolors ]]; then
 	eval "$(dircolors -b ~/dotfiles/dircolors)"
@@ -47,13 +50,6 @@ if [[ ${SUDO_USER:-} ]]; then
 	export LESSHISTFILE=~/.local/state/root_lesshst
 fi
 
-_distro=$(sed -En 's/^ID=//p' /etc/os-release 2>/dev/null || true)
-if [[ $_distro == debian ]]; then
-	export LESSOPEN='| /usr/bin/lesspipe %s'
-	export LESSCLOSE='/usr/bin/lesspipe %s %s'
-fi
-
-
 [[ $- != *i* ]] && return
 
 _load_if_readable()
@@ -62,7 +58,27 @@ _load_if_readable()
 		. "$1"
 	fi
 }
-_load_if_readable /etc/profile.d/bash_completion.sh
+
+_regex_rubout()
+{
+	local right=${READLINE_LINE:$READLINE_POINT}
+	local left=${READLINE_LINE::$READLINE_POINT}
+	[[ $left =~ $1 ]]
+	left=${left::-${#BASH_REMATCH[0]}}
+	READLINE_LINE=$left$right
+	READLINE_POINT=${#left}
+}
+_cw()
+{
+	_regex_rubout '([a-zA-Z0-9]+|[^ a-zA-Z0-9]+) *$'
+}
+bind -x '"\C-w": _cw'
+bind -x '"\eh": _cw'
+_mbackslash()
+{
+	_regex_rubout '([^ ;&|<>] *)*(;|&&|\|\||\||\|&|<|>|<<|>>|&>|>&)? *$'
+}
+bind -x '"\e\\": _mbackslash'
 
 shopt -s autocd cdspell checkhash checkjobs checkwinsize dotglob execfail globstar histreedit lithist no_empty_cmd_completion nocaseglob
 
@@ -132,6 +148,7 @@ alias ll='ls -alhF'
 alias manless='man -P less'
 alias rm='rm -i'
 alias scheme='scheme --eehistory ~/.local/state/chez_history ~/dotfiles/chezrc.ss'
+alias sush='sudo --preserve-env=HOME $BASH --rcfile ~/.bashrc'
 alias tm='tmux new -ADX'
 alias vi='vim --clean'
 e()
@@ -159,26 +176,6 @@ mkcd()
 	mkdir "$1"
 	cd "$1"
 }
-_regex_rubout()
-{
-	local right=${READLINE_LINE:$READLINE_POINT}
-	local left=${READLINE_LINE::$READLINE_POINT}
-	[[ $left =~ $1 ]]
-	left=${left::-${#BASH_REMATCH[0]}}
-	READLINE_LINE=$left$right
-	READLINE_POINT=${#left}
-}
-_cw()
-{
-	_regex_rubout '([a-zA-Z0-9]+|[^ a-zA-Z0-9]+) *$'
-}
-bind -x '"\C-w": _cw'
-bind -x '"\eh": _cw'
-_mbackslash()
-{
-	_regex_rubout '([^ ;&|<>] *)*(;|&&|\|\||\||\|&|<|>|<<|>>|&>|>&)? *$'
-}
-bind -x '"\e\\": _mbackslash'
 cdd()
 {
 	cd "$(dirname "$1")"
@@ -204,15 +201,9 @@ realwhich()
 {
 	realpath "$(which "$1")"
 }
-clean_history()
-{
-	(($# == 1)) || return 1
-	local pat=$1
-	perl -0777 -i -pe 's/^#\d+\n('"$pat"') *\n//gm' $HISTFILE
-}
 fix_history()
 {
-	perl -i -ne 'BEGIN { $sawtime = 0 } if (/^#/) { $sawtime = 1 } if ($sawtime) { print }' $HISTFILE
+	sed -ni '/^#/,$p' $HISTFILE
 }
 fixmod()
 {
@@ -317,7 +308,6 @@ dl()
 	done
 	trap - SIGINT
 }
-alias sush='sudo --preserve-env=HOME $BASH --rcfile ~/.bashrc'
 _load_if_readable ~/dotfiles/rpm-commands.sh
 rm_rfchmod()
 {
@@ -356,17 +346,25 @@ loredl()
 	curl -fsSLo "$msgid.mbox.gz" "$url"
 }
 
+_load_if_readable /etc/profile.d/bash_completion.sh
+_comp_copy()
+{
+	local srccmd=$1 destcmd=$2 spec newspec func
+	$(complete -pD | cut -d\  -f3) "$srccmd"
+	spec=$(complete -p "$srccmd" 2>/dev/null)
+	newspec=$(awk "{\$NF=\"$destcmd\"; print}" <<<$spec)
+	func=$(awk '{print $(NF-1)}' <<<$spec)
+	eval "$newspec"
+	$func
+}
 _comp_tryssh_load()
 {
-	local f
-	$(complete -pD | cut -d\  -f3) ssh
-	f=$(complete -p ssh | cut -d\  -f3)
-	complete -F $f tryssh
-	$f
+	_comp_copy ssh tryssh
 }
 complete -F _comp_tryssh_load tryssh
 complete -c realwhich
 
+_distro=$(sed -En 's/^ID=//p' /etc/os-release 2>/dev/null || true)
 if [[ $_distro == debian ]]; then
 	_pc2='${debian_chroot:+($debian_chroot)}'$_pc2
 	upgrade()
