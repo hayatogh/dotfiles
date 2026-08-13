@@ -758,6 +758,7 @@ aug vimrc
 	au FileType sh nno <buffer> <Leader>r <Cmd>call <SID>Command(1, 0, 0, 1, ['bash', 'TEMPBUF'])<CR>
 	au FileType text setl expandtab
 	au FileType text ino <buffer> <Tab> <C-V><Tab>
+	au FileType tmux syn clear tmuxInvalidVariableExpansion
 	au FileType xml setl expandtab shiftwidth=2
 	au FileType xml ino <buffer> <Tab> <C-V><Tab>
 	au BufNewFile *.go,*.pl,*.py,*.sh call <SID>Template()
