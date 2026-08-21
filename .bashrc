@@ -40,11 +40,11 @@ if [[ -r ~/dotfiles/dircolors ]]; then
 	eval "$(dircolors -b ~/dotfiles/dircolors)"
 fi
 export MANOPT='--nh --nj'
-export MANPAGER='vim +MANPAGER --not-a-term -'
+export MANPAGER='vi +MANPAGER --not-a-term -'
 export NPM_CONFIG_USERCONFIG=~/dotfiles/npmrc
 export RLWRAP_HOME=~/.local/state/rlwrap
 export RUST_BACKTRACE=1
-export VISUAL=vim
+export VISUAL=vi
 export XDG_CONFIG_HOME=~/.config
 if [[ ${SUDO_USER:-} ]]; then
 	export LESSHISTFILE=~/.local/state/root_lesshst
@@ -150,7 +150,6 @@ alias rm='rm -i'
 alias scheme='scheme --eehistory ~/.local/state/chez_history ~/dotfiles/chezrc.ss'
 alias sush='sudo --preserve-env=HOME $BASH --rcfile ~/.bashrc'
 alias tm='tmux new -ADX'
-alias vi='vim --clean'
 e()
 {
 	open &>/dev/null "${@:-.}"
@@ -220,11 +219,11 @@ alias rgx='_rg_arch x86'
 alias rgarm='_rg_arch '\''arm|arm64'\'
 vl()
 {
-	vim $($1 -l "${@:2}")
+	vi $($1 -l "${@:2}")
 }
 vll()
 {
-	vim $("$@")
+	vi $("$@")
 }
 calc()
 {

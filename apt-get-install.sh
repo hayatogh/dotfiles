@@ -8,6 +8,7 @@ else
 	echo -n '[su] '
 fi
 $addsudo -c "echo '$USER ALL=(ALL) NOPASSWD:ALL' >/etc/sudoers.d/$USER"
+sudo sh -c "usermod -aG sudo $USER"
 sudo sh -c 'echo "Defaults !admin_flag" >/etc/sudoers.d/disable_admin_file_in_home'
 rm -f ~/.sudo_as_admin_successful
 

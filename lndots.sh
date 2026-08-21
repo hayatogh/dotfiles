@@ -4,7 +4,7 @@ set -euo pipefail
 dotfiles=$(cd $(dirname $0); pwd -P)
 
 tohome=.bashrc
-toconfig='gdb git gitui gtk-3.0/gtk.css lessfilter tmux vim/vimrc'
+toconfig='gdb git gitui gtk-3.0/gtk.css lessfilter ptpython tmux vim/vimrc'
 
 mkdir -p ~/.ssh ~/.config/vim/swap
 chmod 700 ~/.ssh ~/.config/vim/swap
