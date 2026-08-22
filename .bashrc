@@ -73,7 +73,6 @@ _cw()
 	_regex_rubout '([a-zA-Z0-9]+|[^ a-zA-Z0-9]+) *$'
 }
 bind -x '"\C-w": _cw'
-bind -x '"\eh": _cw'
 _mbackslash()
 {
 	_regex_rubout '([^ ;&|<>] *)*(;|&&|\|\||\||\|&|<|>|<<|>>|&>|>&)? *$'
@@ -113,7 +112,7 @@ _pc()
 	eval "$_pc0"
 	gitdir=$(git rev-parse --show-toplevel 2>/dev/null)
 	if [[ $gitdir && :${GIT_PS1_SKIPDIRS:-}: == *:$gitdir:* ]]; then
-		PS1=$_pc1$_pc2-$_pc3
+		PS1=$_pc1$_pc2' -'$_pc3
 		return
 	fi
 	start=$EPOCHSECONDS
