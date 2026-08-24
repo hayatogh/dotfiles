@@ -32,6 +32,7 @@ se pumheight=10
 se report=15
 se runtimepath+=/usr/share/vim/addons
 se scrolloff=3 sidescroll=1 sidescrolloff=10
+se noshowcmd
 se incsearch hlsearch nowrapscan
 se shortmess=aoOtT
 se splitbelow splitright

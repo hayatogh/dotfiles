@@ -18,3 +18,4 @@ cd vim/src
 ./configure --prefix=$prefix --disable-nls &>/dev/null
 make -j$(nproc) &>/dev/null
 make install &>/dev/null
+ln -s $prefix/bin/vim $prefix/bin/vi
