@@ -347,19 +347,18 @@ loredl()
 _load_if_readable /etc/profile.d/bash_completion.sh
 _comp_copy()
 {
-	local srccmd=$1 destcmd=$2 spec newspec func
-	$(complete -pD | cut -d\  -f3) "$srccmd"
-	spec=$(complete -p "$srccmd" 2>/dev/null)
-	newspec=$(awk "{\$NF=\"$destcmd\"; print}" <<<$spec)
-	func=$(awk '{print $(NF-1)}' <<<$spec)
-	eval "$newspec"
-	$func
+	local srccmd=$1 destcmd=$2 spec
+	shift
+	$(complete -pD | awk '{print $(NF-1)}') $srccmd
+	spec=$(complete -p $srccmd)
+	$(awk '{$NF="'$destcmd'"; print}' <<<$spec)
+	$(awk '{print $(NF-1)}' <<<$spec) "$@"
 }
-_comp_tryssh_load()
+_comp_copy_ssh()
 {
-	_comp_copy ssh tryssh
+	_comp_copy ssh "$@"
 }
-complete -F _comp_tryssh_load tryssh
+complete -F _comp_copy_ssh tryssh
 complete -c realwhich
 
 _distro=$(sed -En 's/^ID=//p' /etc/os-release 2>/dev/null || true)
