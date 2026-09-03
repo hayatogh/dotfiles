@@ -51,7 +51,7 @@ xfconf-query -c xsettings -p /Xft/DPI -s 135 -nt int
 
 
 # Set user by default in the login menu
-sed -Ei 's/^#(greeter-hide-users=false)/\1/' /etc/lightdm/lightdm.conf
+sudo sed -Ei 's/^#(greeter-hide-users=false)/\1/' /etc/lightdm/lightdm.conf
 
 # Set Input Method ON/OFF key on uim-pref-gtk3
 # 全体キー設定1
@@ -59,3 +59,19 @@ sed -Ei 's/^#(greeter-hide-users=false)/\1/' /etc/lightdm/lightdm.conf
 
 # Autostart applications
 # Enable Clipman if not pinned to dock
+
+sudo tee /etc/udev/hwdb.d/71-mouse-local.hwdb >/dev/null <<EOF
+mouse:usb:v04a5p800a:*
+mouse:usb:v04a5p8006:*
+ KEYBOARD_KEY_90004=btn_middle
+EOF
+sudo tee /etc/udev/rules.d/99-mouse-remap.rules >/dev/null <<EOF
+SUBSYSTEM=="input", ATTRS{idVendor}=="04a5", ATTRS{idProduct}=="800[a6]", IMPORT{builtin}="keyboard"
+EOF
+sudo tee /etc/udev/hwdb.d/61-keyboard-local.hwdb >/dev/null <<EOF
+evdev:atkbd:dmi:*
+ KEYBOARD_KEY_3a=leftctrl
+EOF
+sudo systemd-hwdb update
+sudo udevadm control --reload
+sudo udevadm trigger

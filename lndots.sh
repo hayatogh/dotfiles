@@ -6,18 +6,23 @@ dotfiles=$(cd $(dirname $0); pwd -P)
 tohome=.bashrc
 toconfig='gdb git gitui gtk-3.0/gtk.css lessfilter ptpython tmux vim/vimrc'
 
-mkdir -p ~/.ssh ~/.config/vim/swap
-chmod 700 ~/.ssh ~/.config/vim/swap
+if [[ ! -e ~/.ssh/id_ed25519 ]]; then
+	ssh-keygen -q -f ~/.ssh/id_ed25519 -N '' -t ed25519
+fi
 touch ~/.ssh/authorized_keys
 chmod 600 ~/.ssh/authorized_keys
 if [[ ! -e ~/.ssh/config ]]; then
 	cp $dotfiles/ssh_config ~/.ssh/config
 fi
+
+mkdir -p ~/.config/vim/swap
+chmod 700 ~/.config/vim/swap
+
 userdirs=~/.config/user-dirs.dirs
 rmdir_name()
 {
 	declare -n dir=$1
-	if [[ $dir == $HOME/ || ! -d $dir ]]; then
+	if [[ ! -d $dir || $dir == $HOME/ ]]; then
 		return
 	fi
 	rmdir --ignore-fail-on-non-empty "$dir"
@@ -25,7 +30,7 @@ rmdir_name()
 mkdir_name()
 {
 	declare -n dir=$1
-	if [[ -e $dir ]]; then
+	if [[ -z $dir || -e $dir ]]; then
 		return
 	fi
 	mkdir -p "$dir"
@@ -54,6 +59,7 @@ XDG_PROJECTS_DIR="$HOME/Desktop/Projects"
 EOF
 	foreach_userdirs mkdir_name
 fi
+
 if [[ -f ~/.profile ]]; then
 	printf '1{/return/!i\\\nif [ "$BASH_VERSION" ]; then . ~/.bashrc; return; fi\n}' | sed -i -f - ~/.profile
 fi
