@@ -9,3 +9,4 @@ else
 fi
 
 uv tool install -U ruff
+uv tool install -U pyrefly

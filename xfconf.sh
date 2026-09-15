@@ -46,6 +46,7 @@ xfconf-query -c xfwm4 -p /general/wrap_windows -s false -nt bool
 xfconf-query -c xfwm4 -p /general/move_opacity -s 60 -nt int
 xfconf-query -c xfwm4 -p /general/resize_opacity -s 60 -nt int
 
+xfconf-query -c xsettings -p /Net/CursorBlink -s false -nt bool
 xfconf-query -c xsettings -p /Net/ThemeName -s Adwaita-dark -nt string
 xfconf-query -c xsettings -p /Xft/DPI -s 135 -nt int
 
