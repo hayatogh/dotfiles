@@ -659,7 +659,7 @@ let g:ale_linters = {
 	\ 'mail'      : ['vale'],
 	\ 'markdown'  : ['vale'],
 	\ 'ocaml'     : ['ocamllsp'],
-	\ 'python'    : ['ruff'],
+	\ 'python'    : ['ruff', 'pyrefly'],
 	\ 'rst'       : ['vale'],
 	\ 'rust'      : ['analyzer', 'cargo'],
 	\ 'sh'        : [],
@@ -672,7 +672,7 @@ let g:ale_fixers = {
 	"\ 'cpp'       : ['clang-format'],
 	\ 'go'        : ['gofmt', 'goimports'],
 	\ 'ocaml'     : ['ocamlformat'],
-	\ 'python'    : ['ruff_format'],
+	\ 'python'    : ['ruff', 'ruff_format'],
 	\ 'rust'      : ['rustfmt'],
 	\ 'typescript': [],
 	\ }
