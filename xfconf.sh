@@ -53,10 +53,19 @@ xfconf-query -c xsettings -p /Xft/DPI -s 135 -nt int
 
 # Set user by default in the login menu
 sudo sed -Ei 's/^#(greeter-hide-users=false)/\1/' /etc/lightdm/lightdm.conf
+# Prompt follows cursor
+opt='active-monitor=#cursor'
+file=/etc/lightdm/lightdm-gtk-greeter.conf
+if ! grep "^$opt" $file &>/dev/null; then
+	sudo sh -c "echo '$opt' >>$file"
+fi
+unset opt file
+# Let lightdm read ~/.face
+chmod o+x ~
 
 # Set Input Method ON/OFF key on uim-pref-gtk3
-# 全体キー設定1
 # Mozc key bindings
+#   Replace <Shift>Space
 
 # Autostart applications
 # Enable Clipman if not pinned to dock
@@ -76,3 +85,10 @@ EOF
 sudo systemd-hwdb update
 sudo udevadm control --reload
 sudo udevadm trigger
+
+
+# sudo apt install -t stable-backports firmware-amd-graphics
+# sudo apt install -t stable-backports linux-image-amd64
+# sudo apt install -t stable-backports firmware-linux
+# sudo apt install -t stable-backports libgl1-mesa-dri mesa-vulkan-drivers
+# sudo apt purge xserver-xorg-video-amdgpu
