@@ -360,6 +360,16 @@ _comp_copy_ssh()
 }
 complete -F _comp_copy_ssh tryssh
 complete -c realwhich
+_comp_kconfig_make()
+{
+	if [[ -r scripts/bash-completion/make ]]; then
+		. scripts/bash-completion/make
+	else
+		$(complete -pD | awk '{print $(NF-1)}') make
+	fi
+	$(awk '{print $(NF-1)}' <<<$(complete -p make)) "$@"
+}
+complete -F _comp_kconfig_make make
 
 _distro=$(sed -En 's/^ID=//p' /etc/os-release 2>/dev/null || true)
 if [[ $_distro == debian ]]; then
