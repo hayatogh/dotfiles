@@ -50,6 +50,11 @@ xfconf-query -c xsettings -p /Net/CursorBlink -s false -nt bool
 xfconf-query -c xsettings -p /Net/ThemeName -s Adwaita-dark -nt string
 xfconf-query -c xsettings -p /Xft/DPI -s 135 -nt int
 
+# Below two to choose screensaver theme
+xfconf-query -c xfce4-screensaver -p /saver/mode -s 2 -nt int
+xfconf-query -c xfce4-screensaver -p /saver/themes/list -s screensavers-xfce-floaters -nat string
+xfconf-query -c xfce4-screensaver -p /saver/idle-activation/delay -s 30 -nt int
+
 
 # Set user by default in the login menu
 sudo sed -Ei 's/^#(greeter-hide-users=false)/\1/' /etc/lightdm/lightdm.conf

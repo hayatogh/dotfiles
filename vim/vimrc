@@ -757,6 +757,7 @@ aug vimrc
 	au FileType scheme nno <buffer> <Leader>r <Cmd>call <SID>Command(1, 0, 0, 1, ['chezscheme', '--script', 'TEMPBUF'])<CR>
 	au FileType sh setl isfname-== keywordprg=:Manbuiltin | let b:sh_indent_options = {'case-labels': 0}
 	au FileType sh nno <buffer> <Leader>r <Cmd>call <SID>Command(1, 0, 0, 1, ['bash', 'TEMPBUF'])<CR>
+	au FileType spec let b:match_words ..= ',^%if\%(\|arch\|narch\|os\|nos\)\>:^%elif\%(\|arch\|os\)\>:^%else\>:^%endif\>'
 	au FileType text setl expandtab
 	au FileType text ino <buffer> <Tab> <C-V><Tab>
 	au FileType tmux syn clear tmuxInvalidVariableExpansion
