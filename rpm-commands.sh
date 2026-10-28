@@ -36,4 +36,35 @@ rpmia()
 	mkdir "$dir" || return 1
 	cd "$dir"
 	rpm2cpio "$rpm" | cpio -idu --quiet
+	if [[ $? -ne 0 ]]; then
+		cd -
+		rmdir "$dir"
+	fi
+}
+
+rpmsort()
+{
+	local f=${1:-} cand
+	if [[ $f ]]; then
+		if [[ -d $f ]]; then
+			f=$f/sos_commands/rpm/package-data
+		fi
+	else
+		for cand in {.,sos,sos*}/sos_commands/rpm/package-data; do
+			if [[ -f $cand && -s $cand ]]; then
+				f=$cand
+				break
+			fi
+		done
+	fi
+
+	{
+		if [[ $f ]]; then
+			echo "Reading $f" >&2
+			cat "$f"
+		else
+			echo 'Executing rpm -qa ..' >&2
+			LC_ALL=C rpm --nodigest -qa --qf="%{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}\t%{INSTALLTIME:date}\t%{INSTALLTIME}\n"
+		fi
+	} | awk -F '\t' '{printf "%s\t%-59s\t%s\n", $3, $1, $2}' | sort -rnk1,1
 }
