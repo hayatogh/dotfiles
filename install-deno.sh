@@ -7,4 +7,5 @@ else
 	deno upgrade
 fi
 
-deno install -g -RWES --deny-net npm:diff2html-cli
+deno install -g -RWE --allow-ffi --allow-run npm:oxfmt
+deno install -g -RWE --allow-ffi --allow-run npm:oxlint
