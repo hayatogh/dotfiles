@@ -129,6 +129,12 @@ _pca()
 	PS1=$_pc1$_pc2$_pc3
 }
 PROMPT_COMMAND=_pc
+if ! type __git_ps1 &>/dev/null; then
+	_load_if_readable /usr/share/git-core/contrib/completion/git-prompt.sh
+fi
+if ! type __git_ps1 &>/dev/null; then
+	PROMPT_COMMAND=_pca
+fi
 
 alias chgrp='chgrp --preserve-root'
 alias chmod='chmod --preserve-root'
@@ -149,6 +155,14 @@ alias rm='rm -i'
 alias scheme='scheme --eehistory ~/.local/state/chez_history ~/dotfiles/chezrc.ss'
 alias sush='sudo --preserve-env=HOME $BASH --rcfile ~/.bashrc'
 alias tm='tmux new -ADX'
+alias l. &>/dev/null && unalias l.
+alias which &>/dev/null && unalias which
+unset -f which
+l.()
+(
+	cd "${1:-.}"
+	ls -dF .*
+)
 e()
 {
 	open &>/dev/null "${@:-.}"
@@ -343,6 +357,18 @@ loredl()
 	url=https://lore.kernel.org/all/$msgid/t.mbox.gz
 	curl -fsSLo "$msgid.mbox.gz" "$url"
 }
+upgrade()
+{
+	sudo apt-get -qq update
+	sudo apt-get -y dist-upgrade
+	sudo apt-get -qq autoremove
+}
+if type dnf &>/dev/null; then
+	upgrade()
+	{
+		sudo dnf --refresh upgrade
+	}
+fi
 
 _load_if_readable /etc/profile.d/bash_completion.sh
 _comp_copy()
@@ -371,37 +397,8 @@ _comp_kconfig_make()
 }
 complete -F _comp_kconfig_make make
 
-_distro=$(sed -En 's/^ID=//p' /etc/os-release 2>/dev/null || true)
-if [[ $_distro == debian ]]; then
-	_pc2='${debian_chroot:+($debian_chroot)}'$_pc2
-	upgrade()
-	{
-		sudo apt-get -qq update
-		sudo apt-get -y dist-upgrade
-		sudo apt-get -qq autoremove
-	}
-	# _load_if_readable /usr/lib/git-core/git-sh-prompt
-elif [[ $_distro =~ fedora|centos|rhel ]]; then
-	upgrade()
-	{
-		sudo dnf upgrade
-	}
-	alias which &>/dev/null && unalias which
-	unset -f which
-	alias l. &>/dev/null && unalias l.
-	_load_if_readable /usr/share/git-core/contrib/completion/git-prompt.sh
-fi
-l.()
-(
-	cd "${1:-.}"
-	ls -dF .*
-)
-
 _load_if_readable ~/.localbashrc.bash
 
-if ! type __git_ps1 &>/dev/null; then
-	PROMPT_COMMAND=_pca
-fi
 if [[ -z ${_nomx:-} && -z ${TMUX:-} && -z ${SUDO_USER:-} && -z $(tmux lsc 2>/dev/null) ]]; then
 	tmux new -A
 fi
