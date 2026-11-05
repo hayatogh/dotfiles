@@ -45,7 +45,9 @@ fu! g:Slfenc()
 endfu
 let g:slbomb = ['', ' BOM']
 let g:slff = {'unix': '', 'dos': ' CRLF', 'mac': ' CR'}
-se statusline=%f%<%(\ %H%)%(\ %M%)%(\ %R%)%0{slpaste[&paste]}%=%{Slfenc()}%0{slbomb[&bomb]}%0{slff[&ff]}\ 0x%02B\ %5l,%3c-%-3v\ %P
+let g:slcstate = 0
+let g:slchar = ['', ' 0x%02B']
+se statusline=%f%<%(\ %H%)%(\ %M%)%(\ %R%)%0{slpaste[&paste]}%=%{Slfenc()}%0{slbomb[&bomb]}%0{slff[&ff]}%{%slchar[slcstate]%}\ %5l,%3c-%-3v\ %P
 se showtabline=2
 fu! s:Tablabel(tabpagenr)
 	let l:buflist = tabpagebuflist(a:tabpagenr)
@@ -574,6 +576,8 @@ fu! s:HlIdeoSpace(toggle)
 	sil! call matchadd('IdeographicSpace', '[\u3000]', 10, 5)
 endfu
 com! Togglehlideographicspace call <SID>HlIdeoSpace(1)
+
+com! Togglestatuslinecharhex let g:slcstate = !g:slcstate
 
 fu! s:CopyUnnamed()
 	if v:event.regname ==# ''
