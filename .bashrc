@@ -160,7 +160,6 @@ alias chgrp='chgrp --preserve-root'
 alias chmod='chmod --preserve-root'
 alias chown='chown --preserve-root'
 alias diff='diff --color'
-alias diffr='diff -Nurp -xtags'
 alias drive='rclone mount drive: ~/Drive --vfs-cache-mode full -vv'
 alias ee=exit
 alias fd='fd -HE.git/'
@@ -309,7 +308,7 @@ EOT
 ' -- "$*"
 }
 dl()
-{
+(
 	if (($#)); then
 		local IFS=$'\n'
 		$FUNCNAME <<<"$*"
@@ -320,7 +319,6 @@ dl()
 	for ((i--; i >= 0; i--)); do
 		kill -9 ${pids[$i]} &>/dev/null && rm -f "${files[$i]}"
 	done
-	trap - SIGINT
 	return
 	' SIGINT
 	while read -ep'URL: ' url && [[ -n $url ]]; do
@@ -334,8 +332,7 @@ dl()
 	for file in ${files[@]}; do
 		echo $file
 	done
-	trap - SIGINT
-}
+)
 _load_if_readable ~/dotfiles/rpm-commands.sh
 rm_rfchmod()
 {
@@ -373,6 +370,32 @@ loredl()
 	url=https://lore.kernel.org/all/$msgid/t.mbox.gz
 	curl -fsSLo "$msgid.mbox.gz" "$url"
 }
+diffr()
+(
+	(($# == 2)) || return 2
+	local l=$1 r=$2 d side t f
+	d=$(mktemp -d ./tags.XXXXXXXXXXXX) || return 2
+	trap '
+	for side in l r; do
+		for t in tags{,.x86,.arm64}; do
+			f=$d/${side}_$t
+			if [[ -e $f || -L $f ]]; then
+				mv -- "$f" "${!side}/$t"
+			fi
+		done
+	done
+	rmdir -- "$d"
+	' EXIT
+	for side in l r; do
+		for t in tags{,.x86,.arm64}; do
+			f=${!side}/$t
+			if [[ -e $f || -L $f ]]; then
+				mv -- "$f" "$d/${side}_$t" || return 2
+			fi
+		done
+	done
+	command diff -Nurp -- "$l" "$r"
+)
 upgrade()
 {
 	sudo apt-get -qq update
