@@ -140,6 +140,16 @@
 		if [ \"$(git rev-parse --show-toplevel)\" = ~/dotfiles ]; then \
 			git push; \
 		fi"
+	prompt-light = "!git config bash.showDirtyState false; \
+		git config bash.showUntrackedFiles false; \
+		git config bash.showUpstream ''"
+	prompt-reset = "!git config --unset bash.showDirtyState; \
+		git config --unset bash.showUntrackedFiles; \
+		git config --unset bash.showUpstream; \
+		true"
+	bigrepoconfig = "!git prompt-light; \
+		git config feature.manyFiles true; \
+		git update-index --index-version 4"
 [checkout]
 	workers = 0
 [core]
@@ -166,6 +176,10 @@
 	fixes = Fixes: %h (\"%s\")
 [pull]
 	rebase = false
+[push]
+	followTags = true
+[tag]
+	sort = version:refname
 [tar "tar.xz"]
 	command = xz -c
 [user]

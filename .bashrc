@@ -4,10 +4,16 @@ _pathadd()
 		PATH=$1:$PATH
 	fi
 }
+_load_if_readable()
+{
+	if [[ -r $1 ]]; then
+		. "$1"
+	fi
+}
 _load_if_missing()
 {
-	if [[ -r $2 && :$PATH: != *$1* ]]; then
-		. "$2"
+	if [[ :$PATH: != *$1* ]]; then
+		_load_if_readable "$2"
 	fi
 }
 _pathadd /usr/sbin
@@ -45,6 +51,7 @@ export NPM_CONFIG_USERCONFIG=~/dotfiles/npmrc
 export RLWRAP_HOME=~/.local/state/rlwrap
 export RUST_BACKTRACE=1
 export VISUAL=vi
+export XDG_CACHE_HOME=~/.cache
 export XDG_CONFIG_HOME=~/.config
 if [[ ${SUDO_USER:-} ]]; then
 	export LESSHISTFILE=~/.local/state/root_lesshst
@@ -52,12 +59,12 @@ fi
 
 [[ $- != *i* ]] && return
 
-_load_if_readable()
-{
-	if [[ -r $1 ]]; then
-		. "$1"
-	fi
-}
+if [[ -z $BASH_COMPLETION_VERSINFO ]]; then
+	_load_if_readable /etc/profile.d/bash_completion.sh
+fi
+if ! type __git_ps1 &>/dev/null; then
+	_load_if_readable /usr/share/git-core/contrib/completion/git-prompt.sh
+fi
 
 _regex_rubout()
 {
@@ -82,16 +89,31 @@ bind -x '"\e\\": _mbackslash'
 shopt -s autocd cdspell checkhash checkjobs checkwinsize dotglob execfail globstar histreedit lithist no_empty_cmd_completion nocaseglob
 
 HISTCONTROL=ignoreboth:erasedups
-HISTSIZE=2000
+HISTFILESIZE=-1
+HISTSIZE=20000
 HISTTIMEFORMAT='%c : '
 if [[ ${SUDO_USER:-} ]]; then
 	HISTFILE=~/.root_history
 fi
+_hist_func()
+{
+	local f=$1 cmd=$2
+	local pre='{ flock 9;' post="} 9>'$XDG_CACHE_HOME/.bash_history.lock';"
+	if ! type flock &>/dev/null; then
+		pre= post=
+	fi
+	eval "$f() { $pre $cmd; $post }"
+}
+_hist_func _hist_sync 'history -a && history -c && history -r'
+_hist_func _hist_exit 'history -a && history -c && history -r && history -w'
+unset -f _hist_func
+trap _hist_exit EXIT
 GIT_PS1_SHOWDIRTYSTATE=1
 GIT_PS1_SHOWSTASHSTATE=1
 GIT_PS1_SHOWUNTRACKEDFILES=1
 GIT_PS1_SHOWUPSTREAM=auto
 GIT_PS1_SHOWCONFLICTSTATE=yes
+GIT_PS1_DESCRIBE_STYLE=tag
 GIT_PS1_SHOWCOLORHINTS=1
 GIT_PS1_HIDE_IF_PWD_IGNORED=1
 GIT_PS1_SKIPDIRS=
@@ -102,7 +124,7 @@ if ((_psl == 1)); then
 	_psl=
 fi
 _nj='\j'
-_pc0='history -a; history -c; history -r; _pj=${_nj@P}; _pj=${_pj#0}'
+_pc0='_hist_sync; _pj=${_nj@P}; _pj=${_pj#0}'
 _pc1='\[\e[0m\]\n'
 _pc2='$PSM\[\e[32m\]\u@\h \[\e[33m\]\w \[\e[38;5;93m\]$_psl \[\e[38;5;166m\]$_pj\[\e[0m\]'
 _pc3=' \[\e[38;5;245m\]\t ${PIPESTATUS[@]}\[\e[0m\]\n\$ '
@@ -111,29 +133,27 @@ _pc()
 	local gitdir start took
 	eval "$_pc0"
 	gitdir=$(git rev-parse --show-toplevel 2>/dev/null)
-	if [[ $gitdir && :${GIT_PS1_SKIPDIRS:-}: == *:$gitdir:* ]]; then
+	if [[ -z $gitdir ]]; then
+		PS1=$_pc1$_pc2$_pc3
+		return
+	fi
+	if [[ :${GIT_PS1_SKIPDIRS:-}: == *:$gitdir:* ]]; then
 		PS1=$_pc1$_pc2' -'$_pc3
 		return
 	fi
 	start=$EPOCHSECONDS
+	local GIT_PS1_SHOWUPSTREAM=$GIT_PS1_SHOWUPSTREAM
 	__git_ps1 "$_pc1$_pc2" "$_pc3"
-	took=$(($EPOCHSECONDS - $start))
-	if [[ $gitdir && $took -ge $GIT_PS1_SKIPSEC ]]; then
+	took=$((EPOCHSECONDS - start))
+	if [[ $took -ge $GIT_PS1_SKIPSEC ]]; then
 		echo "Git prompt took $took >=GIT_PS1_SKIPSEC.  Added to GIT_PS1_SKIPDIRS."
 		GIT_PS1_SKIPDIRS=${GIT_PS1_SKIPDIRS:+$GIT_PS1_SKIPDIRS:}$gitdir
 	fi
 }
-_pca()
-{
-	eval "$_pc0"
-	PS1=$_pc1$_pc2$_pc3
-}
 PROMPT_COMMAND=_pc
 if ! type __git_ps1 &>/dev/null; then
-	_load_if_readable /usr/share/git-core/contrib/completion/git-prompt.sh
-fi
-if ! type __git_ps1 &>/dev/null; then
-	PROMPT_COMMAND=_pca
+	_pc0=$_pc0'; return'
+	PS1=$_pc1$_pc2$_pc3
 fi
 
 alias chgrp='chgrp --preserve-root'
@@ -212,10 +232,6 @@ mktags()
 realwhich()
 {
 	realpath "$(which "$1")"
-}
-fix_history()
-{
-	sed -ni '/^#/,$p' $HISTFILE
 }
 fixmod()
 {
@@ -346,7 +362,7 @@ timesp()
 				exp_sec="$exp_sec$(systemd-analyze --user timespan -- "$tok" | sed -En '/μs/s/(.*: |000000$)//gp') "
 			fi
 		done
-		systemd-analyze --user timespan -- $(($exp_sec)) | sed -En '/Original|Human/s/.*: //p'
+		systemd-analyze --user timespan -- $((exp_sec)) | sed -En '/Original|Human/s/.*: //p'
 	done
 }
 loredl()
@@ -370,7 +386,6 @@ if type dnf &>/dev/null; then
 	}
 fi
 
-_load_if_readable /etc/profile.d/bash_completion.sh
 _comp_copy()
 {
 	local srccmd=$1 destcmd=$2 spec

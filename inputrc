@@ -6,18 +6,18 @@ set blink-matching-paren on
 set colored-completion-prefix on
 set colored-stats on
 set completion-ignore-case on
-set completion-map-case on
 set convert-meta off
 set editing-mode emacs
 set history-size 500
 set input-meta on
 set keyseq-timeout 500
-set mark-modified-lines off
 set mark-symlinked-directories on
 set menu-complete-display-prefix on
 set output-meta on
+set revert-all-at-newline on
 set show-all-if-ambiguous on
 set show-all-if-unmodified on
+set skip-completed-text on
 set visible-stats on
 
 "\C-d": vi-eof-maybe
