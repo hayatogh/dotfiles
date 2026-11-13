@@ -118,7 +118,6 @@ GIT_PS1_SHOWCOLORHINTS=1
 GIT_PS1_HIDE_IF_PWD_IGNORED=1
 GIT_PS1_SKIPDIRS=
 GIT_PS1_SKIPSEC=3
-: ${PSM:=}
 _psl=$((SHLVL ${TMUX:+- 1}))
 if ((_psl == 1)); then
 	_psl=
@@ -126,7 +125,7 @@ fi
 _nj='\j'
 _pc0='_hist_sync; _pj=${_nj@P}; _pj=${_pj#0}'
 _pc1='\[\e[0m\]\n'
-_pc2='$PSM\[\e[32m\]\u@\h \[\e[33m\]\w \[\e[38;5;93m\]$_psl \[\e[38;5;166m\]$_pj\[\e[0m\]'
+_pc2='\[\e[32m\]\u@\h \[\e[33m\]\w \[\e[38;5;93m\]$_psl \[\e[38;5;166m\]$_pj\[\e[0m\]'
 _pc3=' \[\e[38;5;245m\]\t ${PIPESTATUS[@]}\[\e[0m\]\n\$ '
 _pc()
 {
