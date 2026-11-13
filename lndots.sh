@@ -21,7 +21,7 @@ chmod 700 ~/.config/vim/swap
 userdirs=~/.config/user-dirs.dirs
 rmdir_name()
 {
-	declare -n dir=$1
+	local -n dir=$1
 	if [[ ! -d $dir || $dir == $HOME/ ]]; then
 		return
 	fi
@@ -29,7 +29,7 @@ rmdir_name()
 }
 mkdir_name()
 {
-	declare -n dir=$1
+	local -n dir=$1
 	if [[ -z $dir || -e $dir ]]; then
 		return
 	fi
