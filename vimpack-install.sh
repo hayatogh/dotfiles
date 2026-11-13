@@ -1,11 +1,15 @@
 #!/bin/bash
+set -m
 shopt -s nullglob
 export GIT_TERMINAL_PROMPT=0
 export GIT_HTTP_LOW_SPEED_LIMIT=1000
 export GIT_HTTP_LOW_SPEED_TIME=30
+export GIT_SSH_COMMAND='ssh -o BatchMode=yes' # In case of Git config insteadOf set
 
 dest=~/.config/vim/pack/remote/start
 njobs=4
+limit=20
+tries=3
 plugs=(
 	"gh:tpope/vim-commentary"
 	"gh:tpope/vim-eunuch"
@@ -37,6 +41,18 @@ to_dir()
 	echo "$dest/${1##*/}"
 }
 
+retry()
+{
+	local n rc
+	for ((n = 1; n <= tries; n++)); do
+		timeout "$limit" "$@" &>/dev/null </dev/null && return 0
+		rc=$?
+		echo >&2 " Retry($rc) $plug"
+		sleep "$((1 + RANDOM % 3))"
+	done
+	return "$rc"
+}
+
 update()
 {
 	local plug=$1 url dir ret
@@ -44,13 +60,13 @@ update()
 
 	if [[ -d "$dir" ]]; then
 		echo >&2 "Fetch $plug"
-		git -C "$dir" fetch --depth 1 &>/dev/null </dev/null \
+		retry git -C "$dir" fetch --depth 1 \
 			&& git -C "$dir" reset --hard FETCH_HEAD &>/dev/null </dev/null
 		ret=$?
 	else
 		echo >&2 "Clone $plug"
 		url=$(to_url "$plug")
-		git clone --depth 1 -- "$url" "$dir" &>/dev/null </dev/null
+		retry git clone --depth 1 -- "$url" "$dir"
 		ret=$?
 	fi
 	if (($ret)); then
@@ -64,7 +80,8 @@ update_all()
 	local i
 	for i in "${!plugs[@]}"; do
 		(( i >= njobs )) && wait -n
-		update "${plugs[i]}" &
+		(( i > 0 && i < njobs )) && sleep 0.5
+		update "${plugs[i]}" </dev/null &
 	done
 	wait
 }

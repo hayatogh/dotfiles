@@ -1,0 +1,18 @@
+#!/bin/bash
+set -euo pipefail
+
+if [[ -f Kbuild ]]; then
+	arch=x86
+	if [[ ${1:-} =~ arm ]]; then
+		arch=arm64
+	fi
+	if [[ -e tags ]]; then
+		mv tags tags~
+	fi
+	make SRCARCH=$arch tags &>/dev/null
+	mv tags tags.$arch
+	ln -s tags.$arch tags
+	rm -f tags~
+else
+	ctags "${@:--R}" &>/dev/null
+fi

@@ -1,0 +1,34 @@
+#!/bin/bash
+set -euo pipefail
+
+move_tags()
+{
+	local action=${1:-} side t src dest tmp
+	for side in l r; do
+		for t in tags{,.x86,.arm64}; do
+			src=${!side}/$t
+			dest=$d/${side}_$t
+			if [[ $action == undo ]]; then
+				tmp=$src
+				src=$dest
+				dest=$tmp
+			fi
+			if [[ -e $src || -L $src ]]; then
+				mv -- "$src" "$dest" || exit 3
+			fi
+		done
+	done
+}
+
+(($# == 2)) || exit 3
+l=$1 r=$2
+d=$(mktemp -d ./tags.XXXXXXXXXXXX) || exit 3
+
+trap '
+move_tags undo
+rmdir -- "$d"
+' EXIT
+
+move_tags
+
+diff -Nurp -- "$l" "$r"

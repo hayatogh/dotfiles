@@ -1,0 +1,45 @@
+#!/bin/bash
+set -euo pipefail
+
+# 1y == 365d 6h
+# 1month == 30d 10h 30m
+span_to_sec()
+{
+	local lines line us
+	mapfile -t lines < <(systemd-analyze --user timespan -- "$1")
+	line=${lines[1]}
+	us=${line#*: }
+	printf '%d.%06d\n' "$((us / 1000000))" "$((us % 1000000))"
+}
+span_to_human()
+{
+	local lines line
+	mapfile -t lines < <(systemd-analyze --user timespan -- "$1")
+	line=${lines[2]}
+	echo "${line#*: }"
+}
+span_calc()
+{
+	local rest=$1 tok exp_sec= sec
+	while [[ $rest ]]; do
+		[[ $rest =~ ([^-+*/]+|[-+*/] *) ]]
+		tok=${BASH_REMATCH[0]}
+		rest=${rest:${#BASH_REMATCH[0]}}
+		if [[ $tok =~ [-+*/] ]]; then
+			exp_sec="$exp_sec$tok "
+		else
+			exp_sec="$exp_sec$(span_to_sec "$tok") "
+		fi
+	done
+	sec=$(bc <<<$exp_sec)
+	echo "$sec"
+	span_to_human "$sec"
+}
+
+if (($#)); then
+	span_calc "$*"
+else
+	while read -e line && [[ -n $line ]]; do
+		span_calc "$line"
+	done
+fi

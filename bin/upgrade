@@ -1,0 +1,16 @@
+#!/bin/bash
+
+_upgrade()
+{
+	sudo apt-get -qq update
+	sudo apt-get -y dist-upgrade
+	sudo apt-get -qq autoremove
+}
+if type dnf &>/dev/null; then
+	_upgrade()
+	{
+		sudo dnf --refresh upgrade
+	}
+fi
+
+_upgrade

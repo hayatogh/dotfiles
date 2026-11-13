@@ -1,0 +1,10 @@
+#!/bin/bash
+set -euo pipefail
+
+date_to_epoch()
+{
+	date -d "$1" +%s
+}
+
+(($# == 2)) || exit 3
+timespan "$(date_to_epoch "$2")" - "$(date_to_epoch "$1")"
