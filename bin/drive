@@ -1,0 +1,2 @@
+#!/bin/bash
+exec rclone mount drive: ~/Drive --vfs-cache-mode full -vv

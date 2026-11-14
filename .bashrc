@@ -154,12 +154,9 @@ alias chgrp='chgrp --preserve-root'
 alias chmod='chmod --preserve-root'
 alias chown='chown --preserve-root'
 alias diff='diff --color'
-alias drive='rclone mount drive: ~/Drive --vfs-cache-mode full -vv'
-alias ee=exit
 alias fd='fd -HE.git/'
 alias fdall='fd -I'
 alias grep='grep --color'
-alias info='info --init-file ~/dotfiles/infokey'
 alias ls='ls --color=auto'
 alias la='ls -A'
 alias ll='ls -alhF'
@@ -198,32 +195,6 @@ tryssh()
 	done
 	ssh $1
 }
-dl()
-(
-	if (($#)); then
-		local IFS=$'\n'
-		$FUNCNAME <<<"$*"
-		return
-	fi
-	local url file pids files i=0
-	trap '
-	for ((i--; i >= 0; i--)); do
-		kill -9 ${pids[$i]} &>/dev/null && rm -f "${files[$i]}"
-	done
-	return
-	' SIGINT
-	while read -ep'URL: ' url && [[ -n $url ]]; do
-		file=$(sed -E 's:(\?|#).*::; s:.*/::' <<<"$url") || continue
-		eval curl -fsSLo \'$file\' \'$url\' '&'
-		pids+=($!)
-		files+=("$file")
-		i=$((i + 1))
-	done
-	wait ${pids[@]}
-	for file in ${files[@]}; do
-		echo $file
-	done
-)
 _load_if_readable ~/dotfiles/rpm-commands.sh
 
 _comp_copy()

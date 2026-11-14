@@ -1,16 +1,12 @@
 #!/bin/bash
+set -euo pipefail
 
-_upgrade()
-{
+if command -v apt-get &>/dev/null; then
 	sudo apt-get -qq update
 	sudo apt-get -y dist-upgrade
 	sudo apt-get -qq autoremove
-}
-if type dnf &>/dev/null; then
-	_upgrade()
-	{
-		sudo dnf --refresh upgrade
-	}
+elif command -v dnf &>/dev/null; then
+	sudo dnf --refresh upgrade
+else
+	exit 1
 fi
-
-_upgrade
